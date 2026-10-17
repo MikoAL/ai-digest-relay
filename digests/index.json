@@ -1,5 +1,14 @@
 {
   "schema_version": 1,
-  "updated_at": null,
-  "digests": []
+  "updated_at": "2026-10-17T17:24:14+08:00",
+  "digests": [
+    {
+      "date": "2026-10-17",
+      "item_count": 11,
+      "on_focus_count": 10,
+      "top_headline": "Virtual Head Attention: foldable query premix + output postmix lets a GQA-2 model beat GQA-4 and MLA with a smaller KV cache",
+      "json": "digests/2026-10-17.json",
+      "md": "digests/2026-10-17.md"
+    }
+  ]
 }
