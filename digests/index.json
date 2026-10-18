@@ -1,7 +1,15 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-10-17T17:24:14+08:00",
+  "updated_at": "2026-10-18T09:45:00+08:00",
   "digests": [
+    {
+      "date": "2026-10-18",
+      "item_count": 9,
+      "on_focus_count": 8,
+      "top_headline": "Microsoft AI details MAI-Base-2: 2.8T-total/80B-active MoE base model, 50T tokens on 16k GB200s, Muon optimizer",
+      "json": "digests/2026-10-18.json",
+      "md": "digests/2026-10-18.md"
+    },
     {
       "date": "2026-10-17",
       "item_count": 11,
