@@ -1,7 +1,15 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-10-18T09:45:00+08:00",
+  "updated_at": "2026-10-19T09:50:45+08:00",
   "digests": [
+    {
+      "date": "2026-10-19",
+      "item_count": 9,
+      "on_focus_count": 8,
+      "top_headline": "Frozen short-context speculative drafters keep their speedup out to 2M tokens using a capped drafter KV cache and RoPE index remapping",
+      "json": "digests/2026-10-19.json",
+      "md": "digests/2026-10-19.md"
+    },
     {
       "date": "2026-10-18",
       "item_count": 9,
