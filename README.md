@@ -87,4 +87,15 @@ Both exit non-zero with an `INVALID:` message on any contract violation. Nothing
 
 ## Website (reader)
 
-To be built in this repo. It should read `digests/index.json` and the per-day JSON files and must not modify anything under `digests/` or `scripts/`.
+`index.html` at the repo root, served by GitHub Pages from `main` at <https://mikoal.github.io/ai-digest-relay/>. One file, no dependencies, no build step. It reads `digests/index.json` and the per-day JSON files and never modifies anything under `digests/` or `scripts/`, so a new digest shows up on the next page load.
+
+- `#YYYY-MM-DD` selects a day; no hash shows the newest one.
+- Read/favorite marks and the theme live in the viewer's localStorage.
+- `.nojekyll` makes Pages serve files as-is.
+- Spec: `docs/superpowers/specs/2026-10-19-website-design.md`.
+
+Preview locally (fetch does not work from `file://`):
+
+```sh
+python3 -m http.server   # then open http://localhost:8000/
+```

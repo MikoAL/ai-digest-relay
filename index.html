@@ -1,0 +1,833 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI 研究日報</title>
+<meta name="description" content="每日 AI 研究摘要：模型架構與訓練／推論效率。">
+<style>
+:root {
+  --bg: #ffffff;
+  --bg-subtle: #f8f9fa;
+  --bg-ui: #eaecf0;
+  --text: #202122;
+  --text-subtle: #54595d;
+  --text-read: #72777d;
+  --border: #a2a9b1;
+  --border-subtle: #c8ccd1;
+  --link: #3366cc;
+  --link-visited: #6b4ba1;
+  --notice: #3366cc;
+  --warn: #edab00;
+  --error: #d73333;
+  --mark: #fde29b;
+  --serif: 'Linux Libertine', 'Georgia', 'Times', 'Noto Serif TC', 'Noto Serif CJK TC', 'Source Han Serif TC', 'PMingLiU', serif;
+  --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans TC', 'Noto Sans CJK TC', 'Microsoft JhengHei', sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #101418;
+    --bg-subtle: #202122;
+    --bg-ui: #27292d;
+    --text: #eaecf0;
+    --text-subtle: #a2a9b1;
+    --text-read: #8b9097;
+    --border: #72777d;
+    --border-subtle: #404244;
+    --link: #88a3e8;
+    --link-visited: #a799cd;
+    --notice: #88a3e8;
+    --warn: #c99200;
+    --error: #fd7865;
+    --mark: #5a4500;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #101418;
+  --bg-subtle: #202122;
+  --bg-ui: #27292d;
+  --text: #eaecf0;
+  --text-subtle: #a2a9b1;
+  --text-read: #8b9097;
+  --border: #72777d;
+  --border-subtle: #404244;
+  --link: #88a3e8;
+  --link-visited: #a799cd;
+  --notice: #88a3e8;
+  --warn: #c99200;
+  --error: #fd7865;
+  --mark: #5a4500;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.6;
+}
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+a:visited { color: var(--link-visited); }
+button { font: inherit; color: inherit; }
+.linkbtn {
+  background: none; border: 0; padding: 0; margin: 0;
+  color: var(--link); cursor: pointer;
+}
+.linkbtn:hover { text-decoration: underline; }
+.linkbtn:disabled { color: var(--text-subtle); cursor: default; text-decoration: none; }
+mark { background: var(--mark); color: inherit; padding: 0 1px; }
+:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+
+/* ── 頁首 ── */
+.header {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px 24px;
+  flex-wrap: wrap;
+}
+.brand { display: flex; align-items: center; gap: 10px; color: var(--text); }
+.brand:hover { text-decoration: none; }
+.brand:visited { color: var(--text); }
+.brand svg { flex: none; }
+.wordmark { font-family: var(--serif); font-size: 1.4rem; line-height: 1.1; letter-spacing: .02em; }
+.tagline { font-size: .75rem; color: var(--text-subtle); line-height: 1.3; }
+.search {
+  flex: 1 1 260px;
+  max-width: 480px;
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  background: var(--bg);
+}
+.search:focus-within { border-color: var(--link); box-shadow: inset 0 0 0 1px var(--link); }
+.search svg { flex: none; margin: 0 6px 0 8px; align-self: center; color: var(--text-subtle); }
+.search input {
+  flex: 1; min-width: 0;
+  border: 0; outline: 0; background: transparent; color: var(--text);
+  font: inherit; font-size: .95rem; padding: 6px 8px 6px 0;
+}
+.theme-btn {
+  margin-left: auto;
+  border: 1px solid var(--border);
+  background: var(--bg-subtle);
+  border-radius: 2px;
+  padding: 5px 10px;
+  font-size: .85rem;
+  cursor: pointer;
+}
+.theme-btn:hover { background: var(--bg-ui); }
+
+/* ── 版面 ── */
+.page {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: 168px minmax(0, 1fr);
+  gap: 32px;
+}
+.sidebar { font-size: .875rem; padding-top: 8px; }
+.sidebar h2 {
+  font-family: var(--sans);
+  font-size: .75rem;
+  font-weight: 600;
+  color: var(--text-subtle);
+  margin: 0 0 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.sidebar ul { list-style: none; margin: 0 0 20px; padding: 0; }
+.sidebar li { padding: 3px 0; }
+.sidebar .current { font-weight: 700; }
+.sidebar .count { color: var(--text-subtle); font-size: .8em; }
+.mobile-date { display: none; margin: 8px 0 4px; }
+.mobile-date select {
+  width: 100%;
+  font: inherit; color: var(--text); background: var(--bg);
+  border: 1px solid var(--border); border-radius: 2px; padding: 6px;
+}
+
+/* ── 條目 ── */
+.content { min-width: 0; padding-bottom: 32px; }
+.tabs {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: .875rem;
+}
+.tabs > div { display: flex; gap: 16px; }
+.tabs a, .tabs span { display: inline-block; padding: 6px 0; }
+.tabs .selected { color: var(--text); border-bottom: 2px solid var(--text); margin-bottom: -1px; }
+h1.title {
+  font-family: var(--serif);
+  font-weight: normal;
+  font-size: 1.9rem;
+  line-height: 1.3;
+  margin: 16px 0 4px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+}
+.status {
+  font-family: var(--sans);
+  font-size: .8rem;
+  vertical-align: middle;
+  margin-left: 10px;
+  padding: 1px 8px;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  color: var(--text-subtle);
+  background: var(--bg-subtle);
+}
+.status.today { color: var(--bg); background: var(--notice); border-color: var(--notice); }
+.site-sub { font-size: .8rem; color: var(--text-subtle); margin: 0 0 12px; }
+.daynav { font-size: .875rem; margin: 0 0 16px; display: flex; gap: 6px; flex-wrap: wrap; }
+
+.ambox {
+  border: 1px solid var(--border);
+  border-left: 10px solid var(--notice);
+  background: var(--bg-subtle);
+  padding: 8px 12px;
+  margin: 0 0 16px;
+  font-size: .9rem;
+}
+.content .ambox, .toolbar { overflow: hidden; }
+.ambox.warn { border-left-color: var(--warn); }
+.ambox.error { border-left-color: var(--error); }
+.ambox p { margin: 0; }
+.ambox .clamp { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.ambox .more { margin-top: 4px; font-size: .85rem; }
+.ambox code { font-size: .85em; background: var(--bg-ui); padding: 1px 4px; }
+
+/* 資訊框 */
+.side-boxes { float: right; clear: right; width: 290px; margin: 0 0 16px 24px; }
+.infobox, .filterbox {
+  border: 1px solid var(--border);
+  background: var(--bg-subtle);
+  font-size: .85rem;
+  line-height: 1.45;
+  padding: 4px;
+  margin-bottom: 12px;
+}
+.infobox table { width: 100%; border-collapse: collapse; }
+.infobox caption, .box-title {
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  font-weight: bold;
+  padding: 6px 4px;
+  text-align: center;
+}
+.infobox .band th {
+  background: var(--bg-ui);
+  text-align: center;
+  padding: 3px;
+}
+.infobox th, .infobox td { padding: 3px 6px; vertical-align: top; text-align: left; }
+.infobox th { width: 45%; font-weight: 600; }
+.filterbox fieldset { border: 0; margin: 0; padding: 4px 6px 8px; }
+.filterbox legend { font-weight: 600; padding: 0; margin-bottom: 2px; }
+.filterbox label { display: flex; align-items: center; gap: 6px; padding: 1px 0; cursor: pointer; }
+.filterbox label .n { color: var(--text-subtle); margin-left: auto; }
+.filterbox input { margin: 0; accent-color: var(--link); }
+.filterbox .clear { padding: 2px 6px 6px; text-align: right; }
+
+/* 目錄 */
+.toolbar { font-size: .875rem; margin: 0 0 12px; color: var(--text-subtle); }
+.toolbar .sep { margin: 0 6px; }
+.toc {
+  display: table;
+  max-width: 100%;
+  border: 1px solid var(--border);
+  background: var(--bg-subtle);
+  padding: 8px 12px;
+  font-size: .875rem;
+  margin: 0 0 20px;
+}
+.toc-title { text-align: center; font-weight: 700; margin-bottom: 4px; }
+.toc-title .linkbtn { font-weight: normal; font-size: .85rem; margin-left: 6px; }
+.toc ol { margin: 0; padding: 0; list-style: none; counter-reset: toc; }
+.toc li { counter-increment: toc; padding: 2px 0; display: flex; gap: 8px; }
+.toc li::before { content: counter(toc); color: var(--text); min-width: 1.2em; }
+.toc li.read .linkbtn { color: var(--link-visited); }
+.toc .linkbtn { text-align: left; }
+
+/* 章節 */
+.item { margin: 0 0 8px; }
+.item-h {
+  font-family: var(--serif);
+  font-weight: normal;
+  font-size: 1.35rem;
+  line-height: 1.35;
+  margin: 18px 0 4px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+}
+.toggle {
+  background: none; border: 0; padding: 0; margin: 0;
+  font: inherit; text-align: left; cursor: pointer; color: var(--text);
+  display: inline;
+}
+.toggle:hover .hl { text-decoration: underline; text-decoration-thickness: 1px; }
+.caret {
+  display: inline-block; width: .8em; margin-right: .25em;
+  font-family: var(--sans); font-size: .7em; color: var(--text-subtle);
+  transition: transform .15s;
+}
+.item.open .caret { transform: rotate(90deg); }
+.item.read .hl { color: var(--text-read); }
+.editlinks {
+  font-family: var(--sans);
+  font-size: .8rem;
+  color: var(--text-subtle);
+  white-space: nowrap;
+  margin-left: 8px;
+}
+.editlinks .linkbtn[aria-pressed="true"] { font-weight: 600; }
+.meta { font-size: .8rem; color: var(--text-subtle); display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; }
+.tag {
+  display: inline-block;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-subtle);
+  padding: 0 6px;
+  border-radius: 2px;
+  line-height: 1.6;
+}
+.tag.focus { border-color: var(--notice); color: var(--notice); }
+.body { padding: 4px 0 8px; }
+.body h3 {
+  font-family: var(--sans);
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 14px 0 2px;
+}
+.body p { margin: 0 0 8px; }
+.body .orig-title { font-style: italic; color: var(--text-subtle); margin-top: 8px; }
+.body dl { display: grid; grid-template-columns: max-content 1fr; gap: 2px 12px; font-size: .9rem; margin: 12px 0 0; }
+.body dt { font-weight: 600; color: var(--text-subtle); }
+.body dd { margin: 0; overflow-wrap: anywhere; }
+.empty { color: var(--text-subtle); font-style: italic; }
+
+/* ── 頁尾 ── */
+.footer {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 16px 24px 32px;
+  font-size: .8rem;
+  color: var(--text-subtle);
+}
+.footer-inner { border-top: 1px solid var(--border-subtle); padding-top: 12px; margin-left: 200px; }
+.footer p { margin: 0 0 6px; }
+
+@media (max-width: 799px) {
+  .header { padding: 10px 16px; }
+  .theme-btn { margin-left: 0; }
+  .search { order: 3; flex-basis: 100%; max-width: none; }
+  .page { display: block; padding: 0 16px; }
+  .sidebar { display: none; }
+  .mobile-date { display: block; }
+  .side-boxes { float: none; width: auto; margin: 0 0 16px; }
+  .footer { padding: 16px; }
+  .footer-inner { margin-left: 0; }
+  h1.title { font-size: 1.6rem; }
+  .item-h { font-size: 1.2rem; }
+  .editlinks { display: block; margin: 4px 0 0; white-space: normal; }
+  .toc { display: block; }
+}
+</style>
+</head>
+<body>
+<header class="header">
+  <a class="brand" href="./" aria-label="AI 研究日報 首頁">
+    <svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3">
+      <circle cx="22" cy="22" r="19"/>
+      <ellipse cx="22" cy="22" rx="8" ry="19"/>
+      <path d="M3 22h38M6 12h32M6 32h32"/>
+      <rect x="10" y="15" width="24" height="15" rx="2" stroke="none" style="fill: var(--bg)"/>
+      <text x="22" y="27" text-anchor="middle" font-family="Georgia, serif" font-size="14" stroke="none" fill="currentColor" font-weight="bold">AI</text>
+    </svg>
+    <span>
+      <span class="wordmark">AI 研究日報</span><br>
+      <span class="tagline">自由的每日 AI 研究文摘</span>
+    </span>
+  </a>
+  <label class="search">
+    <svg width="16" height="16" viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8.5" cy="8.5" r="6"/><path d="M13 13l5 5"/></svg>
+    <input id="q" type="search" placeholder="搜尋本日摘要" aria-label="搜尋本日摘要" autocomplete="off">
+  </label>
+  <button id="theme" class="theme-btn" type="button">外觀：自動</button>
+</header>
+
+<div class="page">
+  <nav class="sidebar" aria-label="日期">
+    <h2>日期</h2>
+    <ul id="dates"></ul>
+    <h2>關於</h2>
+    <ul>
+      <li><a href="https://github.com/MikoAL/ai-digest-relay">GitHub 原始碼</a></li>
+      <li><a href="digests/index.json">資料索引（JSON）</a></li>
+    </ul>
+  </nav>
+  <main class="content">
+    <div class="mobile-date"><select id="date-select" aria-label="選擇日期"></select></div>
+    <article id="article"></article>
+  </main>
+</div>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <p id="updated"></p>
+    <p>摘要由排程中的 Claude 於每日 09:20（台北時間）產生，聚焦模型架構與訓練／推論效率。本站只讀取 <code>digests/</code> 內的資料。</p>
+    <p><a href="https://github.com/MikoAL/ai-digest-relay">GitHub</a> · 內容以原文為準，請點擊各則的「原文」連結查證。</p>
+  </div>
+</footer>
+
+<script>
+'use strict';
+
+const KINDS = ['paper', 'news', 'release'];
+const CATS = ['architecture', 'efficiency', 'scaling', 'training', 'inference', 'other'];
+const WEEKDAYS = '日一二三四五六';
+const THEMES = { auto: '自動', light: '淺色', dark: '深色' };
+
+// ── 小工具 ──
+function h(tag, props = {}, ...kids) {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(props)) {
+    if (v == null || v === false) continue;
+    if (k === 'class') n.className = v;
+    else if (k === 'text') n.textContent = v;
+    else if (k.startsWith('on')) n.addEventListener(k.slice(2), v);
+    else n.setAttribute(k, v === true ? '' : v);
+  }
+  for (const c of kids.flat()) if (c != null && c !== false) n.append(c);
+  return n;
+}
+
+// localStorage 可能被封鎖；退回只在本次瀏覽有效的記憶體版本
+const mem = new Map();
+const store = {
+  get(k) {
+    try { const v = localStorage.getItem(k); if (v !== null) return v; } catch {}
+    return mem.has(k) ? mem.get(k) : null;
+  },
+  set(k, v) {
+    if (v === null) mem.delete(k); else mem.set(k, v);
+    try { v === null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch {}
+  },
+};
+const readKey = (date, id) => `aidr:read:${date}/${id}`;
+const favKey = (date, id) => `aidr:fav:${date}/${id}`;
+const isRead = (date, id) => store.get(readKey(date, id)) === '1';
+const isFav = (date, id) => store.get(favKey(date, id)) === '1';
+
+function todayTaipei() {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Taipei', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+}
+function parseDate(s) {
+  const [y, m, d] = s.split('-').map(Number);
+  return { y, m, d, wd: WEEKDAYS[new Date(Date.UTC(y, m - 1, d)).getUTCDay()] };
+}
+const longDate = s => { const p = parseDate(s); return `${p.y}年${p.m}月${p.d}日`; };
+const shortDate = s => { const p = parseDate(s); return `${p.m}月${p.d}日（${p.wd}）`; };
+function fmtTime(iso) {
+  const t = new Date(iso);
+  if (isNaN(t)) return iso;
+  return new Intl.DateTimeFormat('zh-TW', { timeZone: 'Asia/Taipei', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false }).format(t);
+}
+
+async function fetchJSON(path) {
+  const r = await fetch(path, { cache: 'no-cache' });
+  if (!r.ok) throw new Error(`${path}：HTTP ${r.status}`);
+  return r.json();
+}
+const digestCache = new Map();
+async function loadDigest(entry) {
+  if (!digestCache.has(entry.date)) digestCache.set(entry.date, await fetchJSON(entry.json || `digests/${entry.date}.json`));
+  return digestCache.get(entry.date);
+}
+
+// ── 狀態 ──
+const state = {
+  index: null,
+  date: null,
+  digest: null,
+  loading: false,
+  error: null,
+  notice: '',
+  query: '',
+  noKinds: new Set(),   // 被取消勾選的類型
+  noCats: new Set(),    // 被取消勾選的分類
+  onFocus: false,
+  favOnly: false,
+  hideRead: false,
+  recs: [],             // 目前這一天每則的 DOM 參照
+};
+
+function tokens() {
+  return state.query.toLowerCase().split(/\s+/).filter(Boolean);
+}
+function haystack(it) {
+  return [it.title, it.headline, it.summary, it.result, it.critique, (it.authors || []).join(' '), it.source, it.arxiv_id]
+    .filter(Boolean).join('\n').toLowerCase();
+}
+function matches(it, toks) {
+  if (state.noKinds.has(it.kind) || state.noCats.has(it.category)) return false;
+  if (state.onFocus && !it.on_focus) return false;
+  if (state.favOnly && !isFav(state.date, it.id)) return false;
+  if (state.hideRead && isRead(state.date, it.id)) return false;
+  if (toks.length) { const s = haystack(it); return toks.every(t => s.includes(t)); }
+  return true;
+}
+function filtersActive() {
+  return state.query.trim() !== '' || state.noKinds.size > 0 || state.noCats.size > 0 || state.onFocus || state.favOnly || state.hideRead;
+}
+
+// 以文字節點與 <mark> 重建內容，不經過 innerHTML
+function highlight(el, text, toks) {
+  el.textContent = '';
+  if (!toks.length) { el.textContent = text; return; }
+  const re = new RegExp(toks.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'), 'gi');
+  let last = 0;
+  for (const m of text.matchAll(re)) {
+    if (m.index > last) el.append(text.slice(last, m.index));
+    el.append(h('mark', { text: m[0] }));
+    last = m.index + m[0].length;
+  }
+  if (last < text.length) el.append(text.slice(last));
+}
+
+// ── 主題 ──
+function applyTheme() {
+  const t = THEMES[store.get('aidr:theme')] ? store.get('aidr:theme') : 'auto';
+  if (t === 'auto') delete document.documentElement.dataset.theme;
+  else document.documentElement.dataset.theme = t;
+  document.getElementById('theme').textContent = `外觀：${THEMES[t]}`;
+  return t;
+}
+document.getElementById('theme').addEventListener('click', () => {
+  const order = Object.keys(THEMES);
+  const cur = applyTheme();
+  store.set('aidr:theme', order[(order.indexOf(cur) + 1) % order.length]);
+  applyTheme();
+});
+
+// ── 路由 ──
+async function boot() {
+  state.error = null;
+  state.loading = true;
+  renderDay();
+  try {
+    state.index = await fetchJSON('digests/index.json');
+  } catch (e) {
+    state.loading = false;
+    state.error = e;
+    renderDay();
+    return;
+  }
+  route();
+}
+
+async function route() {
+  const dates = state.index.digests.map(d => d.date);
+  const want = decodeURIComponent(location.hash.slice(1));
+  state.notice = '';
+  if (!dates.length) { state.date = null; state.digest = null; state.loading = false; renderDay(); return; }
+  let date = dates[0];
+  if (want && dates.includes(want)) date = want;
+  else if (want) state.notice = `找不到 #${want} 的摘要，已顯示最新一天。`;
+  state.date = date;
+  state.digest = null;
+  state.error = null;
+  state.loading = true;
+  renderDay();
+  try {
+    const d = await loadDigest(state.index.digests[dates.indexOf(date)]);
+    if (state.date !== date) return;  // 讀取期間使用者已切換到別天
+    state.digest = d;
+  } catch (e) {
+    if (state.date !== date) return;
+    state.error = e;
+  }
+  state.loading = false;
+  renderDay();
+}
+window.addEventListener('hashchange', () => { if (state.index) route(); });
+
+// ── 畫面 ──
+function renderNav() {
+  const entries = state.index ? state.index.digests : [];
+  const ul = document.getElementById('dates');
+  ul.replaceChildren(...entries.map(e => h('li', {},
+    e.date === state.date
+      ? h('span', { class: 'current', 'aria-current': 'page' }, shortDate(e.date))
+      : h('a', { href: `#${e.date}` }, shortDate(e.date)),
+    ' ', h('span', { class: 'count', text: `（${e.item_count}）` }))));
+  const sel = document.getElementById('date-select');
+  sel.replaceChildren(...entries.map(e => h('option', { value: e.date, selected: e.date === state.date }, `${shortDate(e.date)}・${e.item_count} 則`)));
+  sel.value = state.date || '';
+  const up = document.getElementById('updated');
+  up.textContent = state.index && state.index.updated_at ? `本頁資料最後更新於 ${fmtTime(state.index.updated_at)}（台北時間）。` : '';
+}
+document.getElementById('date-select').addEventListener('change', e => { location.hash = e.target.value; });
+
+function errorBox(err) {
+  const kids = [h('p', {}, h('b', { text: '無法讀取摘要資料。' }), ' ', String(err && err.message || err))];
+  if (location.protocol === 'file:') {
+    kids.push(h('p', {}, '瀏覽器不允許從 file:// 讀取資料。請透過 GitHub Pages 或本機伺服器開啟，例如在 repo 目錄執行 ', h('code', { text: 'python3 -m http.server' }), '，再打開 ', h('code', { text: 'http://localhost:8000/' }), '。'));
+  }
+  kids.push(h('p', { class: 'more' }, h('button', { class: 'linkbtn', type: 'button', onclick: () => (state.index ? route() : boot()) }, '重試')));
+  return h('div', { class: 'ambox error', role: 'alert' }, kids);
+}
+
+function renderDay() {
+  renderNav();
+  const art = document.getElementById('article');
+  const dates = state.index ? state.index.digests.map(d => d.date) : [];
+  const entry = state.index && state.index.digests.find(d => d.date === state.date);
+  state.recs = [];
+  state.toolbar = null;
+
+  const tabs = h('div', { class: 'tabs' },
+    h('div', {}, h('span', { class: 'selected', text: '摘要' })),
+    h('div', {},
+      h('span', { class: 'selected', text: '閱讀' }),
+      entry && h('a', { href: entry.json, text: '原始 JSON' }),
+      entry && entry.md && h('a', { href: entry.md, text: 'Markdown' })));
+
+  if (!state.date) {
+    const title = h('h1', { class: 'title', text: 'AI 研究日報' });
+    let body;
+    if (state.error) body = errorBox(state.error);
+    else if (state.loading) body = h('p', { class: 'empty', text: '讀取中…' });
+    else body = h('div', { class: 'ambox' }, h('p', { text: '目前還沒有任何摘要。排程每天 09:20（台北時間）執行，請稍後再來。' }));
+    art.replaceChildren(tabs, title, h('p', { class: 'site-sub', text: '出自 AI 研究日報，自由的每日 AI 研究文摘' }), body);
+    return;
+  }
+
+  const i = dates.indexOf(state.date);
+  const status = state.date === todayTaipei() ? ['today', '今天'] : i === 0 ? ['', '最新'] : ['', '歷史'];
+  const title = h('h1', { class: 'title' }, longDate(state.date), h('span', { class: `status ${status[0]}`, text: status[1] }));
+  const sub = h('p', { class: 'site-sub', text: '出自 AI 研究日報，自由的每日 AI 研究文摘' });
+  const older = dates[i + 1], newer = dates[i - 1];
+  const daynav = h('nav', { class: 'daynav', 'aria-label': '前後日期' },
+    h('button', { class: 'linkbtn', type: 'button', disabled: !older, onclick: () => { location.hash = older; } }, '← 前一天'),
+    h('span', { text: '｜' }),
+    h('button', { class: 'linkbtn', type: 'button', disabled: !newer, onclick: () => { location.hash = newer; } }, '後一天 →'));
+  const head = [tabs, title, sub];
+  if (state.notice) head.push(h('div', { class: 'ambox warn', role: 'status' }, h('p', { text: state.notice })));
+  head.push(daynav);
+
+  if (state.error) { art.replaceChildren(...head, errorBox(state.error)); return; }
+  if (!state.digest) { art.replaceChildren(...head, h('p', { class: 'empty', text: '讀取中…' })); return; }
+
+  const dg = state.digest;
+  const items = dg.items || [];
+  if (dg.schema_version !== 1) head.push(h('div', { class: 'ambox warn' }, h('p', { text: '資料格式版本不同，部分內容可能無法正確顯示。' })));
+
+  art.replaceChildren(...head, renderSideBoxes(dg, items), renderNotes(dg.notes), ...renderItems(items));
+  applyFilters();
+}
+
+function renderNotes(notes) {
+  if (!notes) return null;
+  const p = h('p', { class: 'clamp', text: notes });
+  const more = h('button', { class: 'linkbtn', type: 'button', 'aria-expanded': 'false' }, '顯示全部');
+  more.addEventListener('click', () => {
+    const open = p.classList.toggle('clamp') === false;
+    more.textContent = open ? '收起' : '顯示全部';
+    more.setAttribute('aria-expanded', String(open));
+  });
+  const box = h('div', { class: 'ambox' }, h('p', {}, h('b', { text: '本日說明：' })), p, h('p', { class: 'more' }, more));
+  // 文字夠短就不需要展開鈕
+  requestAnimationFrame(() => { if (p.scrollHeight <= p.clientHeight + 1) more.parentElement.remove(); });
+  return box;
+}
+
+function countBy(items, key) {
+  const c = {};
+  for (const it of items) c[it[key]] = (c[it[key]] || 0) + 1;
+  return c;
+}
+
+function renderSideBoxes(dg, items) {
+  const kinds = countBy(items, 'kind');
+  const cats = countBy(items, 'category');
+  const onFocus = items.filter(it => it.on_focus).length;
+  const row = (k, v) => h('tr', {}, h('th', { scope: 'row', text: k }), h('td', { text: v }));
+  const presentCats = CATS.filter(c => cats[c]).concat(Object.keys(cats).filter(c => !CATS.includes(c)));
+  const infobox = h('table', {},
+    h('caption', { text: longDate(dg.date || state.date) }),
+    h('tbody', {},
+      h('tr', { class: 'band' }, h('th', { colspan: '2', text: '本日概況' })),
+      row('則數', String(items.length)),
+      row('On-focus', `${onFocus} / ${items.length}`),
+      row('類型', Object.entries(kinds).map(([k, n]) => `${k} ${n}`).join('、')),
+      h('tr', { class: 'band' }, h('th', { colspan: '2', text: '分類' })),
+      ...presentCats.map(c => row(c, String(cats[c]))),
+      h('tr', { class: 'band' }, h('th', { colspan: '2', text: '資料' })),
+      row('產生時間', dg.generated_at ? fmtTime(dg.generated_at) : '—')));
+
+  const check = (label, n, checked, onchange) => h('label', {},
+    h('input', { type: 'checkbox', checked, onchange }), label, n != null && h('span', { class: 'n', text: String(n) }));
+  const toggleIn = set => (v => e => { e.target.checked ? set.delete(v) : set.add(v); applyFilters(); });
+  const flag = key => e => { state[key] = e.target.checked; applyFilters(); };
+  const presentKinds = KINDS.filter(k => kinds[k]).concat(Object.keys(kinds).filter(k => !KINDS.includes(k)));
+  const filterbox = h('form', { class: 'filterbox', 'aria-label': '篩選', onsubmit: e => e.preventDefault() },
+    h('div', { class: 'box-title', text: '篩選' }),
+    h('fieldset', {}, h('legend', { text: '類型' }),
+      ...presentKinds.map(k => check(k, kinds[k], !state.noKinds.has(k), toggleIn(state.noKinds)(k)))),
+    h('fieldset', {}, h('legend', { text: '分類' }),
+      ...presentCats.map(c => check(c, cats[c], !state.noCats.has(c), toggleIn(state.noCats)(c)))),
+    h('fieldset', {}, h('legend', { text: '顯示' }),
+      check('只看 on-focus', null, state.onFocus, flag('onFocus')),
+      check('只看收藏', null, state.favOnly, flag('favOnly')),
+      check('隱藏已讀', null, state.hideRead, flag('hideRead'))),
+    h('div', { class: 'clear' }, h('button', { class: 'linkbtn', type: 'button', onclick: clearFilters }, '清除篩選')));
+
+  return h('div', { class: 'side-boxes' }, h('div', { class: 'infobox' }, infobox), filterbox);
+}
+
+function clearFilters() {
+  state.query = '';
+  document.getElementById('q').value = '';
+  state.noKinds.clear();
+  state.noCats.clear();
+  state.onFocus = state.favOnly = state.hideRead = false;
+  renderDay();
+}
+
+function renderItems(items) {
+  const count = h('span', {});
+  const clear = h('span', {}, h('span', { class: 'sep', text: '·' }), h('button', { class: 'linkbtn', type: 'button', onclick: clearFilters }, '清除篩選'));
+  const toolbar = h('div', { class: 'toolbar' }, count,
+    h('span', { class: 'sep', text: '·' }), h('button', { class: 'linkbtn', type: 'button', onclick: () => setAllOpen(true) }, '全部展開'),
+    h('span', { class: 'sep', text: '·' }), h('button', { class: 'linkbtn', type: 'button', onclick: () => setAllOpen(false) }, '全部收合'),
+    clear);
+
+  const tocList = h('ol', {});
+  const tocToggle = h('button', { class: 'linkbtn', type: 'button' }, '[隱藏]');
+  tocToggle.addEventListener('click', () => {
+    tocList.hidden = !tocList.hidden;
+    tocToggle.textContent = tocList.hidden ? '[顯示]' : '[隱藏]';
+  });
+  const toc = h('nav', { class: 'toc', 'aria-label': '目錄' }, h('div', { class: 'toc-title' }, '目錄', tocToggle), tocList);
+  const empty = h('p', { class: 'empty', hidden: true }, '沒有符合條件的項目。 ',
+    h('button', { class: 'linkbtn', type: 'button', onclick: clearFilters }, '清除篩選'));
+  if (!items.length) empty.textContent = '這一天沒有任何項目。';
+
+  const sections = items.map((it, n) => {
+    const rec = { it, fields: [] };
+    const field = (tag, props, text) => { const el = h(tag, props); rec.fields.push([el, text]); return el; };
+
+    const hl = field('span', { class: 'hl' }, it.headline);
+    const toggle = h('button', { class: 'toggle', type: 'button', 'aria-expanded': 'false', 'aria-controls': `body-${n}` },
+      h('span', { class: 'caret', 'aria-hidden': 'true', text: '▶' }), hl);
+    const favBtn = h('button', { class: 'linkbtn', type: 'button' });
+    const readBtn = h('button', { class: 'linkbtn', type: 'button' });
+    const edit = h('span', { class: 'editlinks' },
+      '[', h('a', { href: it.url, target: '_blank', rel: 'noopener', text: '原文' }), '] ',
+      '[', favBtn, '] ', '[', readBtn, ']');
+    const meta = h('div', { class: 'meta' },
+      h('span', { class: 'tag', text: it.kind }),
+      h('span', { class: 'tag', text: it.category }),
+      it.on_focus && h('span', { class: 'tag focus', text: 'on-focus' }),
+      h('span', { text: it.source }));
+
+    const dl = h('dl', {});
+    const dlRow = (k, v) => dl.append(h('dt', { text: k }), h('dd', {}, v));
+    if (it.authors && it.authors.length) dlRow('作者', field('span', {}, it.authors.join('、')));
+    if (it.arxiv_id) dlRow('arXiv', h('a', { href: `https://arxiv.org/abs/${it.arxiv_id}`, target: '_blank', rel: 'noopener', text: it.arxiv_id }));
+    dlRow('來源', field('span', {}, it.source));
+    dlRow('原文', h('a', { href: it.url, target: '_blank', rel: 'noopener', text: it.url }));
+
+    const body = h('div', { class: 'body', id: `body-${n}`, hidden: true },
+      field('p', { class: 'orig-title' }, it.title),
+      h('h3', { text: '摘要' }), field('p', {}, it.summary),
+      it.result && h('h3', { text: '結果' }), it.result && field('p', {}, it.result),
+      h('h3', { text: '評析' }), field('p', {}, it.critique),
+      dl);
+
+    const sec = h('section', { class: 'item', id: `item-${n}`, 'aria-labelledby': `h-${n}` },
+      h('h2', { class: 'item-h', id: `h-${n}` }, toggle, edit), meta, body);
+
+    const tocBtn = h('button', { class: 'linkbtn', type: 'button', text: it.headline });
+    const tocLi = h('li', {}, tocBtn);
+    tocList.append(tocLi);
+
+    Object.assign(rec, { sec, body, toggle, favBtn, readBtn, tocLi });
+    syncMarks(rec);
+
+    toggle.addEventListener('click', () => setOpen(rec, !sec.classList.contains('open'), true));
+    favBtn.addEventListener('click', () => { store.set(favKey(state.date, it.id), isFav(state.date, it.id) ? null : '1'); syncMarks(rec); });
+    readBtn.addEventListener('click', () => { store.set(readKey(state.date, it.id), isRead(state.date, it.id) ? null : '1'); syncMarks(rec); });
+    tocBtn.addEventListener('click', () => { setOpen(rec, true, true); sec.scrollIntoView({ behavior: 'smooth', block: 'start' }); toggle.focus({ preventScroll: true }); });
+
+    state.recs.push(rec);
+    return sec;
+  });
+
+  state.toolbar = { count, clear, empty };
+  return [toolbar, items.length ? toc : null, empty, ...sections];
+}
+
+function syncMarks(rec) {
+  const read = isRead(state.date, rec.it.id), fav = isFav(state.date, rec.it.id);
+  rec.sec.classList.toggle('read', read);
+  rec.tocLi.classList.toggle('read', read);
+  rec.favBtn.textContent = fav ? '★ 已收藏' : '☆ 收藏';
+  rec.favBtn.setAttribute('aria-pressed', String(fav));
+  rec.readBtn.textContent = read ? '✓ 已讀' : '標為已讀';
+  rec.readBtn.setAttribute('aria-pressed', String(read));
+}
+
+// 讀過／收藏的切換不會立刻重新篩選，避免正在看的項目突然消失；下次變更篩選時才套用
+function setOpen(rec, open, markRead) {
+  rec.sec.classList.toggle('open', open);
+  rec.body.hidden = !open;
+  rec.toggle.setAttribute('aria-expanded', String(open));
+  if (open && markRead && !isRead(state.date, rec.it.id)) {
+    store.set(readKey(state.date, rec.it.id), '1');
+    syncMarks(rec);
+  }
+}
+function setAllOpen(open) {
+  for (const rec of state.recs) if (!rec.sec.hidden) setOpen(rec, open, false);
+}
+
+function applyFilters() {
+  if (!state.toolbar) return;
+  const toks = tokens();
+  let shown = 0;
+  for (const rec of state.recs) {
+    const ok = matches(rec.it, toks);
+    rec.sec.hidden = !ok;
+    rec.tocLi.hidden = !ok;
+    if (ok) shown++;
+    for (const [el, text] of rec.fields) highlight(el, text, toks);
+  }
+  const { count, clear, empty } = state.toolbar;
+  count.textContent = `顯示 ${shown} / ${state.recs.length} 則`;
+  clear.hidden = !filtersActive();
+  empty.hidden = shown > 0;
+}
+
+const q = document.getElementById('q');
+q.addEventListener('input', () => { state.query = q.value; applyFilters(); });
+q.addEventListener('keydown', e => { if (e.key === 'Escape') { q.value = ''; state.query = ''; applyFilters(); } });
+
+applyTheme();
+boot();
+</script>
+</body>
+</html>
