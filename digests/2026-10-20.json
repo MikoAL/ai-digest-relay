@@ -1,0 +1,163 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-20",
+  "generated_at": "2026-10-20T09:57:00+08:00",
+  "notes": "Tuesday in Taipei. This digest covers the arXiv listing dated Mon 19 Oct, which the 19 Oct digest could not see. The listing dated Tue 20 Oct (Monday-evening US Eastern announcement) did not show on any arXiv page this run could read. arXiv rate-limited this run (HTTP 429) after a few abstract pages. As a result, BMuon (2610.23571), 'The Ephemeral Cost of Switching Optimizers Across LLM Training Stages' (2610.22650), Ori (2610.22794), 'Efficient CPU-GPU collaborative MoE inference via Adaptive Expert Assignment' (2610.23006), 'Next Token or Vector?' (2610.22788) and 'Predictable Scaling' (2610.23453) could not be read and were left out. ReaDy (2610.20503) was dropped because two sources gave conflicting author lists. No on-focus lab release or primary-source news turned up for the last 24 hours. The vLLM item is from 18 Oct and had not been covered.",
+  "items": [
+    {
+      "id": "prism-attention-index-sharing",
+      "kind": "paper",
+      "title": "Prism Attention: Proposal-Refined Index Sharing Mechanism for Efficient LLMs Inference",
+      "url": "https://arxiv.org/abs/2610.22985",
+      "source": "arXiv",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "Prism Attention refines shared sparse-attention indices per layer; reports 3.4x decode speedup over FlashAttention at 128K context",
+      "summary": "Token-level sparse attention cuts the cost of attending over a long KV cache during decoding, but recomputing the selected token indices at every layer eats much of the saving. Sharing indices from designated anchor layers avoids that, but the reused indices drift from what each layer actually needs. The authors observe that the core high-attention tokens are stable across layers and that changes cluster at the edges of previously selected regions. Prism Attention therefore takes the shared indices as a coarse proposal and refines them cheaply for each layer (coarse-to-fine). Each layer keeps its own selection while the index computation stays mostly shared.",
+      "result": "The abstract reports state-of-the-art accuracy among mainstream sparse-attention methods on reasoning and long-context benchmarks. It also reports a 3.4x end-to-end decoding speedup over dense FlashAttention at 128K context. The abstract gives no per-benchmark numbers, and the full text could not be read this run.",
+      "critique": "Only the abstract could be read (arXiv rate-limited the HTML). The models tested, the sparse-attention baselines compared and the token budgets are unknown here. The 3.4x figure is measured against dense FlashAttention, not against other sparse or index-sharing methods, so it does not isolate the gain from refining the indices. Whether the method is training-free, and whether code is released, is not stated in what was read. The comments field says the paper was accepted at NeurIPS 2026.",
+      "authors": [
+        "Zhenxu Tian",
+        "Kebin Liu",
+        "Zhengwu Yang",
+        "Yi Su",
+        "Qingqing Dang",
+        "Yanlin Sha",
+        "Kaipeng Deng",
+        "Dianhai Yu",
+        "Yanjun Ma",
+        "Juntao Li",
+        "Min Zhang"
+      ],
+      "arxiv_id": "2610.22985"
+    },
+    {
+      "id": "looped-models-done-right-part-1",
+      "kind": "paper",
+      "title": "Towards Looped Models Done Right, Part I: Topology, Input Injection, Recurrent-State Design",
+      "url": "https://huggingface.co/papers/2610.23036",
+      "source": "HF Daily Papers",
+      "category": "architecture",
+      "on_focus": true,
+      "headline": "Looped-LM design study: prelude/loop/coda layout with input injection beats Ouro on all 10 tasks at 730M and most at 8B-A0.8B MoE",
+      "summary": "Looped language models reuse the same Transformer blocks several times to get more logical depth per parameter. The paper isolates three design axes: where the recurrence sits (topology), whether the input embedding is re-injected at each loop, and how the recurrent state is organized. It trains models from scratch at matched parameter count, logical depth and token budget. The winning layout is a 'sandwich': a non-looped prelude, a looped recurrent block, then a non-looped coda (Huginn-style). Input injection mainly helps knowledge retrieval and use of the context. Random state initialization and separate H/L recurrent states give mixed or negative results. The study also covers MoE looped models.",
+      "result": "At 730M parameters and 336B tokens, the full Huginn-style design beats Ouro on all ten benchmarks. At MoE scale (8B total / 0.8B active, 32B-A3B when unrolled, 500B tokens), it beats Ouro on nearly all knowledge, reasoning and coding benchmarks and spreads load across experts more evenly. At matched training and inference FLOPs, it uses 75% fewer resident parameters than a 112-layer non-looped MoE baseline. It outperforms that baseline on DROP and GSM8K, matches it on MATH500 and is competitive elsewhere.",
+      "critique": "Numbers come from the Hugging Face abstract page; per-benchmark tables were not read. The main baseline is one other looped design (Ouro). The FLOP-matched comparison holds compute fixed but not wall-clock time: looping adds sequential depth, which raises decode latency, and that cost is not reported in what was read. The largest run is 0.8B active parameters, far below production scale. This is 'Part I', so several design choices are deferred. Code is linked at github.com/ifm-ai/xllm-loop.",
+      "authors": [
+        "Benhao Huang",
+        "Chufan Shi",
+        "Junlin Chen",
+        "Shicheng Wen",
+        "Zhengzhong Liu",
+        "Eric Xing",
+        "Xuezhe Ma"
+      ],
+      "arxiv_id": "2610.23036"
+    },
+    {
+      "id": "dlite-history-free-speculative-decoding",
+      "kind": "paper",
+      "title": "DLite: History-free Speculative Decoding for Agentic AI",
+      "url": "https://huggingface.co/papers/2610.23787",
+      "source": "HF Daily Papers",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "DLite: speculative drafter with no draft KV history that reuses target hidden states; claims up to 70% gain over DSpark",
+      "summary": "On agentic workloads (long, constantly changing contexts and many turns), the authors find that existing draft models lose up to 80% of their acceptance length. Keeping the drafter's own KV cache for the whole history also adds system overhead. DLite removes the drafter's history entirely. It predicts draft tokens from the target model's contextual hidden states plus local information, with no draft KV cache. A lightweight sequential head restores causal dependencies inside each speculative block, and a two-stage training recipe aligns the drafter with the target.",
+      "result": "The abstract reports acceptance lengths of 2–6 across general, long-context and agentic workloads, up to 70% better than DSpark. The project README (H800, Qwen3-4B/8B, block size 7) reports 2.07–2.74x end-to-end speedup on agentic workloads. On SWE-Bench with Qwen3-8B it reports 2.74x versus 1.60x for DSpark, and 2.18–3.96x on LongBench v2.",
+      "critique": "Tested only on small targets (Qwen3 4B–14B, Qwen3.5-4B) on H800s. The README text gives exact baseline numbers only for DSpark on one benchmark; EAGLE-3 and DFlash appear only in charts. Throughput under batching (concurrency 1–64) is reported in a table, but its numbers were not available in what was read. SGLang and vLLM integration is still on the roadmap, so production serving gains are unverified. The arXiv page was rate-limited; details come from the HF page and the GitHub README (MIT license, draft weights released).",
+      "authors": [
+        "Jiaming Xu",
+        "Hanzhen Wang",
+        "Tianlang Zhao",
+        "Jiewen Xiao",
+        "Chengze Yuan",
+        "Jiayi Pan",
+        "Yongkang Zhou",
+        "Jiancai Ye",
+        "Yu Wang",
+        "Guohao Dai"
+      ],
+      "arxiv_id": "2610.23787"
+    },
+    {
+      "id": "acceptance-is-not-speed-lossy-spec-decoding",
+      "kind": "paper",
+      "title": "Acceptance Is Not Speed: Length Inflation in Training-Free Lossy Speculative Decoding",
+      "url": "https://arxiv.org/abs/2610.23818",
+      "source": "arXiv",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "Relaxed (lossy) speculative verification raises accepted tokens 1.34x but lengthens outputs 1.54x across 12 target-drafter pairs",
+      "summary": "Training-free lossy speculative decoding loosens the verifier's acceptance rule so that more draft tokens are kept per round, and it is usually reported as a gain in accepted tokens per round. The paper measures what else changes. Across twelve target–drafter pairs it compares relaxed rules with lossless verification on identical prompts. It tracks completion length, verifier rounds, wall-clock time and accuracy. It finds that relaxed acceptance lengthens completions, mostly by extending reasoning traces, which offsets much of the per-round gain.",
+      "result": "At each rule's most relaxed setting, averaged over pairs: 1.34x more accepted tokens per round, but 1.54x longer completions. Rules that substantially cut verifier rounds often reduce accuracy, and some failures come from reasoning using up the token budget before reaching a final answer.",
+      "critique": "Only the abstract was read. The specific models, drafters and relaxation rules are not named in it. Per-pair wall-clock results are not in the abstract. The net slowdown some coverage reports (about 0.87x) is a third party's calculation from the averages, not a number the paper reports. Averages may hide pairs that did speed up. The scope is training-free rules only; lossy methods with a trained verifier or drafter are not tested. The authors say the paper is under review at NAACL 2027.",
+      "authors": [
+        "Chiatzen Wang",
+        "Bill Xu",
+        "Haochen Gu",
+        "Hongyang Zhang"
+      ],
+      "arxiv_id": "2610.23818"
+    },
+    {
+      "id": "hydrallm-elastic-width-slicing",
+      "kind": "paper",
+      "title": "HydraLLM: Adaptive Width Slicing for Elastic Text and Vision-Language Models",
+      "url": "https://arxiv.org/abs/2610.23455",
+      "source": "arXiv",
+      "category": "architecture",
+      "on_focus": true,
+      "headline": "HydraLLM ties model width to active attention heads, giving nested subnetworks; 25% of heads yields +75.3% generation throughput",
+      "summary": "An elastic architecture built on multi-query attention. The number of active attention heads sets the width of the embeddings, attention projections, feed-forward layers and output head. One set of weights therefore contains a nested family of smaller subnetworks for different hardware and latency targets. A pre-trained checkpoint is converted into this form by reordering weights by importance, then training on randomly sampled subnetworks with knowledge distillation. An elastic projection module extends the approach to vision-language inputs.",
+      "result": "With 75% of heads active, TriviaQA accuracy beats a nested baseline that has 17.25% more parameters (secondary coverage puts the margin at +2.2 points). With 50% of heads active on the multimodal task, CLIPScore is comparable to Gemma 3 4B, a model 7x larger. With 25% of heads active, token-generation throughput is 75.3% higher than the full-width model.",
+      "critique": "This is a BabyLM workshop paper at small scale; the base model and its size are not named in the abstract. Using 25% of heads gives 1.75x throughput, not the roughly 4x that compute scaling alone would suggest, because attention scores, normalization, KV-cache traffic and kernel launches do not shrink with width. Reportedly there are no dense same-size baselines, no grouped-query attention variant, and no reasoning or code evaluations. The results beyond the abstract come from secondary coverage (johal.in), not the paper itself.",
+      "authors": [
+        "Oscar Kemme",
+        "Janek Haberer",
+        "Ali Hojjat",
+        "Olaf Landsiedel"
+      ],
+      "arxiv_id": "2610.23455"
+    },
+    {
+      "id": "vllm-v0-32-0",
+      "kind": "release",
+      "title": "vLLM v0.32.0",
+      "url": "https://github.com/vllm-project/vllm/releases/tag/v0.32.0",
+      "source": "GitHub release notes",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "vLLM v0.32.0 adds NVFP4 KV cache on SM8x/SM90/SM12x, sparse-MLA kernel work and new spec-decoding paths; drops Python 3.10",
+      "summary": "A large release (814 commits, 363 contributors), published 18 Oct. KV cache: NVFP4 KV cache now runs on SM8x, SM90 and SM12x, and ROCm gets a 4-bit KV cache. Model Runner V2 adds a GPU n-gram speculator, elastic expert parallelism, and pipeline plus prefill context parallelism for MLA models. Model-specific work includes the following. GLM-5.3 reuses sparse-MLA index conversion across layers (3.5–3.9x on that kernel). MiniMax-M3 gets FP8-query sparse prefill. Kimi-K3 gets fused speculative KDA. Qwen3.8-Flash-Next fuses its QSA projections into one GEMM (1.45–1.68x). Quantization adds MXFP4 W4A4 MoE via CUTLASS, per-token NVFP4 MoE and online FP8 re-quantization. Speculative decoding adds FlashInfer ReplaySSM for Mamba2 MTP and in-graph DSpark/DFlash drafts. Breaking changes: Python 3.11 is now the minimum, cascade attention is removed, default CORS allows no origins, and GLM-5.x defaults to FP8 KV cache on SM100.",
+      "result": "PR benchmarks quoted in the notes: NVFP4 KV halves KV memory per rank, with 2.3–5.5% more throughput but 7–11% worse TTFT. HiSparse residency cache: up to 58% more throughput on GLM-5.3-NVFP4 (B200, long contexts). MoE weighted-sum tuning: 1.17–2.37x. SM100 small-M decode GEMMs: up to 2.7x vs cuBLAS. Multiple API servers: 43–85% more requests/s on very short requests.",
+      "critique": "All speedups are per-PR microbenchmarks on specific models and GPUs, not end-to-end results across workloads. The NVFP4 KV gain comes with a TTFT cost and no accuracy data in the notes. The notes also fix a silent CUTLASS NVFP4/MXFP4 MoE corruption under expert parallelism, so earlier FP4 MoE results with EP deserve re-checking. Published 18 Oct, slightly outside the 24-hour window, and not covered in earlier digests."
+    },
+    {
+      "id": "frozen-16mb-vocabulary-ternary-lm",
+      "kind": "paper",
+      "title": "Embeddings Are Overpriced? A Frozen 16 MB Vocabulary for Small and Ternary Language Models",
+      "url": "https://paperswithcode.co/paper/2610.22428",
+      "source": "Papers with Code (HF Daily Papers)",
+      "category": "efficiency",
+      "on_focus": true,
+      "headline": "Frozen 512-bit sign-binarized embedding table (16 MB) plus ternary BitNet body gives a 46 MB LM running 615–740 tok/s on a laptop CPU",
+      "summary": "In small language models the embedding table holds a large share of the parameters. The paper replaces the trainable table with a frozen 16 MB vocabulary. It is derived from a pretrained embedding by PCA down to 512 dimensions followed by sign binarization (1 bit per dimension). This removes most of the trainable parameters, and the frozen table is paired with a ternary (BitNet-style) Transformer body.",
+      "result": "Per the summary that could be read: little task loss from freezing and binarizing the vocabulary. The full 46 MB model generates 615–740 tokens/s on a laptop CPU.",
+      "critique": "Only a short summary was readable (arXiv rate-limited), so the baselines, tasks and size of the 'little task loss' are unknown here. The frozen table still depends on a pretrained embedding, so the cost of training that source model is not removed, only moved elsewhere. CPU tokens/s for a 46 MB model says little about quality, and the CPU model is not named in what was read. This is a single-author paper with no code link found."
+    },
+    {
+      "id": "futransformer-fp8-prefill-int4-decode",
+      "kind": "paper",
+      "title": "FuTransformer: FP8 prefill and INT4 decode for Llama-style inference on Hopper",
+      "url": "https://arxiv.org/abs/2610.23796",
+      "source": "arXiv",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "FuTransformer: CUDA Llama block for Hopper with FP8 prefill and INT4 weights plus INT4 KV cache for single-token decode",
+      "summary": "A CUDA implementation of a Llama-style Transformer block specialized for NVIDIA Hopper GPUs. Prefill runs in FP8. Single-token decode, which is memory-bound, uses INT4 weights and an INT4 KV cache to cut memory traffic. Quality is checked with WikiText-2 perplexity.",
+      "result": "The abstract reports speedups over PyTorch and CODA baselines and a WikiText-2 perplexity evaluation. The speedup and perplexity numbers could not be retrieved this run.",
+      "critique": "Single-author systems paper. The baselines named in the abstract are PyTorch and CODA, not optimized serving stacks (TensorRT-LLM, vLLM/FlashInfer, Marlin-style INT4 GEMMs), so the speedups may overstate the gain over current practice. WikiText-2 perplexity alone is a weak test of INT4 KV-cache quality, and long-context or task accuracy is not mentioned. The work covers one block on one GPU generation. The full text was not readable this run."
+    }
+  ]
+}
