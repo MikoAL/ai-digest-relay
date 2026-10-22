@@ -1,0 +1,167 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-22",
+  "generated_at": "2026-10-22T10:10:00+08:00",
+  "notes": "Thursday in Taipei. The arXiv cs.LG 'recent' page showed the batch dated Wed 21 Oct as newest (the listing dated Thu 22 Oct was not visible), and only its first 50 of 249 entries. arXiv then rate-limited the run (HTTP 429) on every abstract and HTML page after the first four abstracts. As a result, paper results below come from abstracts or Hugging Face paper pages, not paper bodies. 'Adaptive Pullback' (2610.28194) and 'The KV-Surgeon' (2610.25933, also unreadable on 21 Oct) could not be read and were left out. Next-Concept Modeling rests on secondary coverage. Specter (2511.14102) is an older arXiv ID that resurfaced on Hugging Face Daily Papers under a new title and has not been covered here before.",
+  "items": [
+    {
+      "id": "dont-skip-the-baseline-moe-expert-skipping",
+      "kind": "paper",
+      "title": "Don't Skip the Baseline: A Controlled Comparison of Dynamic Expert Skipping in MoEs",
+      "url": "https://arxiv.org/abs/2610.28369",
+      "source": "arXiv (cs.LG)",
+      "category": "efficiency",
+      "on_focus": true,
+      "headline": "Dynamic expert-skipping methods for MoEs rarely beat simply lowering top-k statically at matched expert compute, a controlled study finds",
+      "summary": "Dynamic expert skipping changes how many experts each token activates at inference time, to save compute in MoE models. The authors group four representative methods into one taxonomy. They compare them with a simple control: a static reduction of the router's top-k, applied to every layer and token. Budgets are matched on expert compute. Models are two text MoEs (Gemma4-26B-A4B, Qwen3-30B-A3B) and one vision-language MoE (Qwen3-VL). They also check whether the effective k measured during calibration matches the effective k at test time.",
+      "result": "Per the abstract, the static-k baseline is 'hard to outperform consistently'. The dynamic methods often score below it, and where they win the margin is small. Effective k on calibration data can differ from effective k at test time, so the methods' inference compute is misestimated. The authors recommend a calibration-free static k reduction chosen per modality, and argue that a dynamic method should beat a static control at matched measured compute. The abstract gives no numbers, and the paper body could not be read this run.",
+      "critique": "No figures could be verified (arXiv rate-limited the HTML page), so the size of the gaps is unknown, and so are the four methods compared. Matching is on expert compute. The abstract does not say whether wall-clock latency or throughput was measured, which is where dynamic skipping can lose further to static k because of irregular batching. Three models from two families is a modest sample. A negative result like this still depends on each method being re-implemented and tuned faithfully.",
+      "authors": [
+        "Jakob Steimle",
+        "Thomas Elsken",
+        "Daniel Ehrhardt",
+        "Lukas Rinder",
+        "Daniel Cremers",
+        "Xi Wang"
+      ],
+      "arxiv_id": "2610.28369"
+    },
+    {
+      "id": "lafa-large-flow-language-models",
+      "kind": "paper",
+      "title": "Large Flow Language Models",
+      "url": "https://arxiv.org/abs/2610.28559",
+      "source": "arXiv (cs.CL)",
+      "category": "architecture",
+      "on_focus": true,
+      "headline": "Lafa: blockwise continuous-flow LM scaled to 8B, adapted from AR models with <30B tokens; self-speculative decoding at 2.54x AR throughput",
+      "summary": "Lafa is a continuous flow language model that generates text in blocks. Attention is causal across the prefix, and inside each block tokens are generated jointly by a bidirectional, asynchronous flow. Because the prefix stays causal, a pretrained autoregressive model can be adapted, and inference can reuse a prefix cache and decode a block in parallel. Models are trained at 0.5B, 7B and 8B with fewer than 30B tokens. The flow can be distilled into flow maps for one- or few-step generation. The authors report a multi-token-prediction effect from flow training. They use it for self-speculative decoding: the model drafts a block with the flow and verifies it autoregressively within the same network. Code and three checkpoints (lafa-0.5B, lafa-7B, lafa-8B) are linked from the Hugging Face paper page.",
+      "result": "The abstract reports that Lafa matches or beats autoregressive models on instruction following, reasoning and coding. Self-speculative decoding reaches 2.54x the throughput of an AR model at comparable quality. The authors say this beats multi-token-prediction and discrete-diffusion baselines. The abstract gives no benchmark scores.",
+      "critique": "No benchmark numbers could be checked: the abstract names no benchmarks, scores, or which AR base models were adapted. 'Comparable quality' at 2.54x is not defined, and neither are the batch size and hardware behind the throughput figure. Self-speculative gains are usually largest at batch size 1. The MTP and discrete-diffusion baselines are not named. Training under 30B tokens is cheap only because it starts from pretrained AR weights, so the comparison with diffusion LMs trained from scratch is not like-for-like.",
+      "authors": [
+        "Arnav Chavan",
+        "Chanhyuk Lee",
+        "Udbhav Bamba",
+        "Jaehoon Yoo",
+        "Seunghoon Hong",
+        "Aditi Raghunathan",
+        "Jinwoo Kim"
+      ],
+      "arxiv_id": "2610.28559"
+    },
+    {
+      "id": "recursive-flint-40b-a2-5b-moe",
+      "kind": "release",
+      "title": "Recursive Flint (RecursiveSI/flint)",
+      "url": "https://huggingface.co/RecursiveSI/flint",
+      "source": "Hugging Face model card",
+      "category": "architecture",
+      "on_focus": true,
+      "headline": "Recursive releases Flint, a 39.8B-total / ~2.5B-active MoE coding model (256 experts, top-6 + shared) under Apache 2.0",
+      "summary": "Per the model card, Flint is a 49-layer decoder-only MoE (2 dense layers, then 47 MoE layers). Each MoE layer has 256 routed experts, 6 selected per token, plus one always-on shared expert. Attention is hybrid: 35 sliding-window layers (513-token window, RoPE) and 14 full-attention layers with no positional encoding. All use GQA (32 query / 4 KV heads), per-head QK RMSNorm and learned attention sinks. Documented context is 262,144 tokens. The model was trained from scratch (pretraining, mid-training, SFT, RL). The repo holds a BF16 checkpoint of about 80 GB. Per MarkTechPost's 21 Oct coverage (not the card), the lm_head was also quantized to 4 bits with distillation from the BF16 model. The same coverage says NVFP4 is within 0.7 points of BF16, and that it runs at more than 125 tok/s on an M4 Pro MacBook Pro in short-context tests.",
+      "result": "Self-reported on the card: Terminal-Bench 2.1 54.9%, SWE-bench Verified 74.2%, SWE-bench Pro v2 89.7%. Per MarkTechPost's reproduction of Recursive's chart, Qwen 3.6 MoE scores 44.9 / 73.4 / 73.8 on the same three, and Qwen 3.8 dense scores 73.0 / 75.6 / 94.9.",
+      "critique": "All scores and speeds are developer-reported, and the card itself warns that evaluation setups differ across sources. The card gives no training tokens, data or compute. Speed figures are short-context only and come from coverage, not the card, so the payoff of the 35:14 sliding/full split at long context is unmeasured. Dense models of similar size still lead on several benchmarks.",
+      "authors": [
+        "Recursive Superintelligence"
+      ]
+    },
+    {
+      "id": "d-pal-speculative-decoding-distributional-losses",
+      "kind": "paper",
+      "title": "Beyond the Point Mass: Acceptance-Derived Weights and Distributional Losses for Speculative Decoding",
+      "url": "https://arxiv.org/abs/2610.28355",
+      "source": "arXiv (cs.LG)",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "D-PAL trains speculative-decoding drafters on draft-target overlap, not the sampled token; acceptance length 4.50→4.57 on Qwen3-4B",
+      "summary": "D-PACE trains draft models by weighting each draft position by its contribution to expected accepted length. Its weights and its cross-entropy loss only use the draft's probability on the recorded target token, which treats the target as a point mass. Under rejection sampling, a draft token's acceptance probability is the overlap between the draft and target distributions (1 − total variation). D-PAL derives position weights from that overlap, using the exact expected accepted length, and uses log-acceptance as the per-position loss. It reduces to D-PACE when the target is a point mass. The weights are detached, so other losses can be swapped in. Forward KL and Rényi-1/2 divergence match or beat log-acceptance, and Rényi-1/2 provably bounds the acceptance rate from both sides. Code: github.com/Lucas-TY/D-PAL-SpecForge.",
+      "result": "With a Qwen3-4B target across six benchmarks, mean acceptance length over D-PACE rises from 4.50 to 4.57 at T=0 and from 4.20 to 4.28 at T=1, with higher throughput at both temperatures (per the abstract). Swapping cross-entropy for Rényi-1/2 also raises acceptance length under D-PACE's own weights.",
+      "critique": "The gain is small (about 1.6–1.9% in acceptance length), and the abstract gives no seeds or variance, so it may be within noise. Only one target model (Qwen3-4B) is shown. The abstract does not quantify the throughput gain or give the drafter architecture. Comparison is only with D-PACE, not with EAGLE-style or other drafter training objectives. The method needs full target distributions at training time, which costs more than storing sampled tokens.",
+      "authors": [
+        "Tianyu Wu",
+        "Zhuohan Wang",
+        "Jonathan Geuter",
+        "Yu Yao",
+        "Weifan Jiang",
+        "Chengxi Zhang",
+        "Ju Li",
+        "Minlan Yu"
+      ],
+      "arxiv_id": "2610.28355"
+    },
+    {
+      "id": "par-progress-aligned-recurrence-looped-lms",
+      "kind": "paper",
+      "title": "PAR: Progress-Aligned Recurrence for Length Generalization in State Tracking",
+      "url": "https://huggingface.co/papers/2610.27628",
+      "source": "HF Daily Papers",
+      "category": "architecture",
+      "on_focus": true,
+      "headline": "PAR: looped LM supervised per loop step plus norm-anchored recurrent states; Qwen2.5-0.5B extrapolates S5 state tracking 32→512 moves",
+      "summary": "Looped (weight-tied, recurrent-depth) language models are meant to run more iterations on harder inputs, but they tend not to extrapolate beyond the lengths they were trained on. Progress-Aligned Recurrence (PAR) makes two changes. First, it supervises the prediction after each loop iteration to match the state after the corresponding number of operations, instead of supervising only the final answer. Second, it rescales the recurrent state at each iteration to its first-iteration norm. A learned readout decides when to stop and answer. A prefix self-distillation variant covers tasks without intermediate labels.",
+      "result": "On swap-S5 state tracking, a Qwen2.5-0.5B looped model trained on at most 32 moves reaches about 95.5% full-state accuracy at 512 moves (16x length extrapolation), per the Hugging Face page. Removing norm anchoring, or using only final-answer supervision, substantially reduces the extrapolation.",
+      "critique": "Only a synthetic group-composition task is shown. Nothing indicates it transfers to natural-language reasoning. Dense per-step supervision needs intermediate state labels, and the self-distillation fallback is not quantified. The page gives no comparison with other length-generalization methods for recurrent or looped models, and no inference cost for running hundreds of loop iterations. No code is linked.",
+      "authors": [
+        "Pan Wang",
+        "Yihao Hu",
+        "Guangyuan Dong",
+        "Yitong Lin",
+        "Hang Wang",
+        "Zimi Liu",
+        "Zhihao Wen",
+        "Jianshe Li",
+        "Jiang-Ming Yang",
+        "Wei Wu",
+        "Yongqi Tong"
+      ],
+      "arxiv_id": "2610.27628"
+    },
+    {
+      "id": "token-energy-law-llm-decode",
+      "kind": "paper",
+      "title": "The Token-Energy Law of LLM Decode: Active Bytes and Realized Time Account for Joules per Token",
+      "url": "https://arxiv.org/abs/2610.28576",
+      "source": "arXiv (cs.LG)",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "Token-Energy Law: GPU joules per decoded token as affine in bytes moved and decode time; ≤3.73% held-out error on Hopper/Blackwell",
+      "summary": "The paper models GPU energy per output token during dense, full-history LLM decoding with two factors. 'Active bytes' is the memory traffic per output token, split into weight bytes shared across the decode batch and per-request KV-cache reads and writes. The second factor is realized decode time per output token. Energy is an affine combination of the two, with coefficients calibrated per model and hardware/runtime configuration. The model shows why batching amortizes weight traffic, why longer attended histories raise KV traffic, and why throughput sets the time-proportional cost.",
+      "result": "Across three models in BF16 on NVIDIA Hopper and Blackwell, including 2-GPU tensor parallelism on Hopper, held-out energy predictions with fixed coefficients and observed decode time are within 3.73% of measurement (maximum error, per the abstract).",
+      "critique": "The model needs observed decode time as an input, so it explains energy rather than predicting it from first principles. Coefficients must be recalibrated for each model and hardware/runtime pair. The scope is narrow: three models, BF16 only, dense full-history attention, and no quantized, MoE, sparse-attention or speculative decoding, which are where active bytes change most. The abstract does not name the models, and no code is linked.",
+      "authors": [
+        "Chenxu Niu",
+        "Batuhan Sencer",
+        "Wei Zhang",
+        "Yong Chen"
+      ],
+      "arxiv_id": "2610.28576"
+    },
+    {
+      "id": "specter-moe-speculative-offloading",
+      "kind": "paper",
+      "title": "Specter: Fast MoE Inference via Quantization-Enabled Multi-Step Speculative Offloading",
+      "url": "https://huggingface.co/papers/2511.14102",
+      "source": "HF Daily Papers",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "Specter: a quantized draft model's lookahead schedules MoE expert transfers ahead of verification; 1.50x average TPOT speedup on one GPU",
+      "summary": "When an MoE does not fit in GPU memory, expert weights are offloaded to host memory and fetched over PCIe, and those transfers sit on the critical path. Specter runs a lightweight quantized draft model on the GPU for speculative decoding. The draft's multi-step lookahead reveals which experts upcoming tokens will need, so the runtime schedules expert transfers and execution ahead of verification. This hides PCIe latency. The arXiv ID dates from November 2025. An earlier version was titled 'MoE-SpeQ: Speculative Quantized Decoding with Proactive Expert Prefetching and Offloading for Mixture-of-Experts'. The Hugging Face page lists it as published on 20 Oct, which suggests a revised version.",
+      "result": "For single-request inference, the Hugging Face page reports an average 1.50x and peak 1.88x speedup in time per output token over 'the state-of-the-art system'.",
+      "critique": "The page does not name the baseline system, the MoE models or the GPU, and this run could not read the paper body, so the comparison cannot be judged. Results are single-request only. Batched serving, where expert reuse across requests changes the picture, is not covered. How much the quantized draft's routing predictions differ from the full model's is not quantified. What changed between the MoE-SpeQ version and this one is not stated on the page.",
+      "arxiv_id": "2511.14102"
+    },
+    {
+      "id": "next-concept-modeling-parallel-text-generation",
+      "kind": "paper",
+      "title": "Next-Concept Modeling: Fast, Parallel Text Generation",
+      "url": "https://aiweekly.co/alerts/next-concept-modeling-claims-31-speedup-over-diffusion-lms",
+      "source": "AI Weekly (secondary coverage)",
+      "category": "architecture",
+      "on_focus": true,
+      "headline": "Next-Concept Modeling reported 21x faster than the strongest diffusion LM on LM1B with better generative perplexity",
+      "summary": "Per AI Weekly's summary of the abstract (arXiv 2610.14162; Kumbong, Arora, Mirhoseini, Ré and five co-authors), a multiscale residual VQ-VAE encodes text into a coarse-to-fine hierarchy of discrete codes. A transformer then generates one level at a time, predicting all codes within a level in parallel. This is a non-autoregressive alternative to diffusion language models. The paper is about a week old and is trending on Hugging Face; it has not been covered here before.",
+      "result": "As reported: better generative perplexity than the strongest diffusion LM baseline on LM1B at 21x the speed with matched parameters, the same ROUGE-L as that baseline on XSum at 31x, and competitive on OpenWebText at 10x.",
+      "critique": "This item rests on secondary coverage. This run could not read the arXiv paper, so no figure has been checked against it. The diffusion baseline is not named, model scale is not given, and generative perplexity is a weak quality metric that can reward low-diversity output. There is no comparison with autoregressive decoding plus speculative decoding, which is the real competitor on latency. Results are on academic-scale benchmarks only."
+    }
+  ]
+}

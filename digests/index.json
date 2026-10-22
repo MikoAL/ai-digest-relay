@@ -1,7 +1,15 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-10-21T10:03:46+08:00",
+  "updated_at": "2026-10-22T10:10:00+08:00",
   "digests": [
+    {
+      "date": "2026-10-22",
+      "item_count": 8,
+      "on_focus_count": 8,
+      "top_headline": "Dynamic expert-skipping methods for MoEs rarely beat simply lowering top-k statically at matched expert compute, a controlled study finds",
+      "json": "digests/2026-10-22.json",
+      "md": "digests/2026-10-22.md"
+    },
     {
       "date": "2026-10-21",
       "item_count": 10,
