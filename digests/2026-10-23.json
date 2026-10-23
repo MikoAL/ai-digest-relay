@@ -1,0 +1,173 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-23",
+  "generated_at": "2026-10-23T10:11:15+08:00",
+  "notes": "Friday in Taipei. The newest arXiv listing visible this run was the one dated Thu 22 Oct; the Fri 23 Oct listing (announced Thu 20:00 US Eastern) was not visible. Only the first 50 entries of that batch were readable for cs.LG (of 240), cs.CL (of 137) and cs.AI (of 211). arXiv rate-limited most abstract and HTML fetches, so SPARE, Right On Q, BitMTP and PACE rest on abstracts (PACE also on AI Weekly coverage). 'Stochastic Pruning of the DPO Computation Graph' (2610.29538), 'Looped Uniform Diffusion Language Models' (2610.30066) and 'Asymmetric Looped Transformers' (2610.28489) could not be read and were left out. The Hugging Face Daily Papers page could not be fetched. BitMTP is from the Wed 21 Oct batch and had not been covered. No on-focus lab model release with a primary source turned up for the last 24 hours. llm-d v1.0.0 dates from 20 Oct.",
+  "items": [
+    {
+      "id": "nemotron-3-5-super-lightning-report",
+      "kind": "paper",
+      "title": "Nemotron 3.5 Super and Lightning: Open, Efficient (NVIDIA technical report)",
+      "url": "https://research.nvidia.com/labs/nemotron/files/NVIDIA-Nemotron-3.5-Super-and-Lightning-Technical-Report.pdf",
+      "source": "NVIDIA technical report",
+      "category": "architecture",
+      "on_focus": true,
+      "headline": "NVIDIA report on Nemotron 3.5 Super (120B, 12B active) and Lightning (30B, 3B active) MoEs: 1M context, NVFP4 keeps 99.62% median accuracy",
+      "summary": "Technical report dated 21 Oct 2026 for two open MoE models. Super (Nemotron 3.5 Super VL) is a 120B-total / 12B-active multimodal hybrid Mamba-Transformer MoE initialised from Nemotron 3 Super. Lightning is a 30B / 3B-active text-only model initialised from Nano 3 Base, not derived from 3.5 Super. Both get a 100B-token multi-token-prediction (MTP) warm-up with the backbone frozen, then 1T tokens of distillation. Lightning distils from top-128 logits of Super 3 Base, and its MTP head is pruned from Super 3 Base's head (hidden 4096 to 2688, MoE intermediate 2688 to 1856, routed experts 512 to 128). Super merges two MTP heads into one recursively shared head for speculative decoding. Both models are extended to 1M context; NVFP4 checkpoints come from post-training quantization.",
+      "result": "Super on one GB200: up to 4,856 output tokens/s/GPU on a 20-turn agentic proxy workload at 50 or more tokens/s/user. NVFP4 vs BF16 gives 2.43x throughput, and Super is 2.34x faster than Qwen3.5 122B-A10B and 1.90x faster than Qwen3.8 Flash-Next. NVFP4 median accuracy recovery is 99.62% across 36 benchmarks. Boosting raises MTP acceptance length at temperature 1 from 3.787 to 4.612. Super scores 51.78% on SWE-bench Pro (Nemotron 3 Ultra: 49.66%) and 71.10% on SWE-bench Verified (Ultra: 73.93%). Agentic mid-training at 256K dropped RULER-1M from 79.9 to 33.5, and a 9B-token recovery stage brought it back to 81.0.",
+      "critique": "Throughput comparisons are NVIDIA's own, on its own hardware and proxy workload, and are not independently verified. The exact Mamba-2/attention/MoE layer pattern is not stated in what was read. Some results come from internal harnesses, several vision benchmarks are not open-sourced, and Text Arena results are called preliminary. Lightning skipped mid-training and is text-only. The RULER-1M collapse after 256K mid-training shows that long-context ability needed an explicit repair stage. A separate NVIDIA developer-blog page about Lightning retrieved in this run carried an August 2026 date, so Lightning may predate this report; the report itself is new.",
+      "authors": [
+        "NVIDIA"
+      ]
+    },
+    {
+      "id": "pace-four-bit-recurrent-states",
+      "kind": "paper",
+      "title": "PACE: Periodic and Channel-Aligned Encoding of Four-Bit Recurrent States",
+      "url": "https://arxiv.org/abs/2610.29545",
+      "source": "arXiv",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "PACE stores linear-attention recurrent states at 4 bits by rounding every few tokens; mixed 4/8-bit heads rival 8-bit DAMP at ~2/3 memory",
+      "summary": "In hybrid linear-attention LLMs the per-sequence recurrent state becomes a major memory cost at high concurrency. Existing state quantizers round the state after every token, and at 4 bits the rounding error accumulates. PACE is post-hoc and needs no fine-tuning. It rounds the state only every few decoded tokens and keeps the tokens in between in a small buffer, extending the once-per-chunk state write of chunked-prefill kernels to decoding. Because large entries of the gated-delta state cluster in columns, it shares one quantization scale per column. PACE-4/8 keeps the heads with the most accumulated rounding error at 8 bits. Secondary coverage (AI Weekly) adds that rounding happens every 8 tokens, that a quarter of heads per layer stay at 8 bits, and that Triton kernels for decoding over a packed 4-bit state were released.",
+      "result": "The abstract reports that on four hybrid models (4B to 35B), PACE-4/8 is competitive with 8-bit DAMP on the three larger models at about two-thirds of the memory. All-4-bit PACE outscores Q-Mamba at equal memory, and periodic rounding keeps the decoding speedup of the buffer. Per AI Weekly, the models are Qwen3.5-4B/9B/27B and Qwen3.6-35B-A3B, and fp32 states take 10-41% of combined weight and state memory at 64 concurrent sequences.",
+      "critique": "Only the abstract (arXiv) and a secondary summary were read; arXiv rate-limited the full text. Per that summary, PACE-4/8 is below DAMP INT8 on the 4B model (GSM8K, MMLU-Pro, IFEval), throughput was measured only on the 4B model on one H100 PCIe at 512-token context, and all tests are on one model family (Qwen hybrids with gated-delta layers). Transfer to all-recurrent models or other update rules is not shown. 'Competitive' is not quantified in the abstract.",
+      "authors": [
+        "Patrick Haller",
+        "Filipe Laitenberger",
+        "Alan Akbik"
+      ],
+      "arxiv_id": "2610.29545"
+    },
+    {
+      "id": "bitmtp-low-bit-multi-token-prediction",
+      "kind": "paper",
+      "title": "BitMTP: When Multi-Token Prediction Meets Low-Bit Large Language Models",
+      "url": "https://arxiv.org/abs/2610.28500",
+      "source": "arXiv",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "BitMTP pairs multi-token prediction with ternary LLMs, reporting 2.1-2.4x mean decode speedup on H20 at comparable quality",
+      "summary": "Ternary/low-bit backbones cut memory traffic and multi-token prediction (MTP) cuts sequential steps, but the authors find that naively combining them gives no speedup at equal quality. Two causes: masked drafting lacks the intermediate token inputs seen in next-token training, and wider computation with causal KV updates eats the savings. BitMTP trains one model with a joint next-token plus MTP objective, so it both generates autoregressively and drafts block-causally, with no separate draft model. It offers three decoding modes (confidence-only, speculative-only, hybrid). An accepted-prefix alignment step keeps the committed prefix, KV boundary and CUDA Graph replay state consistent, and execution uses width-specialised low-bit kernels with captured graphs reused over shared KV storage.",
+      "result": "Hybrid decoding on NVIDIA H20 gives a five-task mean speedup of 2.2x on BitNet b1.58-2B and 2.1-2.4x on Bonsai 1.7B-4B models at comparable task quality. Up to 2.0x five-task mean throughput on RTX 3090 and 3.3x on MBPP+ on Jetson Orin.",
+      "critique": "Only the abstract and the GitHub README were read. The speedup baseline is not named in the abstract (presumably the same low-bit model decoding autoregressively), and 'comparable quality' is not quantified there. The models are small (at most 4B) and all ternary, so whether it carries over to 4-bit or larger models is untested. Accepted at NeurIPS 2026. Code (Apache-2.0) and checkpoints are released. From the Wed 21 Oct arXiv listing, not covered here before.",
+      "authors": [
+        "Ning Zhang",
+        "Shihao Wang",
+        "Jinrui Zhang",
+        "Chaodong Xiao",
+        "Lei Zhang"
+      ],
+      "arxiv_id": "2610.28500"
+    },
+    {
+      "id": "long-context-cpt-scaling-law",
+      "kind": "paper",
+      "title": "Don't Stop Long-Context Continual Pre-Training Too Early: An Empirical Scaling Law",
+      "url": "https://arxiv.org/html/2610.29352",
+      "source": "arXiv",
+      "category": "scaling",
+      "on_focus": true,
+      "headline": "Fitted scaling law for long-context continual pre-training predicts 32K perplexity up to 100B tokens; RULER shows no saturation",
+      "summary": "Long-context continual pre-training (LCCP) is usually given a small token budget. The authors train five custom Transformers (31M-821M non-embedding, up to 1.22B total) with 4K pre-training and 32K LCCP over 100 budget configurations. They fit log(LongPPL) = A/N^a + B_s/D_s^b_s + B_l/D_l^b_l + C, where N is non-embedding parameters, D_s short-context tokens and D_l long-context tokens. To track one long run they use constant learning rate with checkpoint merging (Constant-Last4) rather than separate linear-decay runs, and follow it with 128K extension and long-context and agentic SFT.",
+      "result": "The law reaches R^2 > 0.95 and under 2% MAPE in log-LongPPL on held-out scales (S4 predicted from S1-S3, S5 from S1-S4). It still predicts the 1.22B model's trajectory out to about 100B LCCP tokens, more than 8x the largest long-context budget in the fitting set. RULER-32K keeps trending up across that trajectory with no clear saturation, and gains persist after 128K extension and SFT.",
+      "critique": "Scale tops out at about 1B parameters and 100B LCCP tokens, far below production long-context models. The main trajectory is a single run. The fitted offset C is negative, so the authors themselves call it a finite-range law, and it gives no compute-optimal LCCP budget. RULER gains come mainly from intermediate-difficulty retrieval subtasks, and agentic results fluctuate. Compute is not reported in what was read.",
+      "authors": [
+        "Ziqing Qiao",
+        "Xiaoyue Xu",
+        "Sikui Zhang",
+        "Yinuo Xu",
+        "Bingxiang He",
+        "Chaojun Xiao",
+        "Xu Han"
+      ],
+      "arxiv_id": "2610.29352"
+    },
+    {
+      "id": "spare-moe-routing-entropy-pruning",
+      "kind": "paper",
+      "title": "SPARE: Sparsity Allocation via Routing Entropy for Efficient MoEs",
+      "url": "https://arxiv.org/abs/2610.29662",
+      "source": "arXiv",
+      "category": "efficiency",
+      "on_focus": true,
+      "headline": "SPARE sets per-layer MoE expert-pruning ratios from routing entropy; beats uniform allocation on Mixtral, Qwen3 and DeepSeek models",
+      "summary": "Expert-pruning methods for MoE LLMs focus on which experts to drop but prune every layer by the same amount. SPARE is training-free and instead decides how many experts to remove per layer. On calibration data it measures routing entropy, i.e. how evenly each token's normalised top-k gate weights spread across experts. Layers with more diffuse routing are pruned harder, because removing one expert from a spread-out distribution discards less of the routed signal. It plugs into an existing expert selector. The authors support the rule with a perturbation bound under random pruning and with controlled interventions.",
+      "result": "Under the same selector and pruning budget, SPARE beats uniform per-layer allocation on Mixtral, Qwen3 and DeepSeek models, with the largest gains at high pruning ratios. The abstract gives no numbers.",
+      "critique": "Only the abstract could be read; arXiv rate-limited the full text three times, so model sizes, benchmarks and gains are unknown here. The only baseline named is uniform allocation. Comparison against other non-uniform allocation schemes and against expert merging is not visible. Memory saved and latency are not reported in the abstract.",
+      "authors": [
+        "Yifan Yang",
+        "Hanling Yi",
+        "Dongquan Yang",
+        "Feng Lin",
+        "Rong Xiao",
+        "Aijun Li",
+        "Xiaotian Yu"
+      ],
+      "arxiv_id": "2610.29662"
+    },
+    {
+      "id": "right-on-q-quantized-reasoning",
+      "kind": "paper",
+      "title": "Right On Q: Recovering Reasoning under Quantization via Self-Generated Trajectories",
+      "url": "https://arxiv.org/abs/2610.29378",
+      "source": "arXiv",
+      "category": "efficiency",
+      "on_focus": true,
+      "headline": "OnQ trains 2-3-bit Qwen3 models on their own outputs with a per-token KL mix; +10.26 avg points over the best baseline at 2-bit 8B",
+      "summary": "Quantization-aware training for low-bit reasoning models usually fits the quantized student to fixed full-precision teacher responses. Students still fail long reasoning tasks and often run out of token budget. The authors trace this to prefixes the student never generates itself, a gap that grows with response length, and to systematic under- and over-prediction of candidate tokens at high-entropy prefixes. OnQ first does block-wise calibration, then on-policy distillation: the quantized student generates its own responses and the full-precision teacher supervises them. A candidate-wise 'Dynamic KL' weights forward and reverse KL per token by the teacher/student probability ratio.",
+      "result": "On Qwen3-1.7B/4B/8B at 2 and 3 bits, OnQ has the highest average across nine benchmarks. At 2 bits it beats every baseline on every benchmark at every size, and improves the Qwen3-8B average by 10.26 points over the strongest baseline. It also produces shorter responses with fewer truncations and repetition failures.",
+      "critique": "Only the abstract was read: the nine benchmarks, the baselines and the per-size numbers are not named there. On-policy distillation for low-bit reasoning has been proposed before, so how much comes from Dynamic KL rather than on-policy data needs the ablations. Training cost of student rollouts is not given in the abstract. Results cover only Qwen3 up to 8B.",
+      "authors": [
+        "Boyuan Zheng",
+        "Jing Xiong",
+        "Chenwei Wu",
+        "Hui Shen",
+        "Zesen Zhao",
+        "Hei Ting Una Chan",
+        "Xueshen Liu",
+        "Zhen Zhang",
+        "Liyue Shen",
+        "Zechun Liu",
+        "Z. Morley Mao"
+      ],
+      "arxiv_id": "2610.29378"
+    },
+    {
+      "id": "law-pure-self-conditioning-lm",
+      "kind": "paper",
+      "title": "Loopholing All the Way: Language Modeling with pure Self-Conditioning",
+      "url": "https://arxiv.org/html/2610.30068",
+      "source": "arXiv",
+      "category": "architecture",
+      "on_focus": true,
+      "headline": "LAW drops discrete tokens from diffusion LM sampling, propagating only an expected-embedding state; 42.2% vs 34.5% on GSM8K over LDDM",
+      "summary": "Discrete diffusion LMs sample each position independently and discard the denoiser's prediction after every step. Loopholing (LDDM) carries a continuous self-conditioning state alongside the sampled tokens. LAW keeps only the continuous state: it propagates the expected embedding under the denoiser's predicted distribution from step to step, starts from uniformly random tokens, and decodes tokens once at the final step. Two choices make this work: using the expected embedding rather than the final hidden state as the state, and temperature regularisation during training.",
+      "result": "Hard Sudoku: 96.5% vs 91.0% for LDDM-U and 58.4% for Duo. GSM8K (TinyGSM training, 1024 NFE): 42.2% vs 34.5% for LDDM-U. Fine-tuning Duo with LAW raises GSM8K from 17.2% to 48.1%. Ablations: expected embedding vs final hidden state 35.8% vs under 1.5%, and temperature regularisation 24.8% to 48.8%. On OpenWebText its generative perplexity approaches the autoregressive baseline at 64 NFE and beats it at 1024 NFE. Diffusion and flow baselines are compared at matched training FLOPs.",
+      "critique": "Model sizes, training tokens and wall-clock latency are not given in what was read, so the speed case against autoregressive decoding is not made. Generative perplexity at 1024 NFE comes with entropy capped around 5.1-5.2, so the comparison with the autoregressive model depends on sample diversity. Tasks are small-scale (Sudoku, maze, TinyGSM-trained GSM8K). The limitations section was cut off in the text read.",
+      "authors": [
+        "Adrien Deschenaux",
+        "Nadezhda Ilieva",
+        "Manuel Madeira",
+        "Dorina Thanou",
+        "Aurelien Lucchi",
+        "Antonio Orvieto",
+        "Caglar Gulcehre",
+        "Pascal Frossard"
+      ],
+      "arxiv_id": "2610.30068"
+    },
+    {
+      "id": "llm-d-v1-0-0",
+      "kind": "release",
+      "title": "llm-d v1.0.0",
+      "url": "https://github.com/llm-d/llm-d/releases/tag/v1.0.0",
+      "source": "llm-d (GitHub release notes)",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "llm-d v1.0.0: v1 router config API, flow-control QoS, router HA and DisaggregatedSet for prefill/decode; base vLLM v0.31.0",
+      "summary": "First stable release (20 Oct) of the Kubernetes-native distributed inference stack now under CNCF, founded by Red Hat, IBM, Google Cloud, CoreWeave and NVIDIA. New: priority- and fairness-aware flow control with load shedding (config moved under flowControl); router high availability with hot standby and rolling updates; DisaggregatedSet, which manages prefill and decode replicas as one unit; router configuration API graduated to v1; Responses API previous_response_id support; session affinity and turn-priority scheduling for multi-turn agents. It ships with base vLLM v0.31.0, SGLang v0.5.22 and TRT-LLM 1.3.0rc29 images. Existing features include prefix-cache- and load-aware routing, KV offloading, P/D disaggregation and wide expert parallelism.",
+      "critique": "The release notes contain no benchmarks. The 5-10x cost reduction and 3x throughput figures in IBM's press release give no baseline or method in the release itself. Its GLM 5.2 numbers (6.6M output tokens/min, 3,000 concurrent agents) are compared with commercial API pricing, not other serving stacks. The notes themselves say not all 1.0 goals (issue #2619) were met. They list breaking changes (the P/D guide needs LeaderWorkerSet v0.11.1+ with DisaggregatedSet) and deprecate the ROCm image."
+    }
+  ]
+}
