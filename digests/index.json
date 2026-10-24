@@ -1,7 +1,15 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-10-23T10:11:15+08:00",
+  "updated_at": "2026-10-24T10:26:27+08:00",
   "digests": [
+    {
+      "date": "2026-10-24",
+      "item_count": 10,
+      "on_focus_count": 9,
+      "top_headline": "BeNice! lets looped LMs share one KV cache across recurrences at matched perplexity; up to 83.6% lower p90 TTFT in simulated serving",
+      "json": "digests/2026-10-24.json",
+      "md": "digests/2026-10-24.md"
+    },
     {
       "date": "2026-10-23",
       "item_count": 8,
