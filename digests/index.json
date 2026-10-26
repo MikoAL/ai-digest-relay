@@ -1,7 +1,15 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-10-25T10:17:14+08:00",
+  "updated_at": "2026-10-26T09:59:46+08:00",
   "digests": [
+    {
+      "date": "2026-10-26",
+      "item_count": 9,
+      "on_focus_count": 8,
+      "top_headline": "EAGLE-4 speculative drafter: 289 tok/s vs 82 plain and 178 built-in MTP on Qwen3.8-27B, one MI355X, SGLang (AMD, Oct 20)",
+      "json": "digests/2026-10-26.json",
+      "md": "digests/2026-10-26.md"
+    },
     {
       "date": "2026-10-25",
       "item_count": 8,

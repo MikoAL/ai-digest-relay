@@ -1,161 +1,163 @@
 {
   "schema_version": 1,
-  "date": "2026-10-25",
-  "generated_at": "2026-10-25T10:17:14+08:00",
-  "notes": "Sunday in Taipei: arXiv makes no announcement on Friday or Saturday evenings US Eastern, so there is no new batch today. The newest listing is still the one dated Fri 23 Oct; only its first 50 of 205 cs.LG entries were readable, and arXiv rate-limited most abstract and HTML fetches again. This digest therefore leans on earlier papers not yet covered: Looped UDLMs (21 Oct), Low-Bit N-Gram Embeddings (22 Oct) and KV-Surgeon (19 Oct) were left out of earlier digests because their pages could not be read then. AOPD and Causal CoT rest on abstracts only. 'Asymmetric Looped Transformers' (2610.28489) and 'Multi-Token Prediction and Alternative Tokenization...' (2610.31439) could not be read and were left out. The Hugging Face Daily Papers page could not be fetched. Laplace 3B dates from 20 Oct and had not been covered.",
+  "date": "2026-10-26",
+  "generated_at": "2026-10-26T09:59:46+08:00",
+  "notes": "Monday in Taipei. arXiv's Mon 26 Oct batch (announced Sun 20:00 US Eastern) was not yet visible to this run: arxiv.org/list/cs.LG/recent still showed Fri 23 Oct as the newest listing, and arXiv rate-limited most abstract and HTML fetches. The Hugging Face Daily Papers page could not be fetched. This digest therefore leans on lab and engineering posts from 20-23 Oct and on earlier papers not yet covered: the NVFP4 study (17 Oct), the mixed-precision scaling law (13 Oct), FIGFLEX (21 Oct) and Orthros (12 Oct). Orthros rests on its NeurIPS poster abstract; the EAGLE-4 design rests on AMD's day-0 post, because the EAGLE repo and model card could not be read. 'History Replays Itself' (2610.15715) and 'LEAF' (2610.27078) could not be read and were left out.",
   "items": [
     {
-      "id": "looped-uniform-diffusion-lms",
-      "kind": "paper",
-      "title": "Looped Uniform Diffusion Language Models",
-      "url": "https://arxiv.org/abs/2610.30066",
-      "source": "arXiv",
-      "category": "architecture",
-      "on_focus": true,
-      "headline": "Looping early layers inside each denoising step lets uniform diffusion LMs match a ~0.5T-token baseline's NLL with up to 3.3x fewer FLOPs",
-      "summary": "Uniform diffusion LMs (UDLMs) corrupt tokens to other vocabulary tokens rather than to a mask, so the model must denoise from a context that may itself be wrong. That makes them costlier to train than masked diffusion LMs, though they are reported to reason better. The authors take selective looping (re-applying a few early Transformer layers several times within each denoising step), previously shown to help masked diffusion LMs at iso-FLOPs, and apply it to UDLMs without changing the training objective or the sampler. They also study the distribution from which the loop count is sampled during training.",
-      "result": "Per the abstract: looped UDLMs reach the validation NLL of a non-looped UDLM trained on about 0.5T tokens with up to 2.8x fewer training FLOPs on OpenWebText and up to 3.3x fewer on FineWeb-Edu. At matched function evaluations, generation perplexity is up to 9.8% lower than the non-looped model, with most of the gain at moderate loop counts. Sampling small loop counts more often in training uses 12% fewer loops on downstream tasks than uniform loop-count sampling, at equal accuracy.",
-      "critique": "Read from the abstract only; the paper body could not be fetched, so model sizes, compute accounting and the downstream task list are unchecked. Results are 'up to' figures. The baseline is a non-looped UDLM; there is no comparison here with a masked diffusion LM or an autoregressive model at equal FLOPs, so the gap UDLMs must close is not quantified. Generation perplexity is measured by an external scorer and can reward low-diversity text. Looping cuts parameters, not inference compute per step, so wall-clock cost is not reported. No code link on the arXiv page.",
-      "authors": [
-        "Saiteja Utpala",
-        "Chieh-Hsin Lai",
-        "Yuki Mitsufuji",
-        "Praneeth Vepakomma"
-      ],
-      "arxiv_id": "2610.30066"
-    },
-    {
-      "id": "low-bit-n-gram-embeddings",
-      "kind": "paper",
-      "title": "Low-Bit N-Gram Embeddings for Language Models",
-      "url": "https://arxiv.org/abs/2610.31646",
-      "source": "arXiv",
-      "category": "efficiency",
-      "on_focus": true,
-      "headline": "4-bit n-gram embedding tables cut table memory ~75% and keep >99% of their loss gain; 47-55% savings on two large MoEs",
-      "summary": "Several open-weight LLMs now add n-gram embedding tables (learned vectors for 2- and 3-token sequences, looked up at inference); the abstract cites 196B parameters in DeepSeek-V4.1-Flash's Engram memory. The authors store these tables at low precision, compare quantization methods and per-table bit allocations, test brief fine-tuning to recover losses at very low bit widths, and try reinvesting the freed memory in larger tables.",
-      "result": "Per the abstract: in nanochat-, Llama- and GPT-2-family models trained from scratch, 4-bit tables cut table memory by about 75% while keeping over 99% of the validation-loss improvement the tables provide; larger tables at low bit width can beat the original full-precision tables while using less memory. Applied post hoc to DeepSeek-V4.1-Flash and Qwen3.8-Flash-Next, low-bit tables reduce table memory by 47-55% with under 1.2% perplexity increase and largely retained downstream accuracy.",
-      "critique": "Read from the abstract only. From-scratch experiments are on small model families, and 'largely retained' downstream performance on the large models is not quantified in the abstract. The 47-55% figure is less than the 75% at 4 bits, suggesting mixed or higher precision on the big models, which the abstract does not explain. Lookup tables are memory-bound but cheap in compute, so savings in memory footprint may not translate into speed; no latency or throughput numbers. Closely overlaps 'N-Gram Memories at Two Bits' (2610.21810, covered 21 Oct); the abstract does not compare against it.",
-      "authors": [
-        "Stephen Chung",
-        "Wenyu Du"
-      ],
-      "arxiv_id": "2610.31646"
-    },
-    {
-      "id": "kv-surgeon",
-      "kind": "paper",
-      "title": "The KV-Surgeon: Compensation-Aware Offline KV-Cache Compaction",
-      "url": "https://arxiv.org/abs/2610.25933",
-      "source": "arXiv",
-      "category": "inference",
-      "on_focus": true,
-      "headline": "KV-Surgeon compacts a fixed context's KV cache offline with a quadratic surrogate; up to +4 QA points over attention matching at 50x",
-      "summary": "Offline KV compaction builds a smaller cache for a fixed long context once and reuses it across many queries. Existing methods score each entry independently, but softmax renormalization couples deletions. KV-Surgeon fits a quadratic surrogate of the attention-output error on calibration queries, greedily deletes entries using its closed-form solution, updates the remaining entries in closed form after each deletion to compensate, and finally refits the retained keys' logit biases and values. A faster variant is also given. Code (MIT) is at github.com/ZIB-IOL/KV-Surgeon and supports Qwen3/Qwen3-MoE, Llama 3.1 and Gemma 3.",
-      "result": "Per the abstract: on QuALITY, LongHealth and Long Code Arena, it improves the cost-accuracy trade-off at every compaction ratio tested for dense and MoE models from 4B to 30B. At 50x compaction it gains up to 4 QA accuracy points over attention matching (Zweiger et al., 2026) at comparable cost; the fast variant also beats it at two-fifths of the cost.",
-      "critique": "Numbers come from the abstract; per-benchmark tables were not read. 'Up to 4 points' is a best case. Only applies to fixed contexts queried repeatedly, and depends on calibration queries resembling real ones; robustness to query distribution shift is not stated in the abstract. Compaction cost is compared, but serving latency is not reported. Submitted 19 Oct; omitted from earlier digests because its page could not be read.",
-      "authors": [
-        "Moritz Wagner",
-        "Christophe Roux",
-        "Max Zimmer",
-        "Sebastian Pokutta"
-      ],
-      "arxiv_id": "2610.25933"
-    },
-    {
-      "id": "rcr-kv-reselection-multimodal",
-      "kind": "paper",
-      "title": "Drift Says When, Budget Says How Much: Rate-Controlled KV Re-selection for Long-Form Multimodal Generation",
-      "url": "https://arxiv.org/html/2610.31433",
-      "source": "arXiv",
-      "category": "inference",
-      "on_focus": true,
-      "headline": "RCR re-selects MLLM visual-token KV when attention drifts to evicted tokens; beats InfiniGen by 1.6-3.8 ROUGE-L in 5 of 6 settings",
-      "summary": "Multimodal LLM KV compression usually picks which visual tokens to keep once at prefill. On long detailed captions attention moves across the image, so even an oracle one-shot selection agrees with the uncompressed output at only 0.44-0.52 ROUGE-L (32 tokens per head). Rate-Controlled Refresh (RCR) keeps a full prefix KV copy off the GPU cache and measures drift, the attention mass a step puts on evicted tokens, with a low-rank detector over 8 SVD-rotated key channels (about 4x smaller than InfiniGen's). When drift crosses a per-sample threshold, that layer re-selects tokens, scoring the detector's top 4c candidates exactly and keeping c. The threshold is adjusted multiplicatively so a target fraction (0.4) of layer-steps refresh, and decisions run on the GPU without host syncs.",
-      "result": "At 64 prefix entries per head on Qwen2-VL-7B, LLaVA-NeXT-Mistral-7B and Qwen3-VL-8B (TextCaps, DetailCaps): beats InfiniGen in 5 of 6 model-task settings by +1.6 to +3.8 ROUGE-L (e.g. Qwen2-VL DetailCaps .598 vs .570; LLaVA-NeXT DetailCaps .485 vs .451), and stays within 1.7 points of exact per-step re-selection while refreshing 40-48% of layer-steps. Beats random timing at the same rate by 5.0 points and periodic 50% refresh by 2.0 on Qwen2-VL. Traffic is 63-77 vectors per step and head vs InfiniGen's 64. The margin shrinks to +2.7 at 128 entries and +1.2 (not significant) at 256.",
-      "critique": "Fidelity is ROUGE-L against the uncompressed model's output, not correctness, and there is no human evaluation. Only 7-8B models, captioning and one 300-video task; on video it does not beat a fixed-threshold rule and is not significantly better than InfiniGen on Qwen2-VL. Baselines are the authors' re-implementations in a shared simulation that keeps the full prefix on the GPU, so costs are traffic estimates; no measured latency in a real offloading system. Components were tuned on a 100-image dev split without multiple-comparison correction (all stated by the authors).",
-      "authors": [
-        "Bin Hu",
-        "Yingbo Xiao"
-      ],
-      "arxiv_id": "2610.31433"
-    },
-    {
-      "id": "nvidia-nemotron-3-5-bolt-e4b-4gb",
+      "id": "eagle-4-amd-instinct",
       "kind": "release",
-      "title": "NVIDIA Nemotron 3.5 Bolt E4B 4GB",
-      "url": "https://huggingface.co/nvidia/NVIDIA-Nemotron-3.5-Bolt-E4B-4GB",
-      "source": "Hugging Face model card (NVIDIA)",
-      "category": "efficiency",
+      "title": "EAGLE-4 on AMD Instinct GPUs from day 0",
+      "url": "https://www.amd.com/en/developer/resources/technical-articles/2026/eagle-4-on-amd-instinct-gpus.html",
+      "source": "AMD Developer blog",
+      "category": "inference",
       "on_focus": true,
-      "headline": "NVIDIA releases Nemotron 3.5 Bolt E4B 4GB: Gemma-4-E4B-it post-trained with RL, shipped as Q4_K_M with a DFlash speculative drafter",
-      "summary": "Open model released 23 Oct 2026 (HF and build.nvidia.com). It is Google's Gemma-4-E4B-it (8B total, ~4B effective parameters, Gemma 4 architecture) further post-trained by NVIDIA with RL (GRPO per the card; RLVR and RLHF via NeMo-RL/NeMo-Gym per NVIDIA's research page) for tool calling, instruction following and instruction hierarchy. NVIDIA's research page says the BF16 checkpoint was quantized to Q4_K_M with llama.cpp using importance-matrix calibration, targeting about 4GB of memory; context is 64K. A separate DFlash drafter (NVIDIA-Nemotron-3.5-Bolt-E4B-4GB-DFlash) proposes all draft tokens in one forward pass for speculative decoding. License OpenMDW-1.1.",
-      "result": "Model card (Q4_K_M, NeMo Gym harness) vs Gemma-4-E4B-it / Qwen3.5-4B / Nemotron-3-Nano-4B: MultiChallenge 55.60 vs 39.36 / 52.23 / 34.53; IHEval 82.40 vs 66.61 / 62.87 / 53.75; BFCL-v3 67.31 vs 65.03 / 70.56 / 59.07; Tau2-Bench 52.32 vs 38.72 / 61.74 / 14.89; RULER 64K 85.76 vs 86.14 / 95.37 / 91.31. NVIDIA's research page reports 133.4 tok/s decode and 548 ms TTFT on an RTX 5070 using 3.5GB VRAM, and 15.5 tok/s on Jetson Orin Nano (Q4_K_M, batch 1, llama.cpp CUDA), and says DFlash gives up to 21% more throughput than Gemma 4 E4B's original MTP drafter.",
-      "critique": "All numbers are vendor-reported in NVIDIA's own harness. The model card and the research page give different scores for the same benchmarks (e.g. MultiChallenge 55.60 vs 53.1, BFCL-v3 67.31 vs 68.5) without explaining the setting difference. It trails Qwen3.5-4B on Tau2-Bench, BFCL-v3, IFBench and long-context RULER, and is below its own Gemma base on RULER. 'E4B' is 8B total parameters; the 4GB footprint comes from standard Q4_K_M quantization, not a new compression method. The speed table and the DFlash speedup come from the research page, not the card, and there is no head-to-head speed comparison against the base model at equal quantization.",
-      "authors": [
-        "NVIDIA"
-      ]
+      "headline": "EAGLE-4 speculative drafter: 289 tok/s vs 82 plain and 178 built-in MTP on Qwen3.8-27B, one MI355X, SGLang (AMD, Oct 20)",
+      "summary": "EAGLE-4 is the EAGLE team's new speculative-decoding drafter. Per AMD's day-0 post (20 Oct), it adds three things to the EAGLE family: (1) per-step tree adaptation, where a harness profiles draft and verify cost on the actual hardware at start-up and picks the draft tree that maximises accepted tokens per unit cost, so it uses wide, deep trees at batch 1 and short chains under heavy load; (2) a low-rank head that shortlists vocabulary candidates before the full LM head scores them, cutting draft cost by more than 40% without truncating the vocabulary; (3) a one-layer drafter. A secondary AlphaSignal summary adds a sliding-window draft layer and append-only draft KV cache, vLLM/SGLang integration, and a source-available licence that caps free commercial use at USD 20M annual revenue.",
+      "result": "Qwen3.8-27B BF16, SPEED-Bench, thinking on, greedy, one MI355X: at 1 concurrent conversation, 82 tok/s plain, 178 with built-in MTP, 289 with EAGLE-4 on SGLang and 309 on ATOM (about 3.5x plain, 1.6x MTP). At 32 conversations: 1,285 / 2,551 / 2,784 / 3,243. With 4-GPU tensor parallelism at 1 request: 156 / 303 / 463 (SGLang) / 489 (ATOM).",
+      "critique": "These are vendor numbers on one model, one benchmark, greedy decoding only. The advantage over built-in MTP shrinks from 1.6x at batch 1 to about 1.09x at 32 concurrent requests on SGLang. The EAGLE team's own repo, paper PDF and model card could not be retrieved this run, so the design description rests on AMD's summary and nothing is independently reproduced. The licence is source-available, not open source (per secondary coverage). The release dates from 20 Oct and had not been covered."
     },
     {
-      "id": "aws-i14-laplace-3b-linear-attention-trainium2",
+      "id": "cerebras-kimi-k3-59-wafers",
       "kind": "news",
-      "title": "Beyond the KV cache: Training and serving i14's Laplace 3B linear attention model on AWS Trainium2 with native PyTorch",
-      "url": "https://aws.amazon.com/blogs/machine-learning/beyond-the-kv-cache-training-and-serving-i14s-laplace-3b-linear-attention-model-on-aws-trainium2-with-native-pytorch/",
-      "source": "AWS Machine Learning Blog",
-      "category": "architecture",
+      "title": "How we deploy trillion-parameter frontier models on Cerebras",
+      "url": "https://www.cerebras.ai/blog/how-we-deploy-trillion-parameter-frontier-models-on-cerebras",
+      "source": "Cerebras blog",
+      "category": "inference",
       "on_focus": true,
-      "headline": "AWS and i14 detail training and serving Laplace 3B, a pure gated-linear-attention model with a fixed 29.5 MB state, on Trainium2",
-      "summary": "Laplace 3B (3.028B parameters) replaces softmax attention in all 24 layers with Simple Gated Linear Attention, using fixed per-head geometric decay (half-lives from 1 to ~2,048 tokens), a width-4 causal depthwise conv, and a SiLU GLU FFN. Its recurrent state is 29.5 MB per sequence regardless of context length. It is trained on one trn2.48xlarge (16 Trainium2 chips) in native PyTorch via TorchNeuron with FSDP2 and distributed Muon, toward 100B FineWeb-Edu tokens. Switching Muon's communication from gather/broadcast to all_to_all cut per-rank traffic from 10.87 GB to 0.45 GB per step. Serving uses an unmodified vLLM engine with a wrapper and a compiled decode step. Published 20 Oct 2026.",
-      "result": "Training throughput rose from 73,378 to 119,934 tokens/s (1.63x) after the Muon all_to_all change, with a loss curve the post calls bit-identical; training had reached step 84,210 (~44B tokens, loss ~2.37) at writing. Serving: 11,544 output tokens/s across 1,280 concurrent sequences on one trn2.48xlarge; compiling decode gave 1.7x over eager. Growing the prompt from 2,048 to 8,192 tokens added 0.5% to cost per output token. The post claims the state is ~82x smaller than an 8,192-token KV cache.",
-      "critique": "Vendor post co-written with i14. No quality benchmarks of any kind, including long-context retrieval where pure linear attention is known to be weak, and no transformer baseline at equal size or tokens. Training was less than half done. The 82x KV comparison does not say which transformer configuration it assumes. No dollar cost figures, and the claim that Trainium beat the original GPU Triton kernel has no numbers. Recompilation for new batch shapes took 47.5% of decode time in one test.",
-      "authors": [
-        "Kevin Shabahang",
-        "Massimo Bardetti",
-        "Iman Abbasnejad",
-        "Xiaodong Yu",
-        "Daniel Wirjo"
-      ]
+      "headline": "Cerebras maps ~3T-param Kimi K3 onto 59 WSE-3T wafers as a layer pipeline, with 4-bit weights and an 8-bit KV cache",
+      "summary": "Cerebras explains how it serves Kimi K3 (about 3T parameters; 69 linear-attention layers plus 24 dense-attention layers) from on-chip SRAM. Each wafer has 44 GB of SRAM and each layer needs about 16 GB with 4-bit weights. Two linear-attention layers share a wafer (35 wafers), while each dense layer gets its own wafer (24 wafers) and uses the leftover SRAM for its 8-bit KV cache. Layers are pipeline stages; weights stay put and only activations cross wafers over RDMA-over-Ethernet at about 2 microseconds per hop. Requests stream through the pipeline continuously, and concurrency is roughly stages times micro-batch size. The ceiling comes from KV cache on the dense layers, since linear-attention layers keep a fixed-size state per request.",
+      "critique": "An explanatory post, not a benchmark. The '1000-2000+ tokens per second' figure is stated as a target, without saying whether it is per user or aggregate, and the concurrency figure appears only in an image. No GPU baseline, no tokens/s per megawatt despite calling it the meaningful metric, and no accuracy impact of 4-bit weights or 8-bit KV. The 256k average request length assumption drives the KV budget. Hacker News coverage headlined 2,000 tok/s, which the post does not firmly claim. Published 22 Oct; it reached the HN front page on 25 Oct."
     },
     {
-      "id": "aopd-advantage-on-policy-distillation",
+      "id": "nvfp4-training-recipes-study",
       "kind": "paper",
-      "title": "When to Follow the Teacher: Advantage-Based On-Policy Distillation",
-      "url": "https://arxiv.org/abs/2610.31563",
+      "title": "What Matters for NVFP4 Training? A Comparative Study of Low-Precision Pretraining Recipes",
+      "url": "https://arxiv.org/abs/2610.24343",
       "source": "arXiv",
       "category": "training",
       "on_focus": true,
-      "headline": "AOPD weights each teacher action in on-policy distillation by its estimated advantage for the student, using only standard student rollouts",
-      "summary": "On-policy distillation (OPD) trains the student on its own trajectories but assumes it should imitate the teacher at every step. AOPD separates what the teacher prefers from what helps the student succeed: each teacher action is weighted by its counterfactual advantage for the student, reinforcing helpful actions and downweighting unhelpful ones. Computing that advantage exactly would need extra rollouts; the authors show the objective can be estimated from ordinary student rollouts and their final rewards using teacher importance weights on sampled actions, keeping OPD's rollout cost.",
-      "result": "The abstract reports gains over distillation and RL baselines on math, coding and MedQA, in both external-teacher and self-distillation settings, but gives no numbers; the paper body could not be read in this run.",
-      "critique": "No quantitative result could be verified, and model sizes, baselines and compute are unknown from the abstract. Importance weighting between teacher and student policies can have high variance when they diverge, and the abstract does not say how this is controlled. Similar advantage-shaped OPD variants have appeared in recent months (e.g. OPD+, SAF-OPD); whether they are compared is unknown. Needs a reward signal, so it does not apply to reward-free distillation.",
+      "arxiv_id": "2610.24343",
       "authors": [
-        "Mahdi Sabbaghi",
-        "George Pappas",
-        "Hamed Hassani",
-        "Adel Javanmard"
+        "Anjulie Agrusa",
+        "Andrei Panferov",
+        "Elizabeth Wei",
+        "Keith Wyss",
+        "Paul Gibbons",
+        "Erik Schultheis",
+        "Jinhang Choi",
+        "Frank Sun",
+        "Tijmen Blankevoort",
+        "Dan Alistarh"
       ],
-      "arxiv_id": "2610.31563"
+      "headline": "Controlled comparison of NVFP4 pretraining recipes on 8B dense and 30B-A3B MoE models up to 1T tokens; proposes a combined recipe",
+      "summary": "Most FP4 training methods have been validated only on small models and short runs. This paper compares recent NVFP4 pretraining recipes head to head on a dense 8B model and a 30B-A3B MoE, each trained for up to 1T tokens, and ablates which components are needed to stay close to BF16. The final recipe combines established stability techniques with an unbiased gradient estimator that has lower quantization error than stochastic rounding, and keeps selected layers in high precision.",
+      "result": "The authors claim the strongest FP4 training result at this scale to date, measured by loss gap to BF16. Ablations: every component of the recipe improves the loss trajectory, keeping some layers in high precision is necessary at scale, and de-biasing helps some backward-pass tensors more than others. The abstract gives no numeric loss gap, and the HTML tables could not be retrieved this run.",
+      "critique": "A 10-page workshop paper (ICML 2026 AdaptFM). The headline metric is pretraining loss gap; downstream evaluation is not described in the abstract. No end-to-end throughput or energy numbers are given, though the motivation is speed. Which layers stay in high precision, and therefore how much of the 4-bit speedup is kept, was not visible. Submitted 17 Oct; not previously covered."
     },
     {
-      "id": "causal-cot-context-isolation",
+      "id": "mixed-precision-scaling-laws",
       "kind": "paper",
-      "title": "Causal Chain of Thought: Mitigating Attention Leakage via Context Isolation",
-      "url": "https://arxiv.org/abs/2610.31639",
+      "title": "Mixed Precision Scaling Laws for Quantized Pretraining",
+      "url": "https://arxiv.org/html/2610.17637",
       "source": "arXiv",
+      "category": "scaling",
+      "on_focus": true,
+      "arxiv_id": "2610.17637",
+      "authors": [
+        "Jinuk Kim",
+        "Rajarshi Saha",
+        "Muhammed Fatih Balın",
+        "Youngsuk Park"
+      ],
+      "headline": "Precision scaling law that splits forward and backward quantization and predicts optimal training precision rises with compute",
+      "summary": "The paper fits a scaling law for quantized pretraining that treats forward-pass and backward-pass precision separately. Each scheme rescales effective parameters (forward) or effective tokens (backward), and an added persistent optimization-error term per pass is motivated by a convex convergence bound. A layer-wise extension interpolates loss by the fraction of blocks in each scheme. The authors then solve for compute-optimal model size, token count and per-layer forward/backward precision (BF16, MXFP8 and NVFP4 variants), given assumed hardware speedups.",
+      "result": "Up to 11x lower MSE than existing precision scaling laws on held-out loss as size and tokens scale. In a 430M / 12.8B-token decomposition, NVFP4 in the backward pass only adds 0.32-0.72% loss over BF16, while NVFP4 in the forward pass only adds 0.94-1.22%. The best FP4 recipe (Quartet II, 4/6 + 1D scaling with MS-EDEN) still leaves a 1.07% gap. Unlike prior laws, it predicts that the optimal precision increases with compute budget.",
+      "critique": "The authors' own fits use Qwen3-style models only up to 0.9B parameters and 35.8B tokens, plus published Quartet results, so frontier-scale conclusions are extrapolated. Compute-optimal allocations depend on assumed speedups (MXFP8 fixed at 1.8x) and will move with kernels and hardware. The theory assumes convexity and bounded moments. Some scheme combinations (e.g. 2D forward scaling) are excluded from the grid. Submitted 13 Oct; not previously covered."
+    },
+    {
+      "id": "torchtitan-oct-2026-update",
+      "kind": "release",
+      "title": "TorchTitan Update: New SOTA Models, Performance at Scale, TitanRL",
+      "url": "https://pytorch.org/blog/torchtitan-update-new-sota-models-performance-at-scale-titanrl/",
+      "source": "PyTorch blog",
+      "category": "training",
+      "on_focus": true,
+      "headline": "TorchTitan update: MXFP8 DeepSeek-V3 671B at 5,324 tok/s/GPU on 256 GB300s, ~25x less checkpoint blocking, plus TitanRL",
+      "summary": "Meta's PyTorch-native training stack adds Muse Spark Open, Kimi K3, DeepSeek-V4, Qwen3.5 and others across its 5D parallelism. It also integrates Attention Gym kernels (Gated DeltaNet, Kimi Delta Attention, sparse attention) and Helion kernels. Systems changes include Dist-MoE fused communication-compute kernels for SM100+ with CUDA-graphable activation packing, a deterministic CUDA-graphable pipeline-parallel rewrite, selective local_compile, a torch_remat checkpointing API, a new checkpointing library, and FlexShard (an Owned/BlockShard sharding library). TitanRL uses one model definition from pretraining through vLLM rollouts and has a batch-invariant mode that gives bitwise-identical trainer and generator log-probs.",
+      "result": "DeepSeek-V3 671B (+MTP1), MXFP8, GB300: 5,324 TPS/GPU and 1,553.9 TFLOPs/GPU on 256 GPUs (PP2), 5,263 TPS/GPU on 512. Muse Spark Open at 192K context on 512 GPUs: 31.3% MFU with learned routing, 37.2% when routing is forced to balance. Checkpointing on 512 H100s vs DCPv1: trainer blocking 841 to 34 ms, write 384 to 13 s. FlexShard: up to 79% faster distributed-Muon optimizer step on DSv3 (256 H100s), and up to 20% faster end-to-end steps on Llama 3 405B with blockwise FP8 all-gathers.",
+      "critique": "All numbers come from Meta's internal clusters. There is no side-by-side throughput against Megatron; matching Megatron loss convergence is only claimed, and the plot is not in the text. MFU is not reported for the headline DSv3 table. The forced-balanced routing rows show throughput headroom, not a quality-neutral setting. TitanRL results are shown as curves without numbers. Published 21 Oct; not previously covered."
+    },
+    {
+      "id": "flydsl-pytorch-amd",
+      "kind": "release",
+      "title": "Accelerating PyTorch on AMD GPUs with FlyDSL",
+      "url": "https://pytorch.org/blog/accelerating-pytorch-on-amd-gpus-with-flydsl/",
+      "source": "PyTorch blog",
+      "category": "efficiency",
+      "on_focus": true,
+      "headline": "FlyDSL becomes an optional PyTorch backend on MI350: 1.68x geomean over ATen on MXFP4 GEMM, up to 3.01x in vLLM A4W4",
+      "summary": "FlyDSL is a ROCm Python GPU DSL built on layout algebra and lowered through MLIR. It exposes the tile, wave and thread partitioning, MFMA atoms, LDS swizzles and synchronization that Triton mostly automates. It is now wired into stock PyTorch APIs as an opt-in backend: eager-mode RMSNorm and topk dispatch to it; TorchInductor autotunes FlyDSL against ATen and Triton for dense, grouped and MXFP8/MXFP4 scaled GEMMs; and SDPA can pick FlyDSL kernels through AOTriton. Unsupported inputs fall back to the existing kernels.",
+      "result": "MI355X kernel geomeans: dense BF16 GEMM 1.10x over the better of ATen and Triton (15 shapes); MXFP8 scaled GEMM 1.58x over ATen; MXFP4 1.68x over ATen (range 1.31-2.96x); grouped BF16 GEMM 1.20x over Triton and 1.95x over ATen; topk (K at most 16) 4.82x. End-to-end vLLM on one MI355X: BF16 up to 1.13x (Llama-3.1-8B), MXFP8 A8W8 1.04-2.04x and MXFP4 A4W4 1.25-3.01x over the hipBLASLt baseline.",
+      "critique": "Vendor-authored (AMD with Meta). Limited to gfx950. The kernel timings exclude compile and autotune cost. The vLLM MXFP cells are one run each. Large MXFP gains are measured against ATen/hipBLASLt rather than tuned Triton or AITER kernels, so how much is FlyDSL versus a weak baseline is unclear. The attention numbers compare AOTriton releases and do not isolate FlyDSL. Llama-3.3-70B BF16 gains are within noise. Published 21 Oct; not previously covered."
+    },
+    {
+      "id": "orthros-phase-aware-attention",
+      "kind": "paper",
+      "title": "Orthros: Phase-Aware Heterogeneous Attention for Efficient Transformers",
+      "url": "https://neurips.cc/virtual/2026/poster/154037",
+      "source": "NeurIPS 2026",
+      "category": "architecture",
+      "on_focus": true,
+      "arxiv_id": "2610.13735",
+      "authors": [
+        "Yuhong Chou",
+        "Zehao Liu",
+        "Yuqi Pan",
+        "Qian Liu",
+        "Xianwei Chen",
+        "Jibin Wu"
+      ],
+      "headline": "Orthros uses linear-complexity attention for prefill and full attention for decode in one module; 21.9x prefill speedup claimed",
+      "summary": "Hybrid models usually interleave full-attention layers with linear or sliding-window layers to keep in-context recall. Orthros instead decouples by phase within a single attention module: prefill runs a linear-complexity computation, while decoding attends with full attention. That lowers asymptotic cost for prefill-heavy, decode-light workloads such as long-document QA and RAG. The paper also describes a data-efficient conversion of a pretrained Transformer into Orthros.",
+      "result": "Reports a 21.9x prefill speedup over Transformers and near-perfect 128K needle-in-a-haystack retrieval. It says the converted model surpasses the original Transformer and that real-world in-context recall is on par with strong Transformer baselines. The poster abstract gives no benchmark scores or named baseline models.",
+      "critique": "Only the NeurIPS poster abstract could be read this run; the arXiv page was rate-limited, so the mechanism (how decode-time full attention reuses a prefill that never built a full KV cache) and the model sizes are unverified. NIAH is a weak test of long-context ability. The 21.9x is versus vanilla attention, not FlashAttention-class kernels or other hybrids. Decode-phase memory and cost are not quantified. From the 12 Oct batch; not previously covered."
+    },
+    {
+      "id": "figflex-fp-int-accelerator",
+      "kind": "paper",
+      "title": "FIGFLEX: A Mixed-Precision FP-INT GEMM Accelerator Co-Designed with Low-Bit LLM Quantization",
+      "url": "https://arxiv.org/abs/2610.30480",
+      "source": "arXiv",
+      "category": "efficiency",
+      "on_focus": true,
+      "arxiv_id": "2610.30480",
+      "authors": [
+        "Faraz Tahmasebi",
+        "Haocheng Xu",
+        "Andrew Trauger",
+        "Yomal Perera",
+        "Zhenyu Tang",
+        "Nael Chowdhury",
+        "Sitao Huang"
+      ],
+      "headline": "FIGFLEX co-designs a mixed-precision FP-INT GEMM accelerator and quantizer: 1.56x throughput/area over AxCore at 3-bit",
+      "summary": "Weight-only quantization saves memory but not compute: GPUs dequantize to FP16, and bit-parallel FP-INT accelerators support only one weight precision. FIGFLEX reformulates FP-INT multiplication as radix-4 shift-add, merging multiply and accumulate into one partial-product reduction and roughly halving partial products, and uses spare datapath at INT3. A matching quantizer assigns bit-widths per channel group from the error GPTQ cannot compensate, and applies power-of-two column scaling so activations stay out of FP16 subnormals.",
+      "result": "LLaMA-2-7B WikiText-2 perplexity without fine-tuning: 5.85 at 3-bit average and 8.77 at 2-bit average, reported as better than GPTQ, AWQ, SliM-LLM, AMQ and QuIP#. Whole-chip throughput per area on the linear GEMMs of a 3-bit mixed-precision model: 1.56x over AxCore and 1.42x over FIGLUT.",
+      "critique": "Accuracy is shown only on LLaMA-2-7B perplexity, an old model and a narrow metric, with no downstream tasks in the abstract. The abstract does not say whether the hardware results come from silicon or from synthesis and simulation, and they cover GEMMs only, not attention or end-to-end latency. Baseline perplexities were not visible. Mixed per-group bit-widths complicate integration into real serving stacks. Submitted 21 Oct; not previously covered."
+    },
+    {
+      "id": "kimi-k3-1-pro",
+      "kind": "release",
+      "title": "Kimi K3.1 Pro and K3.1 Pro Highspeed",
+      "url": "https://www.kimi.ai/blog/kimi-k3-1-pro",
+      "source": "Kimi blog",
       "category": "other",
       "on_focus": false,
-      "headline": "CausalCoT splits a problem into a DAG of sub-questions and lets each node attend only to its parents, aiming for more faithful CoT",
-      "summary": "With dense attention, a model can read the answer off the context directly, so chain-of-thought steps may be post-hoc rationalizations. CausalCoT is an inference-time framework that decomposes a problem into a directed acyclic graph of atomic sub-questions and evaluates each node using only its direct causal parents as context, removing attention to unrelated content. The graph also allows test-time interventions on a node whose corrections propagate downstream.",
-      "result": "Per the abstract: competitive accuracy on several reasoning benchmarks, with explanation faithfulness and causal sensitivity of intermediate steps improved by 12 points on average and up to 21 points over the strongest baseline.",
-      "critique": "Abstract only; benchmarks, models and the faithfulness metric are not specified there, and 'competitive' accuracy suggests no accuracy gain. Faithfulness metrics are defined by the authors' own interventions, which the method is built to respond to. Running one call per DAG node with isolated contexts likely increases inference cost and latency, which the abstract does not report. Included as an off-focus item on inference-time structure.",
-      "authors": [
-        "Gabriele Dominici",
-        "Teague McMillan",
-        "Fazl Barez",
-        "Marc Langheinrich",
-        "Martin Gjoreski"
-      ],
-      "arxiv_id": "2610.31639"
+      "headline": "Moonshot releases Kimi K3.1 Pro, a 3T-class post-trained K3 with 1M context; weights promised by Nov 4",
+      "summary": "K3.1 Pro is a further post-trained Kimi K3, using substantially more post-training compute plus a reworked RL framework, long-context inference and sandbox infrastructure for large-scale joint RL. Context is 1M tokens. A Highspeed variant is said to run 2-3x faster. Full weights are due by 4 Nov 2026; the API is available now. Moonshot also says it removed cyber-offence training data. It was the top AI story on Hacker News over the weekend (1,057 points).",
+      "result": "Terminal-Bench 4.0: 65.7% vs GPT-6 Astra 58.2% and Claude Opus 5.5 66.4%. Kimi Hallu Bench Hard claim-level hallucination with tools: 8.3% (K3: 23.4%; Opus 5.5: 15.0%; GPT-6 Astra: 5.5%). xdev-bench-hard cyber pass@3: 81.0% (K3 33.3%; checkpoint without data removal 90.5%).",
+      "critique": "Off focus: the changes are post-training, and the post gives no architecture, parameter count, licence or precision details. The Highspeed 2-3x claim comes with no explanation of how it is achieved. Several benchmarks are internal (Kimi Code Bench, finance suites, Hallu Bench). Weights are not out yet, so nothing is independently verified. The post carries no explicit date; announced 23 Oct per coverage."
     }
   ]
 }
