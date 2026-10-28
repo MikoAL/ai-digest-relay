@@ -1,0 +1,199 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-28",
+  "generated_at": "2026-10-28T09:58:00+08:00",
+  "notes": "Wednesday in Taipei. arXiv's Tue 27 Oct batch is covered here (it was not visible to yesterday's run); the Wed 28 Oct batch was not yet visible. arxiv.org listing pages showed only their first 50-74 entries, and arXiv rate-limited most abstract fetches, so StateLoop, COPE and the dynamic-evaluation paper were read through alphaXiv's copies of the arXiv text. Humming (21 Oct) and MiniMax-M3.1-Flash (vLLM day-0 post 23 Oct) had not been covered before. 'A Distribution-Matching Perspective on LLM Training Algorithms' (2610.33740) was left out because only its number-free abstract was readable. The Hugging Face Daily Papers page could not be fetched. Mistral Large 4 weights are still reported as due 31 Oct and are not included.",
+  "items": [
+    {
+      "id": "loopfold-parallel-recurrent-depth",
+      "kind": "paper",
+      "title": "LoopFold: Parallelizing Recurrent Depth in Looped Transformers",
+      "url": "https://arxiv.org/abs/2610.35556",
+      "source": "arXiv",
+      "category": "architecture",
+      "on_focus": true,
+      "headline": "LoopFold parallelizes loop depths in looped Transformers via a learned predictor and corrector, cutting sequential decode stages",
+      "summary": "Looped Transformers reuse one shared backbone several times per token, so decode latency grows with loop count. Parallel Loop Transformers (PLT) overlap loops across positions but lose accuracy at depth. LoopFold instead runs computations at several recurrent depths in parallel batches for the same prefix: a linear predictor (J = I + dJ, initialised to identity) extrapolates later-loop inputs from the first loop's state change so later loops start early, and a shared corrector refines their outputs as earlier-loop inputs settle. Schedules such as 1+5+5+5+5 reach target depth 9 in five sequential stages. The two maps add 2d^2 parameters (8.39M at 1.4B) and are trained jointly with plain next-token loss. 1.4B LLaMA-style models trained from scratch on 30B Pile tokens.",
+      "result": "Zero-shot Avg-8 accuracy at target depth 5/7/9: LoopFold 53.41/55.23/56.38 vs vanilla looped at the same depth 53.69/54.20/54.18 and PLT 52.41/52.19/52.10. Batch-1 decode latency roughly matches a 3/4/5-loop vanilla model (e.g. 121.68 vs 122.88 ms/token for D=9 vs 5 loops); the abstract claims 46% lower latency than a 9-loop vanilla model.",
+      "critique": "The 46% latency figure compares against a 9-loop vanilla model whose latency does not appear in the paper's tables. LoopFold trades sequential depth for more total FLOPs and KV cache (up to 7x storage without KV sharing; sharing costs some PPL/latency). At D=5 it trails vanilla looped on Avg-8. No dense non-looped baseline, single 1.4B scale, ablations at 410M only, GPU unnamed, no code linked.",
+      "authors": [
+        "Feichen Song",
+        "Boyi Zeng",
+        "Yiqin Hao",
+        "Shixiang Song",
+        "He Li",
+        "Yizhou Yang",
+        "Zitong Wang",
+        "Yifan Liu",
+        "Ziwei He",
+        "Zhouhan Lin"
+      ],
+      "arxiv_id": "2610.35556"
+    },
+    {
+      "id": "stateloop-persistent-state",
+      "kind": "paper",
+      "title": "StateLoop: Persistent State for Looped Transformers",
+      "url": "https://www.alphaxiv.org/abs/2610.35544",
+      "source": "arXiv (via alphaXiv)",
+      "category": "architecture",
+      "on_focus": true,
+      "headline": "StateLoop adds a gated per-token persistent state to looped Transformers, lowering Pile perplexity versus vanilla looping",
+      "summary": "In vanilla looped Transformers each pass's output is the only carrier of information to later passes. StateLoop adds a separate per-token state that persists across loop iterations: a learned gate decides how much old state to keep versus new backbone output, and the updated state is projected back and added to the backbone output used by later passes and the final prediction. Variants add attention or Mamba-2 to the state update. Same group as LoopFold. 1.4B models, 30B Pile tokens, K=4 loops; ablations at 410M/25B tokens.",
+      "result": "1.4B: Pile PPL 7.61 (StateLoop) / 7.60 (+Attn, +Mamba-2) vs 7.79 vanilla looped, 7.74 MeSH, 7.77 Hyperloop, 7.85 PonderLM, 7.87 Parcae; zero-shot Avg-8 54.28 / 54.75 vs 53.31 vanilla and 53.87 MeSH. Parameter overhead +1.18% to +3.26%, decode latency +1.4% to +2.1% at K=4. At 410M the PPL gap to vanilla grows from about 0.14 at K=3 to 0.30 at K=7.",
+      "critique": "Gains are modest (about 1 point Avg-8) at a single 1.4B scale, and the +FFN parameter-matched control is the only check that the gain is not just added parameters (it gets 7.75 PPL). No dense non-looped baseline. Read via alphaXiv's text of the arXiv paper because arXiv rate-limited this run; no code link seen.",
+      "authors": [
+        "Feichen Song",
+        "Boyi Zeng",
+        "He Li",
+        "Shixiang Song",
+        "Yiqin Hao",
+        "Zitong Wang",
+        "Yizhou Yang",
+        "Yifan Liu",
+        "Ziwei He",
+        "Zhouhan Lin"
+      ],
+      "arxiv_id": "2610.35544"
+    },
+    {
+      "id": "minimax-m3-1-flash",
+      "kind": "release",
+      "title": "MiniMax-M3.1-Flash",
+      "url": "https://huggingface.co/MiniMaxAI/MiniMax-M3.1-Flash",
+      "source": "Hugging Face model card",
+      "category": "architecture",
+      "on_focus": true,
+      "headline": "MiniMax-M3.1-Flash: ~428B-total / 23B-active multimodal MoE with MiniMax Sparse Attention in all layers and up to 1M context",
+      "summary": "Model card: native multimodal MoE (text, image, video in; text out), about 428B total and 23B active parameters per token, MiniMax Sparse Attention (MSA) throughout (the first three full-attention layers of M3 were replaced with sparse attention), up to 1M-token context, quantization-aware training over routed experts and attention paths, and a DSpark draft head replacing the earlier EAGLE-like MTP. Per vLLM's day-0 post (23 Oct), MSA splits the KV cache into 128-token blocks, a lightweight indexer scores blocks and attention runs over the top 16 plus the most recent block (at most 2,048 keys per query); routed experts and the KV cache are NVFP4, shrinking the checkpoint to 250.1 GB from 451.5 GB for M3-MXFP8.",
+      "result": "Card: BankerToolBench 76.2 (ties Opus 5), DeepSWE v1.1 73.7 vs 77.0 for DeepSeek V4.1 Flash-1017, Terminal Bench 4.0 38.1 vs 51.8 for Opus 5, LOCA-Bench 256K 60.3 vs 60.0 for GPT-5.6 Sol. vLLM reports that 4x B300 at 256K fits 76 concurrent sequences vs 28 for M3 with FP8 KV.",
+      "critique": "The card lists no layer count, expert count or hidden size, and the Safetensors metadata (220B params) disagrees with the stated ~428B total. No release date on the card; benchmarks are vendor-reported and it trails Opus 5 on most listed agentic tasks. Throughput and memory figures come from vLLM's blog, not MiniMax. Licence is 'minimax-community', not OSI."
+    },
+    {
+      "id": "humming-quantized-kernels",
+      "kind": "release",
+      "title": "Announcing Humming: Fast, Flexible Kernels for Quantized Inference",
+      "url": "https://vllm.ai/blog/2026-10-21-humming",
+      "source": "vLLM blog",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "Ant Group and vLLM release Humming, a JIT-compiled CUDA kernel library for WnA16, W8A8, W4A8 and W4A4 quantized GEMM and MoE",
+      "summary": "Humming (21 Oct, github.com/vllm-project/humming, pip humming-kernels) normalises quantized checkpoints from different export tools into one 'Humming standard' description (weight format, scale granularity/type, zero points, secondary scales), then JIT-compiles GEMM kernels with NVRTC/NVCC from shared components (dequant, cp.async/TMA/multicast loads, warp-specialized and UMMA pipelines, Stream-K and MoE scheduling). It covers INT1-INT3 and FP4-FP8 weight-only formats plus MXFP8/MXFP4/NVFP4 activation-quantized paths on SM75 through Blackwell, with a fast MXFP4-to-INT8/FP8 dequant path for pre-Blackwell GPUs. Built into vLLM CUDA builds from 0.29.0 via --linear-backend/--moe-backend humming.",
+      "result": "GEMM microbenchmarks: W4A8-MXFP4 on Hopper about 4.2-4.5x DeepGEMM W8A8 at small/medium batch; W8A8 about 2.5-2.6x DeepGEMM Contiguous; dense W4A16 roughly matches or beats vLLM Marlin (about 2x on large-batch H200). Single-kernel compile 1.8 s vs 23.35 s for CUTLASS. End to end, DeepSeek-V4.1-Flash on 8x H20 with Humming W4A8 MoE vs Marlin W4A16: +14-43% output throughput, -25-32% TTFT.",
+      "critique": "Benchmarks are run by the authors and the vLLM community, mostly kernel microbenchmarks with cold L2; the single end-to-end result also changes precision (W4A8 vs W4A16), so kernel and format gains are mixed and no accuracy numbers are given. Heuristic config selection can be suboptimal (autotune is future work); INT8 on B300 falls back to slower MMA paths."
+    },
+    {
+      "id": "nvidia-dgx-spark-moe-inference",
+      "kind": "news",
+      "title": "3 Ways to Boost MoE Inference on NVIDIA DGX Spark",
+      "url": "https://developer.nvidia.com/blog/3-ways-to-boost-moe-inference-on-nvidia-dgx-spark/",
+      "source": "NVIDIA Technical Blog",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "NVIDIA: Humming MoE kernels, FP8 LM head and built-in MTP drafting raise Ling-3.0-flash decode throughput on DGX Spark by 42.5% on GSM8K",
+      "summary": "Case study (27 Oct) of batch-1 decoding of Ling-3.0-flash-fp4 (124B total / 5.1B active; 35 Kimi Delta Attention linear-attention layers + 7 MLA layers; 8 of 512 experts) on DGX Spark with SGLang. Starting from the cookbook W4A8 setup (FlashInfer MXFP4 MoE, CUTLASS dense, FP32 LM head), decoding is memory-bound on MoE and the 157K-vocab LM head. Three changes: swap in Humming MXFP4 MoE kernels; quantize the LM head online to FP8 to halve its weight reads; and use the model's built-in NEXTN layer as an MTP drafter (3 steps, 4 draft tokens). It notes the draft model must share the whole LM-head module, otherwise it reads FP8 weights as BF16 and accept length collapses to 1.",
+      "result": "Synthetic 32K-in/2K-out greedy: 36.09 -> 102.88 tok/s (+185%; Humming alone +9.3%, +FP8 head +21.7%), MTP accept length 3.90. GSM8K (1,319 questions, T=0.6): 37.81 -> 53.89 tok/s (+42.5%), TPOT 26.45 -> 18.56 ms, accuracy 96.89% -> 96.82%, accept length 2.68.",
+      "critique": "Vendor blog. Batch size 1 on one device only; no memory figures and no software versions. The headline 185% comes from a repetitive synthetic greedy workload, which the author says does not generalise; the realistic GSM8K gain is 42.5% and is dominated by MTP rather than the kernels."
+    },
+    {
+      "id": "dspark-schedule-distillation-dllm",
+      "kind": "paper",
+      "title": "Learning When to Commit: Schedule Distillation for Fast Diffusion Language Models",
+      "url": "https://arxiv.org/abs/2610.35804",
+      "source": "arXiv",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "dSpark distills unmasking schedules that favour high-impact tokens into diffusion LMs, reporting a 10.12x GSM8K speedup on LLaDA-8B",
+      "summary": "Diffusion LMs can unmask several tokens per step but usually need many rounds. dSpark builds unmasking schedules offline from correct responses of the frozen base model, at each round promoting the token whose reveal most reduces surprisal at the other masked positions (candidates limited to p >= 0.02 and top-10). The student is then LoRA-tuned (rank 256) on intermediate states of these trajectories with cross-entropy plus sharpening on correct ones, and a KL term toward the base model on failed ones to keep quality. Training data from GSM8K, PRM12K, NuminaMath-CoT and AceCode. Code: github.com/VILA-Lab/dSpark.",
+      "result": "GSM8K tokens per forward (TPF) / accuracy: LLaDA-8B-Instruct 10.12 / 78.9 vs base 1.00 / 78.8, d3LLM 9.05 / 74.2, dParallel 7.09 / 75.6, Fast-dLLM 2.91 / 75.5; Dream-7B-Instruct 5.12 / 83.6 vs d3LLM 4.97 / 80.7. Lower TPF on MATH (6.03), HumanEval (6.73), MBPP (5.52) for LLaDA. Batch-1 wall clock on GSM8K: 249 vs 15 tok/s for the LLaDA base.",
+      "critique": "'Speedup' is mostly tokens per forward pass, not wall-clock; only one wall-clock number is given. Main results use no KV cache, and with caching accuracy fell 1.1-2.7 points without a throughput gain. Training data overlaps the math/code evaluation domains; general ability only spot-checked on MMLU/ARC-C. GPU hours not reported.",
+      "authors": [
+        "Aidar Myrzakhan",
+        "Zhiqiang Shen"
+      ],
+      "arxiv_id": "2610.35804"
+    },
+    {
+      "id": "lstm-looped-transformer-shared-kv",
+      "kind": "paper",
+      "title": "LSTM-Style Looped Transformers with Shared KV Caches",
+      "url": "https://arxiv.org/abs/2610.33360",
+      "source": "arXiv",
+      "category": "architecture",
+      "on_focus": true,
+      "headline": "LSTM-gated looped Transformer shares one KV cache across its recurrent core, cutting cache sets from 15 to 4 and params by 40.4%",
+      "summary": "A recurrent-depth Transformer (one untied prologue block, four core blocks applied three times with an LSTM-style gated carry, two untied epilogue blocks) where every core block on every iteration reads a single donor KV cache (the last core block's final-iteration K/V) for earlier tokens. Training builds that cache with a standard parallel pass, but at generation time it is produced recursively, creating a train/serve mismatch; a consistency loss applied over the final 10% of training aligns the two. FineWeb, widths 384-1024, 1.05-4.19B tokens.",
+      "result": "At width 1024, 40.4% fewer parameters than an untied 15-layer control at near-equal forward FLOPs, and 4 instead of 15 cache sets. Consistency loss removes 81-89% of the shared-cache continuation-loss penalty (width 1024: 3.2518 -> 3.1953 vs 3.1878 full-cache), but repaired models still trail untied controls by 0.044-0.089 nats.",
+      "critique": "LM loss only: no downstream tasks or sampled generation, small models (<=228M), mostly single seeds. Cache savings did not translate to speed: a shared-cache decode step took 37.2 ms vs 20.7 ms for the standard layout at width 1024, batch 160, cause not isolated. The abstract (81-89%) and body (81-93%) disagree on the penalty reduction. Single author, no code linked.",
+      "authors": [
+        "Andreas Kirsch"
+      ],
+      "arxiv_id": "2610.33360"
+    },
+    {
+      "id": "cope-moe-offloading-emulation",
+      "kind": "paper",
+      "title": "COPE: Composable Performance Emulation for Mixture-of-Experts Offloading Policies",
+      "url": "https://www.alphaxiv.org/abs/2610.33404.md",
+      "source": "arXiv (via alphaXiv)",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "COPE emulates MoE expert-offloading policies to pick the fastest one for given hardware before building it; prediction error down 1.7-6.8x",
+      "summary": "MoE offloading systems each hard-code one policy. COPE factors the design space into two independent axes, expert residency and MoE execution strategy (exposing four combinations not in existing systems), and estimates each candidate's batch-1 decode TPOT with a 'Virtual Heterogeneous Machine': it profiles atomic operators and short combined-operator schedules on the target hardware, then replays cache states from an offline routing trace. Ground truth comes from nine candidates implemented in llama.cpp (CUDA), tested on Qwen3.5-35B-A3B, Qwen3-30B-A3B and DeepSeek-V2-Lite variants on A100, RTX 4090 and RTX 5090.",
+      "result": "Picks the measured-fastest policy in 134/150 (A100), 20/20 (RTX 4090) and 42/45 (RTX 5090) cases. TPOT MAPE 9.4-17.4% on RTX 4090 vs 31.7-40.6% for an atomic-operator simulation and 61.5-68.5% for MoE-Lightning's Hierarchical Roofline Model; 8.0-13.3% vs 19.6-24.1% and 47.2-53.9% on RTX 5090. Calibration takes 3-44 minutes.",
+      "critique": "Batch-1 decode only; prefill and batched serving may rank policies differently. Excludes quantized or skipped experts and approximate routing, which practical offloaders use. Other GPUs are approximated by resource caps on an A100, and on RTX 5090 better error did not always mean better ranking. Read via alphaXiv because arXiv rate-limited this run.",
+      "authors": [
+        "Hanming Zhang",
+        "Erhu Feng"
+      ],
+      "arxiv_id": "2610.33404"
+    },
+    {
+      "id": "packed-ss-self-speculative-diffusion",
+      "kind": "paper",
+      "title": "One Call Ahead: Packed Self-Speculative Decoding with Diffusion Drafting",
+      "url": "https://arxiv.org/abs/2610.33379",
+      "source": "arXiv",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "Packed-SS drafts and verifies in one model call for AR+diffusion models, with input that grows linearly in speculative width",
+      "summary": "Models that support both autoregressive and diffusion modes can self-speculate: the diffusion mode drafts a block in one pass and the AR mode verifies it. The usual schedule needs two sequential calls per iteration; existing one-call schedules (TiDAR/Nemotron style) need input that grows quadratically with speculative width. Packed-SS runs the drafter one step ahead: while verifying the current draft it builds the next one from an earlier verified prefix and carries the unresolved suffix forward, keeping one call per iteration, linear input size and the target distribution. Under a monotonicity assumption on the drafter, it provably needs no more calls than the two-call schedule under greedy decoding.",
+      "result": "Single A100, batch 1, greedy: Nemotron-Labs-Diffusion 3B/8B throughput +3.5-9.3% vs the two-call schedule and +3.4-32.3% vs the quadratic one-call schedule; SetDLM 1.7B +6.0% (W=8) and +1.5% (W=16) vs two-call. At temperature 1 it is +2.0-6.3% vs two-call and comparable to the quadratic schedule.",
+      "critique": "Gains are single-digit percent against the main baseline, batch 1 only, on one GPU type. The quadratic baseline was run at a smaller block size (8 vs 32), which complicates that comparison. The guarantee rests on an idealised monotonicity assumption and greedy decoding. Detailed result tables were not readable in this run; no code linked.",
+      "authors": [
+        "Yuxiao Chen",
+        "Changxiao Cai"
+      ],
+      "arxiv_id": "2610.33379"
+    },
+    {
+      "id": "dynamic-evaluation-across-architectures",
+      "kind": "paper",
+      "title": "Can Language Models Learn While They Think? Testing Gradient Adaptation Across Architectures",
+      "url": "https://www.alphaxiv.org/abs/2610.33025",
+      "source": "arXiv (via alphaXiv)",
+      "category": "architecture",
+      "on_focus": true,
+      "headline": "Test-time gradient updates lower loss 5-8% for softmax-attention LMs but under 1% for hybrid Gated-DeltaNet models",
+      "summary": "Tests dynamic evaluation (one SGD step per 128-token chunk on the MLP output projections of the last quarter of blocks, 2k window, no training) across softmax-attention LMs (Qwen3-1.7B/4B, Gemma-4-E4B), hybrid Gated-DeltaNet linear-attention models (Qwen3.5-4B, Qwen3.8-27B) and masked-diffusion LMs, then checks whether the loss gains carry over to long-context tasks or fact storage.",
+      "result": "Next-token loss over a document falls 5-8% for softmax-attention models (beating the same frozen model given full 32k context), under 1% for Gated-DeltaNet hybrids at every learning rate, and 8% (Nemotron-Diffusion-8B) to 17-20% (DiffusionGemma-26B) for diffusion LMs. On RULER, BABILong, LongBench-v2, HotpotQA, MuSiQue and others, weight updates recover none of the accuracy lost to truncation. Storing facts by next-token loss gives 30% recall vs 80% in-context and costs 36-38 GSM8K points.",
+      "critique": "The explanation that linear-attention blocks already perform this adaptation is offered, not tested by ablation. One update recipe (fixed layers, plain SGD), so the null downstream result may not hold for other test-time-training schemes. Single author, abstract-level reading via alphaXiv; the paper dates from 10 Oct but appeared in the 27 Oct listing.",
+      "authors": [
+        "Surya Saka"
+      ],
+      "arxiv_id": "2610.33025"
+    },
+    {
+      "id": "anthropic-s1-ipo-filing",
+      "kind": "news",
+      "title": "Anthropic files S-1 registration statement for proposed IPO",
+      "url": "https://www.anthropic.com/news/s1-sec",
+      "source": "Anthropic news",
+      "category": "other",
+      "on_focus": false,
+      "headline": "Anthropic files a Form S-1 with the SEC for a proposed IPO, planning to list Class A shares on Nasdaq under the symbol ANT",
+      "summary": "Anthropic, PBC announced on 26 Oct that it filed a Form S-1 registration statement for a proposed IPO of Class A common stock on the Nasdaq Global Select Market (ticker 'ANT'), with Goldman Sachs and Morgan Stanley named for the preliminary prospectus. Share count and price range are not yet set. Secondary coverage (The Neuron's 27 Oct roundup citing Reuters) says the filing discloses a month-plus pause in training its next flagship model over security concerns; Anthropic's announcement page itself says nothing about training or compute.",
+      "critique": "Off-focus, included for significance. The training-pause and security-incident details rest on secondary coverage of the S-1 that this run did not verify against the filing; the registration statement is not yet effective, so terms may change."
+    }
+  ]
+}
