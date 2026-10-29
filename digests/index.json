@@ -1,7 +1,15 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-10-28T09:58:00+08:00",
+  "updated_at": "2026-10-29T10:04:47+08:00",
   "digests": [
+    {
+      "date": "2026-10-29",
+      "item_count": 10,
+      "on_focus_count": 8,
+      "top_headline": "Calibration-free MoE channel reader keeps 98.1% accuracy at 17.8% of routed-expert reads; 1.60-1.90x faster MoE blocks than vLLM at bs=1",
+      "json": "digests/2026-10-29.json",
+      "md": "digests/2026-10-29.md"
+    },
     {
       "date": "2026-10-28",
       "item_count": 11,
