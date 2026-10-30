@@ -1,0 +1,189 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-30",
+  "generated_at": "2026-10-30T09:55:00+08:00",
+  "notes": "Friday in Taipei. arXiv listing pages, the cs.LG RSS feed and the daily aggregators still showed papers submitted up to Tue 27 Oct as the newest, so the Thu 29 Oct batch was not visible. arXiv rate-limited nearly all abstract and HTML fetches, so MuonGS, CRISP, Select-TTT and the tool-use scaling-law paper rest on papers.cool copies of their arXiv abstracts and TAO on its Hugging Face paper page; only EnergyCal was read on arXiv. Several 26-27 Oct papers (DCKV 2610.36950, KV-bias folding 2610.36520, Layerwise Repacking 2610.35989, CoS-VQ 2610.37336) could not be read anywhere and were left out again. The Hugging Face Daily Papers page for 29 Oct was mostly off-focus. LFM3 (27 Oct) and the Google Sleep post (27 Oct) had not been covered; the Sleep paper itself (arXiv 2606.03979) dates from June.",
+  "items": [
+    {
+      "id": "mistral-large-4-open-weights",
+      "kind": "release",
+      "title": "Mistral Large 4 (Le Chonk) is now open weight",
+      "url": "https://mistral.ai/news/mistral-large-4-oss/",
+      "source": "Mistral AI blog",
+      "category": "architecture",
+      "on_focus": true,
+      "headline": "Mistral releases weights for Large 4, a ~1T-parameter multimodal MoE, under a modified MIT license; 41% on Terminal-Bench 4.0",
+      "summary": "Mistral published the weights of Large 4, a hybrid instruct/reasoning Mixture-of-Experts model with image input and about 1T total parameters, on Hugging Face (repo mistralai/Mistral-Large-4-1T-A52B; Mistral's model docs list 1.05T total, 52B active per token and a 1M-token context). The license is the 'Mistral Ecosystem Open-Weight' license, a modified MIT that requires a separate commercial license only for Model-as-a-Service providers. Self-hosting is supported in vLLM, SGLang and TensorRT-LLM; API price is $0.70 / $2.10 per M input/output tokens. Architecture details (MLA plus DSA sparse indexer, 128 routed experts) come from the vLLM post below, not from this page.",
+      "result": "Mistral reports Terminal-Bench 4.0 41% (+13 points over the October preview), Artificial Analysis Coding Agent Index 48% (described as tied with GLM-5.3 at 47% fewer tokens per task), FrontierCode 2.0 19.7%, BrowseComp 84.5%, Finch 73.3% (second among open models behind Kimi K3).",
+      "critique": "All scores are vendor-reported and several are on third-party indices that Mistral selected; no per-benchmark comparison table against DeepSeek-V4.1, Kimi K3 or GLM-5.3 under identical settings is given. The announcement page gives no release date, expert count, attention design or training-compute figures. The MaaS carve-out makes this not an OSI-style open license."
+    },
+    {
+      "id": "vllm-mistral-large-4-day0",
+      "kind": "news",
+      "title": "Day 0 support for Mistral Large 4 on vLLM",
+      "url": "https://vllm.ai/blog/2026-10-29-mistral-large-4",
+      "source": "vLLM blog",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "vLLM day-0 Mistral Large 4: MLA with a top-2048 sparse indexer, 128-expert MoE; DSpark drafter cuts TP8 FP8 TPOT from 8.84 to 3.50 ms",
+      "summary": "The post documents Large 4's architecture and the serving stack. Model: 72 layers, ~1T total / 49B active (52B with embeddings), layer 0 dense and layers 1-71 with 128 routed experts (top-4) plus 1 shared expert; MLA attention (KV LoRA rank 512) with a DSA sparse indexer picking the top 2048 keys per query; 9 layers reuse layer 35's latent KV cache; NoPE every 4th layer; YaRN with LeRoPE; SSMax query scaling. Serving: TP, DP+EP, decode and prefill context parallelism, P/D disaggregation over NIXL, block-scaled FP8 and NVFP4 checkpoints (NVFP4 experts, FP8 attention), FP8 latent KV cache, FlashMLA sparse kernels, and a built-in 3-layer sliding-window-MLA DSpark drafter. Day-0 targets are NVIDIA Blackwell, AMD MI350 (MXFP4 experts) and TPU v7x.",
+      "result": "DSpark accepts ~2.9 tokens/step and cuts FP8 TPOT at concurrency 1 on TP8 from 8.84 to 3.50 ms (1.9-2.2x output throughput on FP8 and NVFP4). NVFP4 decodes 1.08-1.19x faster than FP8 without speculation, holds ~1.5x the KV cache, and stays within 2.1 points of FP8 on every evaluated task (mean -0.3). DCP8 raises KV capacity from 2.38M to 18.88M tokens; HiSparse host offload raises admitted KV tokens 1.97M to 8.77M on one GB300 node.",
+      "critique": "Speedups are for greedy decoding on 200 prompts at low concurrency, where speculation helps most; high-concurrency throughput with DSpark is not shown. Accuracy checks are light (e.g. GSM8K 0.909 vs 0.918) and no long-context quality evaluation of the sparse indexer or cross-layer KV sharing is given. No comparison against SGLang or TensorRT-LLM."
+    },
+    {
+      "id": "liquid-lfm3",
+      "kind": "release",
+      "title": "Introducing LFM3: Every Modality for Specialized Intelligence",
+      "url": "https://www.liquid.ai/blog/lfm3",
+      "source": "Liquid AI blog",
+      "category": "architecture",
+      "on_focus": true,
+      "headline": "Liquid AI's LFM3: six ~2B open-weight models; the 1.7B text model mixes 13 gated short-conv, 5 sliding-window and 6 global-attention layers",
+      "summary": "LFM3 is a family of ~2B open-weight models (text LFM3-1.7B, VL-2B, Audio-2B, Omni-2B, and two 'd1' decision models) on a shared backbone. The 24-layer text model uses 13 gated short-convolution layers (kernel size 7, up from 3 in LFM2), 5 sliding-window attention layers (256-token window, full RoPE) and 6 global attention layers with partial RoPE on the high-frequency half of each head, plus head-wise sigmoid output gating and sandwich norm. Trained on 22T tokens (last 3.5T mid-training, extending context to 256K), then ~1.75T tokens of SFT plus RL and distillation.",
+      "result": "LFM3-1.7B averages 49.37 on Liquid's agentic/long-context table vs 47.24 for Qwen3.5-9B and 39.27 for Qwen3.5-4B (e.g. BFCL V4 71.39 vs 62.83 for Qwen3.5-9B). KV cache at 128K context is 1.6 GB vs 4.3 GB for Qwen3.5-4B; ~1 GB footprint at 4-bit; 1.8-2.8x faster llama.cpp Q4_0 decode than the next-fastest model at 32K context.",
+      "critique": "It trails clearly where reasoning or long-context retrieval matters: GPQA Diamond 63.37 vs 80.40 (Qwen3.5-9B) and RULER 128K 65.56 vs 84.63 (Qwen3.5-4B), so the averaged 'beats 9B' framing depends on the benchmark mix. The on-device speed comparison does not name the devices. No ablation separates the conv/SWA/global layer ratio from data effects, and the blog names no license."
+    },
+    {
+      "id": "energycal-muon-moe",
+      "kind": "paper",
+      "title": "EnergyCal: Taming Loss Spikes in Muon-Family Optimizers for Sparse MoE Training",
+      "url": "https://arxiv.org/abs/2610.37062",
+      "source": "arXiv",
+      "category": "training",
+      "on_focus": true,
+      "headline": "EnergyCal scales down routed-expert Muon updates by their Newton-Schulz direction energy, cutting loss-spike burden 99.5% on a 4B MoE",
+      "summary": "Muon-family optimizers produce loss spikes in sparse MoE training. EnergyCal leaves the Newton-Schulz orthogonalization unchanged but scales down each routed expert's update by a function of the normalized squared Frobenius norm of its finite-step Newton-Schulz direction. It adds no persistent optimizer state and is tested with plain Muon and with MuonH (Hyperball).",
+      "result": "On a 4B-parameter MoE, against a lower-learning-rate MuonH recipe, EnergyCal-MuonH reduces mean thresholded loss-spike burden by 99.51% and final geometric-mean perplexity by 4.06%, at a modest throughput cost. With plain Muon at matched settings, spike burden falls ~96% on average across two exponents, with small endpoint gains.",
+      "critique": "Single-author paper at a single 4B scale; the spike metric is a thresholded custom measure, and the main comparison is against a lower-LR MuonH recipe rather than other stabilizers (QK-norm, update clipping, router z-loss). The throughput cost is not quantified in the abstract, and no code is linked. Read from the arXiv abstract only.",
+      "authors": [
+        "Masato Fujitake"
+      ],
+      "arxiv_id": "2610.37062"
+    },
+    {
+      "id": "muongs-weight-norm",
+      "kind": "paper",
+      "title": "MuonGS: Pretraining LLMs with Relaxed Weight-Norm Control",
+      "url": "https://papers.cool/arxiv/2610.37647",
+      "source": "papers.cool (arXiv abstract)",
+      "category": "training",
+      "on_focus": true,
+      "headline": "MuonGS removes the radial part of each Muon update by Gram-Schmidt and lets weight norms grow ~sqrt(t); ~15% token speedup over MuonH",
+      "summary": "The authors measure norm control through an 'accumulated effective learning rate' (sum of nominal LR over weight Frobenius norm). Vanilla Muon accumulates only logarithmically, which they argue limits exploration; MuonW and MuonH guarantee linear accumulation. MuonGS projects out the radial component of each Muon update with Gram-Schmidt but does not fix the norm, so the norm grows at most O(sqrt(t)) and the accumulation is Omega(sqrt(T)); they prove O(T^-1/2) stationarity for smooth scale-invariant objectives.",
+      "result": "On 160M and 400M dense models and a 135M-active / 1B-total MoE, MuonGS reaches lower validation perplexity than MuonH at long horizons; for the dense model the estimated token-equivalent speedup at matched loss is up to ~15%.",
+      "critique": "Small scale (at most 1B total parameters); the 15% speedup is an estimate for the dense model only and the MoE gain is not quantified in the abstract. The comparison is to MuonH; AdamW and MuonW numbers are not given in the abstract. Read from the abstract via papers.cool because arXiv was rate-limited.",
+      "authors": [
+        "Athanasios Glentis",
+        "Dawei Li",
+        "Mingyi Hong"
+      ],
+      "arxiv_id": "2610.37647"
+    },
+    {
+      "id": "crisp-edge-moe",
+      "kind": "paper",
+      "title": "CRISP: Co-designing Pruning and Scheduling for Efficient MoE Inference on Edge Servers",
+      "url": "https://papers.cool/arxiv/2610.37442",
+      "source": "papers.cool (arXiv abstract)",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "CRISP stores each MoE expert once at several widths and schedules hot/warm/cold expert combos; up to 2.1x throughput on Mixtral-8x7B",
+      "summary": "On memory-limited edge servers MoE latency is dominated by moving expert weights. CRISP orders neurons within each expert by importance so one stored expert can execute at several widths, classifies frequently co-activated expert combinations as hot, warm or cold by frequency and per-expert contribution, and gives each class a different width and loading policy so expert loading overlaps with compute.",
+      "result": "On Mixtral-8x7B and DeepSeek-MoE-16B, up to 2.1x throughput at the same memory budget, with accuracy loss at most 3.6% relative to full-width inference.",
+      "critique": "Both test models are older, small-expert-count MoEs; behaviour on fine-grained 128-256-expert models is untested. 'Up to' 2.1x hides the typical gain, and a 3.6% accuracy drop is large for some uses. The abstract does not name the baselines (e.g. expert offloading with prefetch) or the edge hardware. Read from the abstract via papers.cool.",
+      "authors": [
+        "Congwei Zhang",
+        "Youming Tao",
+        "Yifei Zou",
+        "Yu Yang",
+        "Ruirui Zhang",
+        "Xiaoyu Zhang",
+        "Falko Dressler",
+        "Xiuzhen Cheng",
+        "Dongxiao Yu"
+      ],
+      "arxiv_id": "2610.37442"
+    },
+    {
+      "id": "tao-agentic-serving",
+      "kind": "paper",
+      "title": "TAO: Tool-Aware Joint Scheduling for LLM-Based Agentic Serving",
+      "url": "https://huggingface.co/papers/2610.37230",
+      "source": "HF Daily Papers",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "TAO schedules agent sessions by tool readiness, decaying cache credit and token footprint; up to 36.3% lower mean TTFT",
+      "summary": "Agentic serving alternates GPU inference with CPU-side tool calls. TAO scores each waiting session by near-term tool-result readiness, a per-node KV-cache credit that decays over time, and token footprint, then uses a dynamic program to choose which sessions to admit and where to place them under GPU capacity limits, replacing heuristic admission and placement.",
+      "result": "Across 12 model/workload/concurrency combinations, up to 26.8% lower latency, up to 36.3% lower mean TTFT and up to 29.5% higher decode throughput, each versus the strongest baseline for that metric.",
+      "critique": "Only maxima are reported ('up to'), each against a different best baseline, so typical gains are unclear. The abstract does not name the baselines or the serving engine. The tested models (DeepSeek-V4 Flash, Qwen3-32B, GLM-4.7) and <0.12% overhead come from a community comment on the page, not the abstract. No code link.",
+      "authors": [
+        "Shuhuai Li",
+        "Shengdong Ye",
+        "Dongdong Ge",
+        "Yinyu Ye",
+        "Jianghao Lin"
+      ],
+      "arxiv_id": "2610.37230"
+    },
+    {
+      "id": "tool-use-agent-scaling-laws",
+      "kind": "paper",
+      "title": "Scaling Laws for Tool-Use Agents via Controllable Environment Synthesis",
+      "url": "https://papers.cool/arxiv/2610.37648",
+      "source": "papers.cool (arXiv abstract)",
+      "category": "scaling",
+      "on_focus": true,
+      "headline": "Scaling law from 849 agent models over 458,752 synthetic tool-use tasks: past small budgets, tool/database diversity beats more tasks",
+      "summary": "SynthAPI generates tool-use training environments while controlling diversity separately across tools, tasks and the databases the tools access. Training 849 models of four sizes on controlled mixtures, the authors fit a scaling law that predicts out-of-distribution agent generalization from the amount and composition of synthetic environments.",
+      "result": "With larger data budgets, adding tool and database diversity helps more than adding tasks, and higher data complexity gives larger gains; agents trained per these guidelines beat models trained on prior synthetic-data work on four benchmarks (numbers not given in the abstract).",
+      "critique": "The abstract gives no fitted exponents, model sizes, or benchmark scores, and the four benchmarks are not named. The law is about data composition for post-training, not pretraining compute, and may not transfer beyond the SynthAPI generator. Read from the abstract via papers.cool.",
+      "authors": [
+        "Andrew Szot",
+        "Samira Abnar",
+        "Omar Attia",
+        "Abbas Kazerouni",
+        "Michael Kirchhof",
+        "Cheng-Yu Hsieh",
+        "Raviteja Vemulapalli",
+        "Alexander Toshev"
+      ],
+      "arxiv_id": "2610.37648"
+    },
+    {
+      "id": "select-ttt",
+      "kind": "paper",
+      "title": "Select-TTT: Query-Conditioned Selective Fast Weight Updates for In-Place Test-Time Training",
+      "url": "https://papers.cool/arxiv/2610.36794",
+      "source": "papers.cool (arXiv abstract)",
+      "category": "architecture",
+      "on_focus": true,
+      "headline": "Select-TTT weights In-Place TTT fast-weight writes by each chunk's relevance to the query, scored with the frozen LM head",
+      "summary": "In-Place TTT reuses MLP down-projections as fast weights that absorb context at test time, but the authors find its gain largely vanishes on realistic web long-context QA, which they attribute to writing every chunk with equal strength. Select-TTT computes each chunk's relevance as the probability mass its hidden states assign to the query tokens under the frozen output head, and turns the scores into per-chunk learning-rate multipliers with a temperature-scaled softmax, keeping chunk-wise context-parallel computation and adding no parameters.",
+      "result": "The abstract reports consistent long-context QA gains on two benchmarks and two backbones but gives no numbers and does not name them.",
+      "critique": "No quantitative result is available from the abstract, so the size of the gain and the comparison to plain retrieval or attention baselines cannot be judged. Query-conditioned writes require knowing the query before ingesting context, which limits use for multi-query or streaming settings that the authors only suggest as future work. Read from the abstract via papers.cool.",
+      "authors": [
+        "Yue Wu",
+        "Yang Zhang",
+        "Weinan Gan",
+        "Chongming Gao",
+        "Xinsen Guo",
+        "Xiaoyuan Li",
+        "Fuli Feng"
+      ],
+      "arxiv_id": "2610.36794"
+    },
+    {
+      "id": "google-sleep-framework",
+      "kind": "news",
+      "title": "The Sleep framework: a new way for LLMs to retain knowledge in continual learning",
+      "url": "https://research.google/blog/the-sleep-framework-a-new-way-for-llms-to-retain-knowledge-in-continual-learning/",
+      "source": "Google Research blog",
+      "category": "training",
+      "on_focus": false,
+      "headline": "Google Research's 'Sleep' framework distills short-term context into unlocked low-rank MoE experts between input phases",
+      "summary": "Blog post (27 Oct) on the June paper arXiv 2606.03979 (Behrouz, Hashemi, Javanmard, Mirrokni). The model alternates a wake phase that stores context in fast short-term memory with a sleep phase that (1) unlocks pre-allocated low-rank MoE memory blocks and distills short-term context into them with generalized knowledge distillation plus RL-style imitation, then resets the fast parameters, and (2) 'dreams' by routing to non-standard experts to generate synthetic samples, filtered by gradient-based selection, for SFT. Built on MoE and the Hope architecture.",
+      "result": "The post reports AIME 24/25 and HMMT 25 scores of 79.2%, 69.0% and 46.1% for the sleep-enhanced model, claimed above SFT, GRPO and on-policy self-distillation; SQuAD knowledge-injection 48.9% (single-task) and 46.2% (CPT), above SFT and SEAL; and near-zero forgetting on continual Manchu and Kalamang translation.",
+      "critique": "The post gives no base-model size and no baseline numbers, only that baselines were beaten. The BABILong claim of near-perfect scaling to 10M tokens is compared against GPT-4 and Titans, which are dated reference points. The paper is from June; this is a blog write-up, not new results, and no code or weights are mentioned."
+    }
+  ]
+}

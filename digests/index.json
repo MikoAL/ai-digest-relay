@@ -1,7 +1,15 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-10-29T10:04:47+08:00",
+  "updated_at": "2026-10-30T09:55:00+08:00",
   "digests": [
+    {
+      "date": "2026-10-30",
+      "item_count": 10,
+      "on_focus_count": 9,
+      "top_headline": "Mistral releases weights for Large 4, a ~1T-parameter multimodal MoE, under a modified MIT license; 41% on Terminal-Bench 4.0",
+      "json": "digests/2026-10-30.json",
+      "md": "digests/2026-10-30.md"
+    },
     {
       "date": "2026-10-29",
       "item_count": 10,
