@@ -1,7 +1,15 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-10-31T09:51:47+08:00",
+  "updated_at": "2026-11-01T09:54:09+08:00",
   "digests": [
+    {
+      "date": "2026-11-01",
+      "item_count": 9,
+      "on_focus_count": 8,
+      "top_headline": "Multi-View MoE: several sigmoid routers pick experts and blend latent input views, same active experts/FLOPs; +1.18 pts on a 10B-A1B model",
+      "json": "digests/2026-11-01.json",
+      "md": "digests/2026-11-01.md"
+    },
     {
       "date": "2026-10-31",
       "item_count": 10,
