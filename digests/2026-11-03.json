@@ -1,0 +1,223 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-03",
+  "generated_at": "2026-11-03T09:44:18+08:00",
+  "notes": "Tuesday in Taipei. The Mon 2 Nov arXiv batch (papers submitted 29–30 Oct; announced Sunday evening US Eastern) had not been covered by earlier runs and is the main source today. The Tue 3 Nov batch was not yet listed when this run checked. Only the first 50 entries of each of the cs.LG, cs.CL and cs.AI listings could be read, so on-focus papers further down those lists may be missing. Every arXiv paper here rests on its abstract page; the RL training-inference mismatch paper rests on its Hugging Face page. arXiv rate-limited Sparse Text Diffusion under Dual Budgets (2610.41487) and DAMI (2610.41994), so both were left out. Mistral Large 4 open weights and Liquid AI LFM3 were covered earlier (28 and 30 Oct) and are not repeated. No new inference-engine or open-weight model releases relevant to the focus were found for 1–2 Nov. No off-focus items today.",
+  "items": [
+    {
+      "id": "zyphra-hierarchical-attention",
+      "kind": "paper",
+      "title": "Subquadratic Attention with a Hierarchical Tree-Structured Indexer",
+      "url": "https://arxiv.org/abs/2610.42112",
+      "source": "arXiv",
+      "category": "architecture",
+      "on_focus": true,
+      "headline": "Zyphra Hierarchical Attention: queries descend a tree of compressed key summaries for sublinear routing; retrofitted by distillation",
+      "summary": "Sparse attention methods whose indexer still scores every key (e.g. a lightning-indexer style top-k) only cut attention by a constant factor, while sliding-window and fixed-state linear attention lose expressiveness. ZHA builds a tree of recursively compressed summaries of the key cache; each query walks down the tree to pick a small subset of keys and attends only to those. The tree gets deeper as the sequence grows, so routing plus attention cost per query grows sublinearly and total cost is subquadratic (but superlinear). It is added to existing pretrained models by a short distillation stage of a few billion tokens.",
+      "result": "The abstract says performance is preserved on long-context retrieval, reasoning, math and agentic coding tasks, and is robust to tree configurations up to 6 levels deep. It gives no accuracy or speed numbers. A performance model projects ZHA beating competing methods beyond 1M tokens of context.",
+      "critique": "The abstract reports no measured speedups, no named baselines and no model sizes. The headline scaling advantage past 1M tokens comes from a performance model, not measurements, and the claim of 'hundreds of millions to billions' of tokens of context is a projection. Check the 43-page paper for wall-clock kernels and for which sparse-attention baselines it actually compares against.",
+      "authors": [
+        "Leon Lufkin",
+        "Cutter Dawes",
+        "Alexander Speicher",
+        "Kamesh Krishnamurthy",
+        "Tomás Figliolia",
+        "Beren Millidge"
+      ],
+      "arxiv_id": "2610.42112"
+    },
+    {
+      "id": "latent-sparse-attention",
+      "kind": "paper",
+      "title": "Latent Sparse Attention: Towards Subquadratic Ultra-Long Context Attention",
+      "url": "https://arxiv.org/abs/2610.42147",
+      "source": "arXiv",
+      "category": "architecture",
+      "on_focus": true,
+      "headline": "Latent Sparse Attention: queries score learned latent key clusters; 22.7x per-layer prefill speedup at 10M tokens on GLM-5.3-Flash",
+      "summary": "Existing sparse-attention indexers either still scale quadratically with context or lose accuracy at ultra-long lengths. LSA hierarchically clusters keys in a learned latent space and has queries score clusters instead of every key, which speeds up prefill, decode and training. Two variants: Distilled-LSA, retrofitted onto pretrained models by distillation, and Native-LSA, trained from scratch with only the next-token loss.",
+      "result": "D-LSA at 10M tokens on GLM-5.3-Flash: 22.7x prefill and 4.6x decode per-layer attention speedup over the model's original sparse attention, at similar accuracy. A second set of figures, 72.4x prefill and 42.5x decode, is given in parentheses alongside Qwen-3.8-27B and described as versus full attention; the abstract's pairing of these numbers is ambiguous. N-LSA matches full-attention accuracy with a 1.6x per-layer training speedup at 128k tokens.",
+      "critique": "The speedups are per attention layer, not end-to-end. 'Similar accuracy across a range of tasks' is not quantified in the abstract. The comparison is against each model's own sparse attention and full attention, not against other sub-quadratic indexers. N-LSA's scale (model size, token count) is not stated.",
+      "authors": [
+        "Ales Kubicek",
+        "Andrea Caciolai",
+        "Liangzu Peng",
+        "Sukrit Sumant",
+        "Benjamin Hoover",
+        "Fraser Greenlee",
+        "Ruairidh M. Battleday",
+        "Radim Urban",
+        "Torsten Hoefler",
+        "James C.R. Whittington"
+      ],
+      "arxiv_id": "2610.42147"
+    },
+    {
+      "id": "hierarchical-residuals-hires",
+      "kind": "paper",
+      "title": "Hierarchical Residuals: A Minimalist Decoupling of Residual Width from Compute Width",
+      "url": "https://arxiv.org/abs/2610.41711",
+      "source": "arXiv",
+      "category": "architecture",
+      "on_focus": true,
+      "headline": "HiRes: a wide PostNorm residual between blocks of normal-width PreNorm layers; ~1.30x FLOPs efficiency from fitted scaling laws",
+      "summary": "Standard residual connections force the residual stream to be as wide as each layer's computation. HiRes groups layers into blocks: inside a block, standard-width PreNorm layers run as usual; between blocks, a wider PostNorm residual stream carries information, with learned projections bridging the two widths at block boundaries. It needs only dense projections and norms, no custom kernels, and is positioned against residual-widening methods such as VWN, mHC and AttnRes.",
+      "result": "Fitted scaling laws imply about 1.30x FLOPs efficiency over vanilla residual addition across sizes and depths. On OLMoE-1B-7B pretraining for 500B tokens, training loss falls by 0.0208 and downstream accuracy rises by 1.14 points. Described as competitive with VWN, mHC and AttnRes at lower activation memory and I/O.",
+      "critique": "The 1.30x is an extrapolation from fitted scaling laws, not a matched-compute run at scale. The largest test is a 1B-active MoE, where a 0.02 loss gap is small. 'Competitive' with mHC/VWN/AttnRes is not quantified in the abstract, and wall-clock overhead of the boundary projections is not given.",
+      "authors": [
+        "Ziteng Wang",
+        "Jianqiao Lu",
+        "Xinyu Ma",
+        "Jintao Zhang",
+        "Jun Zhu",
+        "Yiyuan Ma",
+        "Jianfei Chen"
+      ],
+      "arxiv_id": "2610.41711"
+    },
+    {
+      "id": "uploop-upcycled-looped-transformers",
+      "kind": "paper",
+      "title": "UpLoop: Training Looped Transformers via Upcycling at No Extra Pretraining Compute",
+      "url": "https://arxiv.org/abs/2610.41720",
+      "source": "arXiv",
+      "category": "training",
+      "on_focus": true,
+      "headline": "UpLoop grows a shallow Transformer by copying layers, spends saved FLOPs on looping a shared middle block; 22.99→27.52 avg at 1.3B",
+      "summary": "Looped Transformers reuse a block of layers several times per token, but training them usually costs more than a dense model of the same size. UpLoop is a pretraining schedule matched to a dense baseline in final parameter count, total tokens and training FLOPs: it starts from a shallow model, grows depth by copying learned layers, and uses the compute saved during the cheap early phase to pay for repeated passes through a shared middle block later on.",
+      "result": "At 1.3B parameters, the average over 22 downstream tasks rises from 22.99 to 27.52 against the dense baseline. The abstract also reports better language modeling and gains on math reasoning after SFT.",
+      "critique": "Only one scale (1.3B) is quantified in the abstract. Matched training FLOPs does not mean matched inference cost: the looped model spends more compute per token at inference, and the abstract does not compare against a dense model with equal inference FLOPs, which is exactly the comparison the 'No Free Loop' paper below finds unfavourable at larger sizes. Averages near 23–28 suggest many tasks are near chance at this scale.",
+      "authors": [
+        "Cheng Liang",
+        "Tengfei Zhang",
+        "Ya Zhang",
+        "Yanfeng Wang",
+        "Zhouhan Lin"
+      ],
+      "arxiv_id": "2610.41720"
+    },
+    {
+      "id": "no-free-loop",
+      "kind": "paper",
+      "title": "There Is No Free Loop: When Does Looping a Trained Model Pay for Its Inference Compute?",
+      "url": "https://arxiv.org/abs/2610.42030",
+      "source": "arXiv",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "Looping trained Qwen3/3.5 models (0.8B–9B) beats both same-size and equal-inference-compute baselines only at 0.8B",
+      "summary": "Adds loops (re-running a block of layers per token) to already-trained Qwen3 and Qwen3.5 models from 0.8B to 9B parameters, which adds no parameters but makes every generated token more expensive. Each looped model is compared against two baselines: the same model trained further without the loop, and the best unlooped model that uses the same inference compute.",
+      "result": "Only the looped 0.8B model beats both baselines. At 4B and 9B the looped model fails to beat even the unlooped model with the same parameter count. The authors rule out benchmark saturation, since the unlooped 9B beats the 4B by up to 13 points.",
+      "critique": "The study covers post-hoc looping of models pretrained without loops, so it says little about models pretrained looped from the start (e.g. UpLoop above). It uses one model family; the abstract does not give the looped-vs-baseline gaps or which layers were looped, so whether a different loop placement or longer adaptation would change the verdict is open.",
+      "authors": [
+        "Rhea Sanjay Sukthanker",
+        "Pashmina Cameron"
+      ],
+      "arxiv_id": "2610.42030"
+    },
+    {
+      "id": "trainable-vector-quantization-tvq",
+      "kind": "paper",
+      "title": "Trainable Vector Quantization for Large Language Models",
+      "url": "https://arxiv.org/abs/2610.41822",
+      "source": "arXiv",
+      "category": "efficiency",
+      "on_focus": true,
+      "headline": "TVQ fine-tunes vector-quantized LLM weights with straight-through gradients and block-wise distillation; LLaMA2-70B at 2 bits, ~1% QA drop",
+      "summary": "Training-free vector quantization (e.g. GPTVQ-style codebooks) only minimizes layer-wise reconstruction error, and the discrete codes make accuracy loss hard to recover. TVQ keeps trainable latent weights and uses straight-through estimation so a vector-quantized model can be optimized by gradient descent on arbitrary objectives, inside a block-wise knowledge-distillation framework with tricks to speed up training. It is meant to plug into existing VQ schemes.",
+      "result": "Reports near-lossless 2-bit quantization of LLaMA2-70B with about a 1% accuracy drop on popular QA benchmarks, and claims state-of-the-art low-bit PTQ quality at a modest training budget.",
+      "critique": "The abstract names no baseline methods or perplexity numbers, only an aggregate QA drop on an old model (LLaMA2). 'Popular QA benchmarks' are typically easy zero-shot tasks that hide degradation on generation and reasoning. Training cost in GPU-hours and inference kernel speed are not stated. Accepted at ECML PKDD 2026.",
+      "authors": [
+        "Anastasiia Prutianova",
+        "Alina Bogdanova",
+        "Mikhail Shutov",
+        "Dmitrii Poimanov",
+        "Anatoly Gorkov",
+        "Ilia Zharikov"
+      ],
+      "arxiv_id": "2610.41822"
+    },
+    {
+      "id": "etaps-progressive-sparse-pruning",
+      "kind": "paper",
+      "title": "Prune Gradually, Adapt Sparsely: Efficient Pruning of Large Language Models at Extreme Sparsity",
+      "url": "https://arxiv.org/abs/2610.41968",
+      "source": "arXiv",
+      "category": "efficiency",
+      "on_focus": true,
+      "headline": "ETAPS prunes LLMs in stages while training a small sparse weight delta; up to 42% lower perplexity than ELSA at 50–90% sparsity",
+      "summary": "One-shot pruning degrades quickly at high sparsity, while the strongest extreme-sparsity method, ELSA, optimizes the mask end-to-end but needs optimizer state and auxiliary variables about the size of the model. ETAPS tightens a global sparsity constraint over several stages and, at each stage, trains a sparse weight delta under a small fixed parameter budget; the adapted model's end-to-end gradients then guide the next pruning step. Removing weights gradually keeps each step small enough for the sparse delta to compensate.",
+      "result": "Across six models from 125M to 13B, perplexity is lower than ELSA at every sparsity from 50% to 90%, by up to 42%. At 90% sparsity it prunes LLaMA2-7B on one H200 versus four GPUs for ELSA, with 5.0x smaller persistent state and 49% fewer GPU-hours.",
+      "critique": "Results are perplexity only in the abstract; downstream task accuracy at 90% sparsity is not reported. Unstructured sparsity at these levels rarely yields real speedups without specialized kernels, and no inference speed is given. Models top out at 13B and include older LLaMA2-generation checkpoints.",
+      "authors": [
+        "Jean Lucien Randrianantenaina",
+        "Hung Nguyen",
+        "Nasib Ullah",
+        "Jinbin Zhang",
+        "Nilesh Gupta",
+        "Inderjit S. Dhillon",
+        "Rohit Babbar"
+      ],
+      "arxiv_id": "2610.41968"
+    },
+    {
+      "id": "tracespec-agent-speculative-decoding",
+      "kind": "paper",
+      "title": "TraceSpec: Understanding and Improving Speculative Decoding for LLM Agents",
+      "url": "https://arxiv.org/abs/2610.41177",
+      "source": "arXiv",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "TraceSpec trains speculative drafters on agent trajectory states with state-conditioned budgets; +12.5–22.6% replay throughput over DSpark",
+      "summary": "Agents make many calls over a growing history of reasoning, actions and tool outputs, and aggregate acceptance metrics hide where a draft model fails. TraceSpec combines dynamic execution with fixed-prefix replay for trajectory-level evaluation, releases TraceSpec-Traj (10,000 train / 2,500 test states from web browsing and software engineering), and trains the drafter on intermediate assistant turns, allocating a fixed prediction budget by state-conditioned estimates of where prefix-aware acceptance lags.",
+      "result": "Across three target sizes and two temperatures, replay throughput rises 12.5–22.6% over its DSpark base. Ablations on Qwen3-4B show adaptive allocation increases accepted length by 3.3–10.0% over fixed full-turn supervision. Analysis of five speculative baselines finds overall acceptance can rise with context length while falling within matched late-stage browsing actions.",
+      "critique": "Gains are measured in replay, not live agent runs, and only relative to DSpark; the other four speculative baselines and the three target sizes are not named in the abstract. Only two task domains (browsing, SWE) are covered, so the state-conditioned budget may not transfer.",
+      "authors": [
+        "Jihao Zhao",
+        "Shuaishuai Zu",
+        "Pengfei Li",
+        "Biao Qin",
+        "Guanghuan Fang",
+        "Ben Feng",
+        "Baochuan Yang"
+      ],
+      "arxiv_id": "2610.41177"
+    },
+    {
+      "id": "byod-lora-ar-to-diffusion",
+      "kind": "paper",
+      "title": "BYOD: Build Your Own DLM - Efficient Autoregressive-to-Diffusion Language Model Conversion",
+      "url": "https://arxiv.org/abs/2610.41574",
+      "source": "arXiv",
+      "category": "training",
+      "on_focus": true,
+      "headline": "BYOD converts 7–9B AR models into diffusion LMs with LoRA only, ≤102.4M tokens and 3–4 h on one Colab GPU; Gemma 50.6% vs LLaDA 51.9%",
+      "summary": "Strong diffusion LMs normally need expensive pretraining or full fine-tuning. BYOD converts autoregressive models into masked-diffusion LMs by training only LoRA adapters (4.1–5.8% of final parameters) with all base weights frozen, and without architecture-specific tuning. Applied to Gemma 2 9B, Llama 3.1 8B, Qwen2.5 7B and Ministral 8B; all four generate from fully masked sequences and use bidirectional context in a controlled attention test.",
+      "result": "Each conversion is 25,000 iterations, at most 102.4M tokens and 3.1–4.0 hours on a single Colab GPU. On a nine-task evaluation BYOD-Gemma averages 50.6% vs 51.9% for LLaDA 8B Instruct in the same harness. Open generation of 128 tokens in 64 steps gives perplexity 8.3–11.1, vs 4.1 for LLaDA and 2.2–3.0 for the AR parents.",
+      "critique": "The authors themselves flag open-ended generation at low NFE budgets as the main weakness, and the perplexity gap to LLaDA and the parents is large. The nine-task average is close to LLaDA but likely dominated by multiple-choice tasks. No speed comparison against the AR parent is given in the abstract, so the efficiency case for converting is unshown. Two-author paper with older base models.",
+      "authors": [
+        "Ruurd J.A. Kuiper",
+        "Robert A. Bagheri"
+      ],
+      "arxiv_id": "2610.41574"
+    },
+    {
+      "id": "rl-training-inference-mismatch-dlc",
+      "kind": "paper",
+      "title": "On the Origin and Evolution of Training-Inference Mismatch in LLM Reinforcement Learning",
+      "url": "https://huggingface.co/papers/2610.40945",
+      "source": "HF Daily Papers",
+      "category": "training",
+      "on_focus": true,
+      "headline": "Paper splits RL sampler/trainer mismatch into fixed numerical discrepancy and self-amplifying policy lag; proposes the DLC correction",
+      "summary": "In on-policy LLM RL, a separate inference engine generates rollouts and a trainer computes gradients, so the data is off-policy because of engine numerics and stale weights under asynchronous sampling. Evaluating the trainer at the sampler's weights splits each token's error into a roughly constant numerical discrepancy and a policy lag that the trainer's own updates enlarge. Discrepancy-lag correction (DLC) centers the numerical discrepancy, clips the lag ratio against the sampler's weights, and resynchronizes the sampler when effective sample size drops below one half.",
+      "result": "Importance weighting fails on Qwen3-1.7B once the lag ratio's effective sample size falls below 0.5. With a stale sampler, DLC keeps KL from on-policy training within 2x the KL between two independent on-policy runs on Qwen3-0.6B and Qwen3-1.7B, and its resync prevents collapses that per-token corrections leave.",
+      "critique": "Read from the Hugging Face paper page only. Experiments are on 0.6B and 1.7B models; no task reward or benchmark numbers are given, only KL-based stability, and the cost of resynchronization in throughput is not reported. Per-token correction baselines are not named.",
+      "authors": [
+        "Yu Li",
+        "Yufa Zhou",
+        "Tian Lan"
+      ],
+      "arxiv_id": "2610.40945"
+    }
+  ]
+}
