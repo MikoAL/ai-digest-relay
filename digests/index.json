@@ -1,7 +1,15 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-11-03T09:44:18+08:00",
+  "updated_at": "2026-11-04T10:00:45+08:00",
   "digests": [
+    {
+      "date": "2026-11-04",
+      "item_count": 11,
+      "on_focus_count": 10,
+      "top_headline": "FLAMIA: MXFP8 and mixed NVFP4/FP8 attention kernels for training on Blackwell, 1.10–1.40x on B200 and 1.06–1.42x on B300",
+      "json": "digests/2026-11-04.json",
+      "md": "digests/2026-11-04.md"
+    },
     {
       "date": "2026-11-03",
       "item_count": 10,
