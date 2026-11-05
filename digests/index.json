@@ -1,7 +1,15 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-11-04T10:00:45+08:00",
+  "updated_at": "2026-11-05T09:42:21+08:00",
   "digests": [
+    {
+      "date": "2026-11-05",
+      "item_count": 11,
+      "on_focus_count": 10,
+      "top_headline": "Kimi K3.1 Pro weights on HF: 2.8T-total/104B-active MoE, 69 KDA + 24 Gated DSA layers, MXFP4 weights via QAT, 1M context",
+      "json": "digests/2026-11-05.json",
+      "md": "digests/2026-11-05.md"
+    },
     {
       "date": "2026-11-04",
       "item_count": 11,
