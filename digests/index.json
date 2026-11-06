@@ -1,7 +1,15 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-11-05T09:42:21+08:00",
+  "updated_at": "2026-11-06T10:13:24+08:00",
   "digests": [
+    {
+      "date": "2026-11-06",
+      "item_count": 11,
+      "on_focus_count": 11,
+      "top_headline": "Baidu ERNIE-5.5-Flash-Base weights: 280B-total/14B-active MoE, 37 compressed-attention + 6 MLA-DSA layers, 33.5T tokens",
+      "json": "digests/2026-11-06.json",
+      "md": "digests/2026-11-06.md"
+    },
     {
       "date": "2026-11-05",
       "item_count": 11,
