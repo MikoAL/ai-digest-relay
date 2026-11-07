@@ -1,0 +1,213 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-07",
+  "generated_at": "2026-11-07T10:02:18+08:00",
+  "notes": "Saturday in Taipei. arXiv makes no announcement on Friday evening US Eastern, so there is no new batch today. The newest batch is Fri 6 Nov (announced Thursday evening), which the 6 Nov run could not see; most papers here come from it. The cs.LG listing could only be read for its first 50 of 224 entries and the cs.CL 'new' listing up to about entry 44, so on-focus papers further down may be missing. Hybrid Spark and RECAP are from the 5 Nov batch; the 6 Nov run found them but could not read them. SpecOPD (2 Nov) comes from Hugging Face Daily Papers (5 Nov listing). All papers rest on their arXiv abstract pages only. Two items were left out because arXiv rate-limited their pages: 'The Gating Mechanism of KV Cache Eviction' (2611.07605) and StrataFlux (2611.08363). Gemini Omni 1.2 Flash (video generation, off focus) was left out because its official post could not be fetched. No new vLLM release since v0.32.0 (17 Oct) was found. No off-focus items were judged significant enough to include.",
+  "items": [
+    {
+      "id": "recsa-recursive-sparse-attention",
+      "kind": "paper",
+      "title": "Recursive Sparse Attention: Million-Token Length Extrapolation at Logarithmic Cost",
+      "url": "https://arxiv.org/abs/2611.07232",
+      "source": "arXiv",
+      "category": "architecture",
+      "on_focus": true,
+      "headline": "RecSA: tree over the KV cache gives O(log L) sparse attention; Qwen3-4B trained at 32K scores 60.5 on RULER at 1M vs 40.0",
+      "summary": "Most trainable sparse-attention methods still pay O(L) per query to pick blocks, and hierarchical O(log L) methods have only been evaluated inside their training length. RecSA builds a tree over the KV cache in which every node summarizes its subtree with one key and one mean-pooled value. Each layer has a single key pooler, shared across tree levels and distilled from dense attention. At each level a query keeps at most k candidates, so selection cost and entries read per query are O(log L). Unselected summaries share one softmax with the exact tokens that are read. RoPE positions are assigned by an entry's index among its level's candidates rather than its absolute position, so relative distances stay within the trained range at any length. The model is initialized from Qwen3-4B and trained on 0.62B tokens at the original 32K length.",
+      "result": "On RULER it beats all baselines at every length from 131K to 2M; at 1M tokens it scores 60.5 vs 40.0 for the best baseline (dense attention + DCA). With optimized kernels it is faster than dense attention end to end from 64K to 2M tokens; at 524K on one H200 it reports 3.2x faster prefill and 3.8x faster decoding.",
+      "critique": "Only one model (Qwen3-4B) and one long-context benchmark family (RULER) appear in the abstract, and the only named baseline is dense + DCA, a training-free extrapolation method; comparisons against other trained hierarchical or sparse methods (e.g. NSA/DSA-style) at long lengths are not visible from the abstract. Mean-pooled values are a lossy summary, so tasks needing exact aggregation over many far tokens may suffer. Speedups depend on the authors' kernels and are reported on a single GPU. No code link on the abstract page. Read from the abstract only.",
+      "authors": [
+        "Ruitian Wang",
+        "Xinyu Yang",
+        "Minshen Zhang",
+        "Hao Zhang"
+      ],
+      "arxiv_id": "2611.07232"
+    },
+    {
+      "id": "muir-linear-attention",
+      "kind": "paper",
+      "title": "Muir: Linear Attention with Sensitivity-Allocated Gating and Matched-Filter Readout",
+      "url": "https://arxiv.org/abs/2611.08376",
+      "source": "arXiv",
+      "category": "architecture",
+      "on_focus": true,
+      "headline": "Muir modifies Gated DeltaNet-2 gating and readout; reports 1.8–2.0% lower perplexity than GDN-2 at 166M–1.34B",
+      "summary": "An analysis of Gated DeltaNet-2 (GDN-2) finds that the state update is much more sensitive to writes than to erasure, and that slow-decaying state rows build up large norms and dominate an unweighted readout. Muir therefore (1) gives the erase gate a lower-rank projection than the write path ('sensitivity-allocated' gating), (2) adds a matched-filter readout gate that re-weights state rows before readout, and (3) spends the saved parameters on a wider FFN. It also introduces a parallel update form meant to keep large-chunk training numerically stable.",
+      "result": "Across 166M–1.34B parameters: perplexity 1.8–2.0% lower than GDN-2 and 2.5–3.6% lower than a Transformer baseline; up to +1.9 points on commonsense accuracy; better than both on multi-hop and multi-needle recall at 1.34B; stable perplexity when extrapolating from 4K training to 10M-token streams; trains 2.7x faster than the Transformer at 32K with throughput matching GDN-2.",
+      "critique": "Small scale (max 1.34B) and relative perplexity gains of ~2% that may shrink with scale or tuning. Baselines are GDN-2 and a Transformer only; no comparison with other recent gated linear/SSM variants (e.g. Mamba-style or hybrid models) is visible in the abstract. Token budget and compute are not given in the abstract, and stable perplexity on 10M-token streams says little about long-range retrieval at that length. No code link on the abstract page.",
+      "authors": [
+        "Tushaar Gangavarapu",
+        "Gil Tabak",
+        "Clemens JS Schaefer"
+      ],
+      "arxiv_id": "2611.08376"
+    },
+    {
+      "id": "inkling-2-small",
+      "kind": "release",
+      "title": "Introducing Inkling 2 Small",
+      "url": "https://thinkingmachines.ai/news/inkling-2-small/",
+      "source": "Thinking Machines Lab",
+      "category": "architecture",
+      "on_focus": true,
+      "headline": "Thinking Machines' Inkling 2 Small: 594B-total/17B-active MoE, pretrained natively in NVFP4; Apache-2.0 weights promised next week",
+      "summary": "Thinking Machines Lab announced Inkling 2 Small on 5 Nov: a mixture-of-experts model with 594B total and 17B active parameters, image input (292M-parameter Perception Encoder-based vision encoder) and variable reasoning effort. Pretraining (H1) used 8.4T tokens in 68 hours on GB300 NVL72 racks, natively in NVFP4; later stages added 3.8T tokens at 512K context, ~320B tokens at 1M context and ~34B tokens of agent trajectories, then a joint RL run (1,075 steps, 3T+ tokens, 2,048 GPUs, 9 days, >4e23 FLOPs). It is available now with closed weights on Tinker; full weights are to follow under Apache 2.0 after external safety testing.",
+      "result": "Lab-reported: 30.6 on the Artificial Analysis Index v5.0 (DeepSeek-V4.1-Flash-1017: 32.6; GLM 5.3: 31.7); 72.1% on DeepSWE v1.1 (DeepSeek-V4.1-Flash-1017: 77.0%); 28.7% on HLE-Diamond (Kimi K3: 26.9%).",
+      "critique": "Weights are not out yet, so the open-weight claim and the architecture (expert count, routing, attention type, max context) cannot be checked; the post gives none of those MoE details. Benchmarks are self-reported and the model trails DeepSeek-V4.1-Flash on most rows shown. The NVFP4 pretraining claim is the most interesting part for efficiency but comes without a quality comparison against a BF16/FP8 run."
+    },
+    {
+      "id": "ripple-65b-preview",
+      "kind": "release",
+      "title": "ricursiveAI/Ripple-65B-Preview",
+      "url": "https://huggingface.co/ricursiveAI/Ripple-65B-Preview",
+      "source": "Hugging Face model card",
+      "category": "architecture",
+      "on_focus": true,
+      "headline": "Ripple-65B Preview: Apache-2.0 dense 65B, 80 layers at d_model 5120, gated attention, global NoPE, value residuals, 1M context",
+      "summary": "Ricursive Intelligence published Ripple-65B Preview, a dense (not MoE) 65B Transformer; the card says dense was chosen to reduce training and serving complexity. It is 'thin-and-deep' (d_model 5120, 80 layers) and moved from an Olmo 3 llama-like design to a Gemma 3N-like one for stability. Attention changes: more heads, a higher sliding-window-to-global layer ratio with a smaller window to pay for them, gated attention, NoPE on global layers, value residuals, plus FFN activation clipping. Context up to 1,048,576 tokens. Training: 12T tokens pretraining at 8K, 200B midtraining, 6.5B long-context, 183B SFT, 13.5B long-context SFT.",
+      "result": "Self-reported Terminal-Bench 2.1: 80.5 vs Reflection Beam 501B 80.1, Muse Spark Open 816B 76.4, Nemotron 3 Ultra 550B 56.4. It trails those models on SWE-bench Verified (76.5 vs Beam 81.6), MMLU-Pro (84.2 vs Muse Spark Open 87.9) and GPQA Diamond (85.2 vs Beam 90.6).",
+      "critique": "The model card gives no release date; it was reported as new around 5–6 Nov by secondary coverage. All benchmarks are self-reported, and the card itself says agentic scores are hard to replicate. No ablations show which of the many architecture changes matter, and long-context quality at 1M is not benchmarked on the card. Requires custom code to load."
+    },
+    {
+      "id": "spare-linear-attention-decoding",
+      "kind": "paper",
+      "title": "SPARE: Fast Linear Attention Decoding with Compact Recurrent States",
+      "url": "https://arxiv.org/abs/2611.07552",
+      "source": "arXiv",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "SPARE runs linear-attention decoding on low-rank recurrent states without retraining: 2.55x decode speedup, 3.31x lower peak memory",
+      "summary": "Linear-attention states are fixed-size but grow quadratically with head dimension, and reading/writing them every decode step makes decoding memory-bound. SPARE is training-free: it projects states onto fixed low-dimensional subspaces, allocates different ranks to different parts of the state, and adds a lightweight write compensation term. Reads and updates run directly on the compact state, with no online decomposition and no reconstruction of the dense state.",
+      "result": "2.55x full-model decoding speedup, 7.49x lower DRAM traffic in the recurrent kernel and 3.31x lower peak GPU memory; at matched memory budgets it keeps better associative-retrieval accuracy than structured pruning.",
+      "critique": "The abstract names only structured pruning as a baseline and does not say which linear-attention models, sizes or hardware were tested. Fixed subspaces may not hold under distribution shift or long generations; downstream quality beyond associative retrieval is not quantified in the abstract. No code link. Read from the abstract only.",
+      "authors": [
+        "Ke Wan",
+        "Zaiyi Zheng",
+        "Chen Chen"
+      ],
+      "arxiv_id": "2611.07552"
+    },
+    {
+      "id": "specopd-branch-parallel-opd",
+      "kind": "paper",
+      "title": "SpecOPD: Branch-Parallel On-Policy Distillation for Speculative Decoding",
+      "url": "https://arxiv.org/abs/2611.02846",
+      "source": "arXiv (via HF Daily Papers)",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "SpecOPD parallelizes on-policy distillation for block drafters; up to 41% longer acceptance and 3.56x speedup over autoregressive decoding",
+      "summary": "On-policy distillation can push parallel block drafters (which predict a draft block in one forward pass) past acceptance plateaus, but collecting supervision needs slow sequential draft-and-verify rollouts. SpecOPD observes that a draft block can be supervised from its reference prefix plus the drafter's own sampled history, so it samples many independent branches at reference anchor points and packs them into proposal trees that share target-prefix compute. Branch histories are kept correct with tree masks for full attention, branch-consistent indexer groups for sparse attention and indexed state replay for linear attention. The drafter is trained with an E2E-TV surrogate that targets acceptance length. Targets: an 8B GQA model, a 27B GQA–GDN linear hybrid, and a 125B sparse-linear (QSA–GDN) model; drafters: DFlash, DSpark, DFlash V2.",
+      "result": "Up to 41.45% higher mean acceptance length, up to 16.09x supervised-token throughput vs sequential-rollout OPD, and up to 3.56x generation speedup over autoregressive decoding, across dialogue, coding, math and agentic tasks.",
+      "critique": "All headline numbers are 'up to' maxima; averages across targets and domains are not in the abstract. The speedup is measured against autoregressive decoding, not against the same drafters trained without SpecOPD in end-to-end wall-clock terms. Training compute is not given. No code link on the abstract page. Submitted 2 Nov; listed on HF Daily Papers for 5 Nov.",
+      "authors": [
+        "Tianyu Liu",
+        "Jun Zhang",
+        "Wenjie Huang",
+        "Yuhao Shen",
+        "Tianqi Xu",
+        "Xinyue Hao",
+        "Hongyaoxing Gu",
+        "Xuyang Liu",
+        "Baolin Zhang",
+        "Yating Zhu",
+        "Shuang Ge",
+        "Jun Dai",
+        "Lei Chen",
+        "Yue Li",
+        "Mingchen Wan"
+      ],
+      "arxiv_id": "2611.02846"
+    },
+    {
+      "id": "hybrid-spark-adaptive-drafter",
+      "kind": "paper",
+      "title": "Hybrid Spark: Adaptive Speculative Decoding That Lets the Content Choose the Drafter",
+      "url": "https://arxiv.org/abs/2611.05611",
+      "source": "arXiv",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "Hybrid Spark runs a model drafter and an n-gram drafter each step in vLLM: 1.10–1.62x over DSpark on code editing at batch 4",
+      "summary": "Model-based drafters propose short blocks on any content; model-free n-gram drafters cheaply propose long spans when output copies input (e.g. code editing), but give no per-token confidence, so they cannot join adaptive verification that spends a limited verify budget on the likeliest tokens. Hybrid Spark runs both drafters every step and picks the better chain per request, inside adaptive verification and fully on GPU so asynchronous scheduling is kept. The key device is a price per verified draft token, equal to the goodput that batch slot would otherwise earn; with n-gram acceptance estimates calibrated once on general text, both drafters' chains can be compared on one scale. Implemented with DSpark plus an n-gram drafter in vLLM.",
+      "result": "Output throughput vs DSpark alone: 1.10–1.62x on code editing at batch size 4 and 1.04–1.27x at batch 128; 0.97–1.01x on chat at temperature 0.",
+      "critique": "The only baseline is DSpark alone; there is no comparison with simply switching drafters by a heuristic or with other hybrid/suffix-tree methods. Gains on chat are flat to slightly negative, and only temperature 0 is reported for chat. Acceptance calibration is done once on general text, which may drift on unusual workloads. Target model sizes and hardware are not stated in the abstract. Found by the 6 Nov run but not readable then.",
+      "authors": [
+        "Ekagra Ranjan",
+        "Bharat Venkitesh"
+      ],
+      "arxiv_id": "2611.05611"
+    },
+    {
+      "id": "strong-to-weak-opd-vs-grpo",
+      "kind": "paper",
+      "title": "Unpacking the Compute Efficiency of Strong-to-Weak OPD against GRPO",
+      "url": "https://arxiv.org/abs/2611.08453",
+      "source": "arXiv",
+      "category": "training",
+      "on_focus": true,
+      "headline": "Study: OPD from an external teacher is less FLOP-efficient than GRPO, but multi-teacher OPD matches joint GRPO with 42% fewer FLOPs",
+      "summary": "Asks whether on-policy distillation (student rollouts, frozen teacher's per-token reverse-KL guidance) needs fewer training FLOPs than GRPO to reach a target accuracy. Vanilla reverse-KL OPD and GRPO are compared across task difficulty, model sizes, domains and optimizer choices, tracking held-out accuracy against training FLOPs. Two teacher settings are separated: an external stronger teacher, and the student's own GRPO checkpoint.",
+      "result": "With an external teacher, OPD generally gives lower accuracy per training FLOP than GRPO (even when the teacher was itself GRPO-trained) and often makes responses excessively long. With the student's own GRPO checkpoint as teacher, OPD recovers its math accuracy with 50x fewer distillation FLOPs than GRPO needs, also on code, a larger student and a second model family. Multi-teacher OPD merges per-domain GRPO experts into one student matching each expert, at 5.2% (2 domains) and 8.0% (4 domains) of specialist training FLOPs; the full pipeline matches joint GRPO on the 2-domain mix with 42.0% fewer total FLOPs.",
+      "critique": "The 50x figure compares distilling an already-trained GRPO checkpoint against training it, which the authors note adds compute in the single-domain case. Model families, sizes and benchmarks are not named in the abstract. Only vanilla reverse-KL OPD is studied, so improved OPD variants could change the conclusion. The 42% saving is shown for a 2-domain mix only.",
+      "authors": [
+        "Zeyu Leo Liu",
+        "Yang Li",
+        "Bo Pang",
+        "Emre Can Acikgoz",
+        "Xuan-Phi Nguyen",
+        "Anurag Koul",
+        "Srijan Bansal",
+        "Erik Nijkamp",
+        "Shafiq Joty",
+        "Semih Yavuz"
+      ],
+      "arxiv_id": "2611.08453"
+    },
+    {
+      "id": "recap-multimodal-spec-decoding",
+      "kind": "paper",
+      "title": "RECAP: Context-Aware Prediction Recycling with Request-Local and Persistent Memories for Multimodal Speculative Decoding",
+      "url": "https://arxiv.org/abs/2611.05894",
+      "source": "arXiv",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "RECAP: training-free speculative decoding for VLMs from recycled predictions; 1.66x on Qwen2.5-VL-7B vs 1.51x for Token Recycling",
+      "summary": "Training-free speculative decoding can draft from the target model's own past predictions, but existing methods key these by the last token only, so in vision-language models predictions made under different images or prefixes get mixed. RECAP stores predictions under 1-, 2- and 3-token keys: contextual memories live only for the current request (implicitly tied to its image), while token-level memories persist across requests for coverage. Lookups fuse predictions weighted by key specificity and entropy-based confidence; a best-first search builds a candidate token tree, padded with suffix-matched continuations, which one target pass verifies under greedy decoding.",
+      "result": "Mean speedup over autoregressive decoding across seven single-turn benchmarks: 1.66x on Qwen2.5-VL-7B and 1.56x on LLaVA-1.6-7B, vs 1.51x and 1.37x for Token Recycling, the strongest training-free baseline.",
+      "critique": "Greedy decoding only, single-turn benchmarks only, and only 7B models. The comparison set is training-free methods; trained drafters (e.g. EAGLE-style) would likely be faster, which the abstract does not address. Persistent cross-request memories raise questions about memory growth and isolation in multi-tenant serving that the abstract does not cover. Code is linked (github.com/Senmo996/RECAP-official-code). Found by the 6 Nov run but not readable then.",
+      "authors": [
+        "Hengjie Zhu",
+        "Dayan Wu",
+        "Xinze Liu",
+        "Peng Fu",
+        "Zheng Lin",
+        "Weiping Wang"
+      ],
+      "arxiv_id": "2611.05894"
+    },
+    {
+      "id": "learning-dynamics-opd",
+      "kind": "paper",
+      "title": "Learning Dynamics of On-Policy Distillation",
+      "url": "https://arxiv.org/abs/2611.08016",
+      "source": "arXiv",
+      "category": "training",
+      "on_focus": true,
+      "headline": "Analysis of on-policy distillation dynamics: why students respond weakly to teacher disagreement and why offline warm-up matters",
+      "summary": "On-policy distillation (OPD) trains a student on its own rollouts with dense teacher guidance, forming a feedback loop because each update changes the next batch of data. The paper analyzes this loop in two stages: how the distillation signal becomes parameter updates, and how those updates propagate across prefixes to reshape the rollout distribution. The framework explains two failure modes: the student can barely move even when it disagrees strongly with the teacher, and updates that improve local agreement can raise the probability of failing continuations, so the student then trains on unreliable supervision.",
+      "result": "The abstract gives no numbers. Qualitatively: prior offline distillation can prepare a student for OPD without much immediate held-out gain; OPD alone may degrade generation quality, but after enough offline preparation it yields large accuracy gains.",
+      "critique": "No quantitative results, model sizes or benchmarks in the abstract, so the size of the reported effects cannot be judged from it. The 'offline warm-up then OPD' recipe is consistent with common practice and needs comparison against tuned baselines to show the analysis adds predictive value. No code link.",
+      "authors": [
+        "Guan Zhe Hong",
+        "Sumeet Ramesh Motwani",
+        "Liang Chen",
+        "Yangchen Pan",
+        "Junchi Yu",
+        "Jialin Yu",
+        "Philip Torr",
+        "Yi Ren"
+      ],
+      "arxiv_id": "2611.08016"
+    }
+  ]
+}

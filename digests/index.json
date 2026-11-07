@@ -1,7 +1,15 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-11-06T10:13:24+08:00",
+  "updated_at": "2026-11-07T10:02:18+08:00",
   "digests": [
+    {
+      "date": "2026-11-07",
+      "item_count": 10,
+      "on_focus_count": 10,
+      "top_headline": "RecSA: tree over the KV cache gives O(log L) sparse attention; Qwen3-4B trained at 32K scores 60.5 on RULER at 1M vs 40.0",
+      "json": "digests/2026-11-07.json",
+      "md": "digests/2026-11-07.md"
+    },
     {
       "date": "2026-11-06",
       "item_count": 11,
