@@ -1,7 +1,15 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-11-07T10:02:18+08:00",
+  "updated_at": "2026-11-08T09:45:41+08:00",
   "digests": [
+    {
+      "date": "2026-11-08",
+      "item_count": 11,
+      "on_focus_count": 10,
+      "top_headline": "SpecPilot: agent loop tunes speculative decoding per deployment; speedup over AR rises from 4.46x (stock) to 10.87x at batch 1",
+      "json": "digests/2026-11-08.json",
+      "md": "digests/2026-11-08.md"
+    },
     {
       "date": "2026-11-07",
       "item_count": 10,
