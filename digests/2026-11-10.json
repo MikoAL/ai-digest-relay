@@ -1,0 +1,204 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-10",
+  "generated_at": "2026-11-10T09:37:23+08:00",
+  "notes": "Tuesday in Taipei. Papers come mainly from the Mon 9 Nov arXiv batch (submissions of 5-6 Nov), plus a few strong 31 Oct-5 Nov papers earlier digests had not covered; the Tue 10 Nov batch was announced at 09:00 Taipei, minutes before this run, and was not visible. The arXiv cs.LG listing showed only the first 50 of 213 entries for 9 Nov, and an export.arxiv.org past-week listing returned a stale 2024 page, so other on-focus papers from this batch may be missing. Papers rest on their arXiv abstract pages only (FLAMIA on its Hugging Face paper page). The Kimi K3.1 Pro weights date from 2-5 Nov but had not been covered. Skipped pages: arXiv abstracts of RidgeFill (2611.09709), Transformer-FSQ (2611.09598) and Efficient Activation Checkpointing (2611.09614) were declined (not reachable via search results); Rethinking MoE Load Balancing as Feedback Control (2611.09252) was rate-limited on every attempt and is left out; a GitHub daily-news issue (dboeter/daily-diff #218) failed to load. An alphaXiv entry for 'LISA: Head-Fused Linear Indexing for Efficient Sparse Attention' (4.13x TTFT over DSA at 1M tokens on DeepSeek-V3.2) was left out because it had no arXiv ID and could not be reconciled with an earlier arXiv LISA paper (2607.19358). OpenAI's GPT-6 Cyber and BioBasicsBench (off focus) were not included. No new vLLM/SGLang release was found.",
+  "items": [
+    {
+      "id": "kimi-k3-1-pro-weights",
+      "kind": "release",
+      "title": "Kimi K3.1 Pro (open weights)",
+      "url": "https://huggingface.co/moonshotai/Kimi-K3.1-Pro",
+      "source": "Hugging Face model card (Moonshot AI)",
+      "category": "architecture",
+      "on_focus": true,
+      "headline": "Moonshot's Kimi K3.1 Pro weights: 2.8T-param MoE (104B active), 69 KDA + 24 Gated DSA layers, 1M context, MXFP4 QAT",
+      "summary": "Moonshot AI published the weights of Kimi K3.1 Pro on Hugging Face (coverage dates the upload between 2 and 5 Nov; earlier digests did not cover it). Per the model card: 93 layers (1 dense), 896 routed experts with 16 active per token plus 2 shared, expert hidden size 3,072 with a 3,584 latent MoE dimension. The attention stack is hybrid: 69 Kimi Delta Attention (linear) layers and 24 Gated DeepSeek Sparse Attention layers (indexer: 32 heads x 128 dim, top-k 2,048), which replace the full-attention Gated MLA layers of Kimi K3 to make 1M-token context cheaper. Weights are MXFP4 with MXFP8 activations via quantization-aware training; a 401M MoonViT-V2 encoder adds image input. Recommended engines: vLLM, SGLang, TokenSpeed.",
+      "result": "Self-reported: HLE-Full with tools 70.0 (top of its table), BrowseComp 92.1 vs GPT-6 Astra 91.5 and Claude Opus 5.5 90.8, Terminal-Bench 4.0 65.7 vs Opus 5.5 66.4; trails on Program Bench (31.5 vs 65.0) and HLE-Diamond (39.4 vs 65.8 for GPT-6 Astra).",
+      "critique": "All benchmarks are Moonshot's own, several with differing harnesses or internal benchmarks, and none are independently verified. No technical report on the KDA/Gated-DSA ratio, QAT recipe or training compute was found; there is no ablation showing what swapping Gated MLA for Gated DSA costs in quality. The license is custom (attribution and revenue-based terms), not a standard open-source license, and the card does not give an upload date. Serving 2.8T parameters even at MXFP4 needs a multi-GPU node."
+    },
+    {
+      "id": "hasa-head-adaptive-sparse-attention",
+      "kind": "paper",
+      "title": "Attend at the Right Resolution: Head-Adaptive Sparse Attention via Query-Key Interaction Structure",
+      "url": "https://arxiv.org/abs/2611.09700",
+      "source": "arXiv",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "HASA: training-free sparse attention that sizes selection per head from its QK spectrum; up to 14.07x over dense attention",
+      "summary": "Training-free sparse attention methods usually pick tokens with fixed rules for feature dimensionality and block granularity. HASA instead derives, per pretrained head, an effective rank from the singular spectrum of its query-key operator and scores tokens in that compact head-specific subspace; along the sequence it progressively merges neighbouring regions whose responses are directionally coherent and keeps dissimilar ones apart. Exact attention is then computed over the selected regions with the original full-dimensional K/V.",
+      "result": "Captures 88.1% of dense attention mass; versus the sparse-attention baseline UNIQUE, up to +3.47 points on RULER and +2.57 on LongBench-Pro and up to 1.32x faster self-attention; up to 14.07x faster than dense attention.",
+      "critique": "Abstract-only reading: models, context lengths and hardware behind the 'up to' numbers are not stated there, and the 14.07x is an attention-kernel figure, not end-to-end latency. Only one named sparse baseline (UNIQUE); no comparison with trained sparse attention such as DSA/NSA. 88.1% attention-mass recall leaves room for failure on retrieval-heavy tasks. No code link.",
+      "authors": [
+        "Wajih Hassan Raza",
+        "Ahsan Bilal",
+        "Yidan Shen",
+        "Renjie Hu",
+        "Xin Fu",
+        "Yu Wen"
+      ],
+      "arxiv_id": "2611.09700"
+    },
+    {
+      "id": "leansparse-sparse-attention-serving",
+      "kind": "paper",
+      "title": "LeanSparse: Memory-Efficient Serving for Native Sparse-Attention LLMs",
+      "url": "https://arxiv.org/abs/2611.04671",
+      "source": "arXiv",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "LeanSparse (SGLang): 2.95x more concurrent requests, 2.14x decode throughput vs HiSparse for DeepSeek-V4-Flash at 950K context",
+      "summary": "Natively sparse-attention models (DSA-style indexers) still keep the full set of indexer keys on GPU even when the KV cache is offloaded, which caps decode concurrency, and prefill's transient memory can stall admission. LeanSparse streams each layer's history through two reusable GPU buffers during prefill (loading layer l+1 while computing layer l) and, in decode, uses coarse-to-fine indexing: search compact representations first and fetch full indexer keys only for candidates to refine, with separate reusable caches for indexer keys and KV.",
+      "result": "On DeepSeek-V4-Flash at 950K context: 2.95x concurrent requests and 2.14x decode throughput vs HiSparse. On multi-turn Open-SWE traces: median TTFT 21.6 s -> 0.6 s and 17.7% lower median session time vs ECHO.",
+      "critique": "Evaluated on a single model (DeepSeek-V4-Flash) and the abstract does not give the hardware. Coarse-to-fine indexing is approximate, and the abstract reports no accuracy check that selection quality matches the native indexer. Baselines are research systems (HiSparse, ECHO); no comparison with stock SGLang/vLLM offloading. No code link.",
+      "authors": [
+        "Zaifeng Pan",
+        "Chris Wu",
+        "Xinwei Qiang",
+        "Zhengding Hu",
+        "Zhongkai Yu",
+        "Yufei Ding"
+      ],
+      "arxiv_id": "2611.04671"
+    },
+    {
+      "id": "jet-qsparse-fp4-sparse-attention",
+      "kind": "paper",
+      "title": "Jet-QSparse: Accelerating Agentic LLM Inference with 4-Bit Sparse Attention",
+      "url": "https://arxiv.org/abs/2611.01022",
+      "source": "arXiv",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "Jet-QSparse: NVFP4 KV cache + FP4 QK scoring + top-block sparse attention; 1.94x decode vs dense BF16 at 128K on GB300",
+      "summary": "Training-free decode-attention scheme for long agentic contexts. The KV cache is stored in NVFP4 and query-key scores for the whole history are computed in FP4 on Blackwell tensor cores; the top 128-token blocks are then gathered for value aggregation in FP16 with FP32 accumulation. Calibrated key centering and at most two BF16 pages per sequence and layer contain quantization error; FP8 prefill uses a temporary buffer while the persistent cache is written directly from BF16 activations.",
+      "result": "With 128 blocks per KV head, no detected accuracy loss across four hybrid LLMs on math, coding and agentic benchmarks; with 64 blocks, Qwen3.8-27B reaches 1.94x end-to-end decode speedup over dense BF16 at 128K context, batch 16, one GB300; KV pools hold 2.58-2.76x BF16's token capacity.",
+      "critique": "The only baseline is dense BF16, not other sparse or FP8/FP4 KV methods, so the gain over the state of the art is unknown. The headline speedup uses the 64-block budget, while the 'no loss' claim is for 128 blocks, and the abstract concedes smaller budgets lose accuracy. Blackwell-only (FP4 tensor cores); no code link. Submitted 31 Oct, outside the 24-hour window, but not covered in earlier digests.",
+      "authors": [
+        "Haozhan Tang",
+        "Hao Kang",
+        "Meng Lu",
+        "Yecheng Wu",
+        "Zerui Wang",
+        "Seokho Han",
+        "Haocheng Xi",
+        "Shuo Yang",
+        "Song Han",
+        "Han Cai"
+      ],
+      "arxiv_id": "2611.01022"
+    },
+    {
+      "id": "fused-softmax-quantized-attention",
+      "kind": "paper",
+      "title": "Fused-Softmax for efficient quantized attention",
+      "url": "https://arxiv.org/abs/2611.09225",
+      "source": "arXiv",
+      "category": "efficiency",
+      "on_focus": true,
+      "headline": "Fused-Softmax folds softmax into attention GEMMs; MXFP4 attention hits ~4.6 PFLOP/s on MI355X, 3.2x over BF16, shipped in AITER",
+      "summary": "As low-precision matrix throughput outgrows vector throughput, softmax (exp, max, sum on vector units) becomes the attention bottleneck. Fused-Softmax Attention reformulates and approximates softmax so its main operations are absorbed into the attention GEMMs, moving work from vector units to matrix cores. Implemented as MXFP8/MXFP6/MXFP4 attention kernels for AMD CDNA 4, training-free.",
+      "result": "On an AMD Instinct MI355X: about 3.0 / 4.0 / 4.6 PFLOP/s for MXFP8 / MXFP6 / MXFP4, i.e. 2.1x / 2.8x / 3.2x over BF16 attention; added error stays below the GEMM-operand quantization error. Wan2.2-T2V-A14B with a hybrid MXFP6/4 schedule: up to 2.05x end-to-end; AMD's MLPerf Inference v6.1 Wan2.2 submission ran 1.7x faster than its previous round.",
+      "critique": "Baseline is BF16 attention, not an FP8 FlashAttention-class kernel, which inflates the headline speedups. End-to-end evaluation is a video diffusion model; LLM accuracy (especially long-context and causal decode) is not reported in the abstract. Quality 'preserved' is asserted without named metrics in the abstract. Authors are from AMD, and the MLPerf improvement mixes this kernel with other changes. AMD-only.",
+      "authors": [
+        "Tianxing Wu",
+        "Juuso Korhonen",
+        "Jesus Carabano Bravo"
+      ],
+      "arxiv_id": "2611.09225"
+    },
+    {
+      "id": "resserve-fp4-residue-compensation",
+      "kind": "paper",
+      "title": "ResServe: Accurate and Efficient FP4 LLM Inference with Residue Compensation",
+      "url": "https://arxiv.org/abs/2611.08713",
+      "source": "arXiv",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "ResServe adds an FP4 residue to FP4 activations using idle decode compute; at most 3.4% latency over W4A4 on B200",
+      "summary": "Block-scaled FP4 (NVFP4/MXFP4) inference loses quality; going to W4A8 recovers it but costs speed. ResServe keeps an FP4 activation base plus an FP4-quantized residue of what quantization dropped, computes the residue's contribution in the spare tensor-core capacity that skinny decode GEMMs leave idle, and merges results on-chip. Applied to linear layers and decode attention, with selective compensation during prefill to bound extra work.",
+      "result": "On NVIDIA B200: at most 3.4% request-latency overhead vs uncompensated W4A4 and 22.4-53.3% lower latency than W4A8. Across five models, code-generation accuracy improves over same-format uncompensated inference by a mean relative 15.04% (NVFP4) and 53.57% (MXFP4).",
+      "critique": "Accuracy is reported as relative gains over plain W4A4 on code generation only; the abstract does not say how close it gets to W4A8 or BF16 accuracy, which is the comparison that matters. The 'spare capacity' argument holds for low-batch decode; overhead at large batch sizes is unclear. Models are not named in the abstract. Single GPU type (B200); no code link. Submitted 5 Nov, outside the 24-hour window, but not covered earlier.",
+      "authors": [
+        "Shuo Rong",
+        "Ruibo Fan",
+        "Jiawen Wen",
+        "Xiaowen Chu"
+      ],
+      "arxiv_id": "2611.08713"
+    },
+    {
+      "id": "flamia-blackwell-low-precision-attention",
+      "kind": "paper",
+      "title": "FLAMIA: FLAsh MIcroscaling Attention for Fast and Causally Safe Training on Blackwell",
+      "url": "https://huggingface.co/papers/2611.03344",
+      "source": "HF Daily Papers",
+      "category": "training",
+      "on_focus": true,
+      "headline": "Yandex's FLAMIA: MXFP8 and NVFP4/FP8 attention kernels for training on Blackwell; code released",
+      "summary": "Using Blackwell's low-precision MMA for attention in training raises three problems: quantization overhead, causal leakage through scales shared across future tokens, and forward/backward numerical mismatch. FLAMIA provides an MXFP8 training path and a mixed NVFP4/FP8 path, using token-block scaling (quantized operands reused across matrix orientations), safeguards against scale-induced causal leakage, consistent forward/backward computation, fused quantization, and document-local scaling with workload-aware scheduling so packed variable-length documents run without repacking.",
+      "result": "MXFP8 path: 1.10-1.40x on B200 and 1.06-1.42x on B300 for the combined forward+backward attention call (including quantization) on causal packed-document workloads, vs the fastest evaluated baseline per workload; training stability and quality reported preserved when pretraining Llama-style models.",
+      "critique": "Baselines are not named in the abstract ('fastest evaluated baseline'), and the speedups are modest for a precision drop from BF16. No numbers given for the NVFP4/FP8 path in the abstract. Pretraining validation is on Llama-style models of unstated scale and token count. Read via the Hugging Face paper page (abstract), not the full paper. Submitted 2 Nov, outside the 24-hour window, but not covered earlier.",
+      "authors": [
+        "Fedor Velikonivtsev",
+        "Mikhail Koltakov",
+        "Denis Kuznedelev"
+      ],
+      "arxiv_id": "2611.03344"
+    },
+    {
+      "id": "iser-moe-in-switch-expert-replication",
+      "kind": "paper",
+      "title": "ISER-MoE: Dynamic In-Switch Replication of Hot Experts for Load Balancing in Expert-Parallel",
+      "url": "https://arxiv.org/abs/2611.09008",
+      "source": "arXiv",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "ISER-MoE multicasts hot experts through the NVLink switch in TensorRT-LLM; +17.4% prefill throughput on DeepSeek-V4-Pro",
+      "summary": "In expert-parallel MoE, the most loaded GPU sets layer latency and a few hot experts cause most of the imbalance. Replicating them per layer only helps if weights arrive in time, and point-to-point copies or plain broadcasts overload the owning GPU. ISER-MoE (in TensorRT-LLM) multicasts hot experts through the NVLink switch to fixed GPU groups so each byte leaves the owner once; a GPU-side scheduler assigns hot experts to groups per layer and a multi-port broadcast spreads traffic across the group's ports, overlapped with shared-expert compute.",
+      "result": "Trace replay: the scheduler removes 98-99% of excess load. Prefill serving of DeepSeek-V4-Pro: +17.4% throughput on a math benchmark and +7.2% on agentic prompts.",
+      "critique": "Gains are prefill-only in the abstract; decode, where expert imbalance also matters, is not reported. Requires NVLink-switch multicast (NVIDIA NVL systems), so it does not transfer to PCIe or other vendors. Baselines (point-to-point copy, baseline broadcast, EPLB-style static replication) are not quantified in the abstract. Author list appears to be largely NVIDIA; no code link beyond the TensorRT-LLM mention.",
+      "authors": [
+        "Jintao Peng",
+        "Ethan Zhang",
+        "Kefeng Duan",
+        "Bangyu Sheng",
+        "Min Li",
+        "Itamar Rosenfeld Rauch",
+        "Jack Yang",
+        "June Yang"
+      ],
+      "arxiv_id": "2611.09008"
+    },
+    {
+      "id": "nvidia-reshard-rl-weight-refit",
+      "kind": "release",
+      "title": "Accelerating Reinforcement Learning Weight Refit with the Reshard Collective",
+      "url": "https://developer.nvidia.com/blog/accelerating-reinforcement-learning-weight-refit-with-the-reshard-collective/",
+      "source": "NVIDIA Technical Blog",
+      "category": "training",
+      "on_focus": true,
+      "headline": "NVIDIA's NCCL Reshard cuts RL weight refit 2.7-5.7x in NeMo RL, e.g. DeepSeek v3 on DGX H100 from 14.9 s to 2.6 s",
+      "summary": "In disaggregated RL post-training, updated weights must be copied from training GPUs to inference GPUs every step, across different parallel layouts; gather-and-broadcast moves whole tensors even when receivers need a shard. Reshard treats refit as a DTensor-to-DTensor transfer: it computes exact source/destination shard overlaps so only needed regions move; each source shard crosses the network once and receivers in the same NVLink domain redistribute over NVLink, overlapping the two. Open-sourced as NCCL M2N Reshard in NVIDIA/nccl-extensions with a NeMo RL integration (refit_transport: nccl_reshard). NeMo RL uses it for feed-forward projection weights (~95% of parameters) and keeps gather-and-broadcast for QKV and Mamba weights.",
+      "result": "Refit latency in NeMo RL vs gather-and-broadcast: Qwen 3 235B on DGX H100 6.4 s -> 1.9 s; DeepSeek v3 671B on DGX H100 14.9 s -> 2.6 s and on DGX GB200 6.1 s -> 2.3 s; Nemotron Ultra v3 on GB200 8.2 s -> 2.3 s.",
+      "critique": "Vendor benchmarks on NVIDIA systems only; total GPU counts are not stated, and there is no comparison with other refit systems (e.g. RDMA weight-transfer engines in other RL frameworks), only with the naive gather-and-broadcast baseline. Only feed-forward weights take the fast path. Effect on end-to-end RL step time is not reported. Posted 6 Nov (updated 9 Nov), outside the 24-hour window, but not covered earlier."
+    },
+    {
+      "id": "mine-entropy-coded-llm-inference",
+      "kind": "paper",
+      "title": "MINE: Entropy-coded Memory-efficient Inference for Large Language Models",
+      "url": "https://arxiv.org/abs/2611.09424",
+      "source": "arXiv",
+      "category": "efficiency",
+      "on_focus": true,
+      "headline": "MINE: lossless GPU entropy coding of quantized weights as a vLLM plugin; 2.52x single-stream speedup on RTX 4060 Ti",
+      "summary": "Lossless weight compression for LLM inference has mostly been limited to BF16. MINE's dtANS-LLM is a GPU entropy coder (adapted from dtANS) that exploits the non-uniform weight distribution that remains after quantization, with hyperparameters trading compression ratio against decode cost. It auto-tunes these per tensor and GPU to map the size/latency frontier and, as a vLLM plugin, picks the best kernel configuration for a given memory budget, targeting memory-bound single-stream decoding.",
+      "result": "Llama 3.1 8B Instruct from a 2.1-bit EntQuant checkpoint: 2.52x speedup on an RTX 4060 Ti (2.24 effective bits/weight) and 1.48x on an RTX 5090 (3.43 bits/weight) vs the fastest baseline.",
+      "critique": "The abstract does not name the baselines behind 'fastest baseline'. Single model and single-stream only; batched serving, where decode is less memory-bound, is not covered. The higher bitrate chosen on the RTX 5090 suggests the gain shrinks on GPUs with more bandwidth. Artifact on Zenodo; no repository link on the abstract page.",
+      "authors": [
+        "Emil Schätzle",
+        "Markus Püschel"
+      ],
+      "arxiv_id": "2611.09424"
+    }
+  ]
+}

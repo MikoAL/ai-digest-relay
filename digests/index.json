@@ -1,7 +1,15 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-11-09T09:41:23+08:00",
+  "updated_at": "2026-11-10T09:37:23+08:00",
   "digests": [
+    {
+      "date": "2026-11-10",
+      "item_count": 10,
+      "on_focus_count": 10,
+      "top_headline": "Moonshot's Kimi K3.1 Pro weights: 2.8T-param MoE (104B active), 69 KDA + 24 Gated DSA layers, 1M context, MXFP4 QAT",
+      "json": "digests/2026-11-10.json",
+      "md": "digests/2026-11-10.md"
+    },
     {
       "date": "2026-11-09",
       "item_count": 9,
