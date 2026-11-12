@@ -1,7 +1,15 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-11-11T09:38:15+08:00",
+  "updated_at": "2026-11-12T09:35:34+08:00",
   "digests": [
+    {
+      "date": "2026-11-12",
+      "item_count": 12,
+      "on_focus_count": 11,
+      "top_headline": "ADIndex speeds up the DeepSeek Sparse Attention indexer: up to 6.22x prefill and 3.40x decode kernel speedup at 256K context",
+      "json": "digests/2026-11-12.json",
+      "md": "digests/2026-11-12.md"
+    },
     {
       "date": "2026-11-11",
       "item_count": 10,
