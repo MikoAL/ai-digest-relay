@@ -1,7 +1,15 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-11-12T09:35:34+08:00",
+  "updated_at": "2026-11-13T09:59:34+08:00",
   "digests": [
+    {
+      "date": "2026-11-13",
+      "item_count": 9,
+      "on_focus_count": 8,
+      "top_headline": "SGLang-TorchTPU runs all 62 layers of 816B Muse Spark Open as one Pallas megakernel on TPU v7: 1.95 vs 3.78 ms per decode token",
+      "json": "digests/2026-11-13.json",
+      "md": "digests/2026-11-13.md"
+    },
     {
       "date": "2026-11-12",
       "item_count": 12,
