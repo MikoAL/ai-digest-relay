@@ -1,7 +1,15 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-11-13T09:59:34+08:00",
+  "updated_at": "2026-11-14T09:31:33+08:00",
   "digests": [
+    {
+      "date": "2026-11-14",
+      "item_count": 11,
+      "on_focus_count": 11,
+      "top_headline": "KVPath stores one full KV at layer 1 and small delta KVs above it, cutting KV cache up to 68% (GQA) and 55% (MLA) at matched params",
+      "json": "digests/2026-11-14.json",
+      "md": "digests/2026-11-14.md"
+    },
     {
       "date": "2026-11-13",
       "item_count": 9,
