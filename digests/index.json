@@ -1,7 +1,15 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-11-15T09:25:53+08:00",
+  "updated_at": "2026-11-16T09:32:39+08:00",
   "digests": [
+    {
+      "date": "2026-11-16",
+      "item_count": 10,
+      "on_focus_count": 8,
+      "top_headline": "SimpleHC drops residual mixing from Hyper-Connections, matching mHC on 15B-30B MoE at 2.4% training overhead over a plain residual",
+      "json": "digests/2026-11-16.json",
+      "md": "digests/2026-11-16.md"
+    },
     {
       "date": "2026-11-15",
       "item_count": 11,

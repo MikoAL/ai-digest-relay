@@ -1,0 +1,221 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-16",
+  "generated_at": "2026-11-16T09:32:39+08:00",
+  "notes": "Monday in Taipei, but the new arXiv batch (announced Sun 15 Nov 20:00 ET, about 20 minutes before this run) was not visible: the cs.LG and cs.CL /new pages still showed Fri 13 Nov and cs.LG /recent ended at Wed 11 Nov, so the Mon 16 Nov papers could not be checked and should be picked up tomorrow. Papers therefore come from the Fri 13 Nov cs.CL listing, which earlier digests had not drawn on (cs.LG was covered 14-15 Nov), and from Hugging Face Daily Papers (November and trending pages) items from late Oct to early Nov not covered before. Paper details rest on listing abstracts or abstract aggregators (papers.cool), not individual arXiv abstract pages; author lists for Lara Mini Base (about 100 authors) and DiVR are truncated to those shown. Skipped pages: pdf.arxiv.org cs.CL listing (fetch denied by the permission classifier); Hugging Face paper pages for 2611.01182 (fast exact relative-position attention kernels), 2611.13004 (G-STAR token compression) and 2610.42148 (permission request not answered). No Lara Mini Base model card was found by search. Seen but not included: Claude Fable 5.2 / Mythos 5.2 (9 Nov, reportedly ~20% cheaper and up to 30% faster than 5.1; only secondary coverage read), Gemini 4 Hydrogen and Carbon, Muse Ember, Qwen4-Max preview (covered earlier or off-focus), Curiosity-0826-4B medical event model, Effective Teacher Support (covered 14 Nov). NVIDIA technical blog had no new posts after 13 Nov (covered 15 Nov); latest vLLM release is still v0.33.0.",
+  "items": [
+    {
+      "id": "simplehc-hyper-connections",
+      "kind": "paper",
+      "title": "On the Design of Hyper-Connections: Simplification, Stability, and Scalability",
+      "url": "https://huggingface.co/papers/2611.05984",
+      "source": "HF Daily Papers",
+      "category": "architecture",
+      "on_focus": true,
+      "headline": "SimpleHC drops residual mixing from Hyper-Connections, matching mHC on 15B-30B MoE at 2.4% training overhead over a plain residual",
+      "summary": "Hyper-Connections (HC/mHC) widen the residual stream into several parallel states with learned read/write gates and a mixing matrix, and are now used in frontier LMs, but their components are poorly understood and they add training overhead. The authors ablate HC and find that either learned read/write gating without mixing, or unconstrained mixing with fixed gates, alone performs comparably to mHC, and that repeated access to the expanded residual state is a major overhead source even without mixing. SimpleHC removes residual mixing (an additive structure with shared gate inputs), has layer-specific gates read from a shared group-entry state so reads can be batched and writes deferred, and adds scalar corrections so earlier sublayer outputs are preserved exactly.",
+      "result": "2.4% end-to-end training-time overhead versus a vanilla residual baseline at the largest tested scale; comparable to mHC when scaling from 15B to 30B MoE models. An author comment reports a 64-layer (230B MoE) stress test where SimpleHC's loss closely tracks identityHC. Code: github.com/aHapBean/SimpleHC.",
+      "critique": "The Hugging Face page gives no per-scale tables, so the size of the 'comparable to mHC' gap and downstream benchmark numbers are not visible; the 230B result is from an author comment, not the abstract. Overhead is only reported at one scale, and comparisons are against HC variants and a plain residual, not other residual-stream designs. Paper dated 4 Nov; not covered before.",
+      "authors": [
+        "Xiangdong Zhang",
+        "Xiaohan Qin",
+        "Sunan Zou",
+        "Tuo Dai",
+        "Bizhao Shi",
+        "Zhuo Xia",
+        "Yebin Yang",
+        "Yizhou Chen",
+        "Yuliang Liu",
+        "Yu Cheng",
+        "Junchi Yan"
+      ],
+      "arxiv_id": "2611.05984"
+    },
+    {
+      "id": "lara-mini-base-moe",
+      "kind": "paper",
+      "title": "Lara Mini Base: Language Diversity as a Resource, Not a Trade-off",
+      "url": "https://arxiv.org/abs/2611.16956",
+      "source": "arXiv",
+      "category": "architecture",
+      "on_focus": true,
+      "headline": "Lara Mini Base: 7.2B-total / 0.6B-active MoE trained on 6T tokens in 45 languages, 128k context, weights under CC BY-NC-SA 4.0",
+      "summary": "Translated trains a small sparse mixture-of-experts base model from scratch (7.2B total, 0.6B active parameters) on 6T tokens across English and 44 other languages, including all 24 official EU languages, with 128k-token context. The paper's argument is that broad language coverage need not cost per-language quality at this active-parameter budget.",
+      "result": "Reported highest average score among open base models with up to 2B active parameters, ahead of models trained on 4-6x as many tokens, and at least 1.8x faster generation than any model with a higher average score.",
+      "critique": "Details rest on the abstract in the arXiv cs.CL listing; the specific benchmark suite, the competing models and the hardware behind the 1.8x speed figure were not visible. 'Highest average' depends on which benchmarks are averaged. The non-commercial licence limits reuse. Expert count, routing and long-context method were not described in the abstract.",
+      "authors": [
+        "Translated",
+        "Maria Pia Adinolfi",
+        "Isabelle Andrieu",
+        "Grazia Fiorella Anfuso"
+      ],
+      "arxiv_id": "2611.16956"
+    },
+    {
+      "id": "flide-exact-state-forking",
+      "kind": "paper",
+      "title": "Flide: Accelerating Decision Inference with Exact State Forking",
+      "url": "https://papers.cool/arxiv/2610.42148",
+      "source": "papers.cool (arXiv cs.CL)",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "Flide serves branching decision-model queries as one flattened token stream, reporting up to 9.5x faster answers than vLLM and SGLang",
+      "summary": "Decision models (short categorical answers for agents, e.g. Jev) issue many queries over shared prefixes; generation-oriented engines either recompute the shared prefix or distort output probabilities. Flide separates a request's logical tree from its physical execution as one flattened token stream. ForkAttention uses GPU-resident indices to encode branch dependencies in both standard attention and recurrent Gated DeltaNet layers, so each branch equals an isolated forward pass in exact arithmetic. It also pre-records a small set of execution graphs for mixed request shapes and resumes growing agent histories from saved checkpoints.",
+      "result": "Up to 9.5x faster than vLLM and SGLang; closest to a float32 reference by total variation distance among compared systems, on public hybrid and decision models.",
+      "critique": "'Up to 9.5x' is a best case; per-model speedups, hardware and batch settings were not in the abstract. Exactness is claimed in exact arithmetic, and the TVD comparison gives no values. Targets a niche workload (short decision queries), so gains may not carry to normal generation. Dated 30 Oct; read via an abstract aggregator rather than arXiv.",
+      "authors": [
+        "Bobo Li",
+        "Jiajia Song",
+        "Hao Fei",
+        "Wynne Hsu",
+        "Mong Li Lee"
+      ],
+      "arxiv_id": "2610.42148"
+    },
+    {
+      "id": "olifant-memory-speculative-decoding",
+      "kind": "paper",
+      "title": "Towards Green Text Generation: Memory-Based Speculative Decoding",
+      "url": "https://arxiv.org/abs/2611.16714",
+      "source": "arXiv",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "Olifant drafts tokens with a CPU memory-based classifier in <0.3 ms, giving 2.43x throughput in speculative decoding without a KV cache",
+      "summary": "Replaces the neural draft model in speculative decoding with Olifant, a memory-based (k-nearest-neighbour style) classifier that predicts the next token from a four-token window in under 0.3 ms on CPU. The argument is that speculative decoding still pays off against fast verifiers if drafting is almost free.",
+      "result": "38.1% acceptance on EU legal text; 2.43x throughput and 2.51x lower energy per token versus the neural verifier alone. With a KV-cached verifier, 1.25x throughput, while a TinyLlama draft model halves throughput in the same setting.",
+      "critique": "Single author, single domain (EU legal text, which is highly formulaic and favours n-gram-like drafting); verifier model and hardware were not stated in the listing abstract. The headline 2.43x is against a verifier without a KV cache, an unrealistic baseline; the realistic KV-cached gain is 1.25x. No comparison with other training-free drafters (prompt-lookup, n-gram, suffix-tree decoding).",
+      "authors": [
+        "Antal van den Bosch"
+      ],
+      "arxiv_id": "2611.16714"
+    },
+    {
+      "id": "system-one-adaptive-computation",
+      "kind": "paper",
+      "title": "From Large Language Models to Efficient System One Models via Adaptive Computation",
+      "url": "https://arxiv.org/abs/2611.16321",
+      "source": "arXiv",
+      "category": "efficiency",
+      "on_focus": true,
+      "headline": "Jointly trained early-exit sub-models with per-exit gates match independently trained models at every depth on 7 decision benchmarks",
+      "summary": "Starts from the observation that the final six layers of a decision model can be removed without loss. Trains the full model jointly with prefix sub-models that share its final layers and decision head, using self-distillation from the full model, plus a lightweight gate at each exit that decides whether more computation is needed, so easy inputs leave early.",
+      "result": "Matches or beats independently trained models at every depth across seven decision benchmarks, with a better accuracy-efficiency trade-off.",
+      "critique": "The listing abstract gives no absolute accuracies, speedups or FLOP savings, and does not name the base model or the benchmarks. Single author. Early exit with self-distillation is well studied (e.g. LayerSkip-style methods); comparison to those is not mentioned. Wall-clock gains under batching, where exits diverge, are not reported.",
+      "authors": [
+        "Minh-Anh Nguyen"
+      ],
+      "arxiv_id": "2611.16321"
+    },
+    {
+      "id": "loco-local-reasoning-compression",
+      "kind": "paper",
+      "title": "Think Less, Locally: Local Preference Learning for Reasoning Compression",
+      "url": "https://papers.cool/arxiv/2611.04814",
+      "source": "papers.cool (arXiv cs.AI)",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "LoCo trains reasoning models with DPO at local overthinking points, cutting math completion length 42-45% at equal or better accuracy",
+      "summary": "Reasoning models keep deliberating after they have enough information. Instead of rewarding shorter whole trajectories, LoCo finds candidate overthinking states in the model's own traces, freezes the prefix up to each state, samples shorter verified continuations from that state, and trains with DPO on these state-conditioned preference pairs, so the model learns when to stop rather than to be short everywhere. Training data is self-generated math traces only.",
+      "result": "On five math benchmarks, completion length falls 41.7-45.4% while accuracy is maintained or improved; on three code benchmarks (not trained on), length falls 23.4-36.3% with the best accuracy-efficiency AUC across all code benchmarks.",
+      "critique": "The abstract names neither the base models nor the baseline compression methods, and gives no per-benchmark accuracy or AUC values. Token-length reduction is not the same as latency reduction. Code and models are promised, not yet released. Dated 3 Nov; read via an abstract aggregator.",
+      "authors": [
+        "Muyao Yuan",
+        "Liyan Xu",
+        "Weizhan Zhang",
+        "Muyan Jiao",
+        "Jiangnan Li",
+        "Jinchao Zhang",
+        "Jie Zhou"
+      ],
+      "arxiv_id": "2611.04814"
+    },
+    {
+      "id": "differential-backpack-lm",
+      "kind": "paper",
+      "title": "Differential Backpack Language Models: Sense Inhibition via Signed Contextualization Weights",
+      "url": "https://arxiv.org/abs/2611.15642",
+      "source": "arXiv",
+      "category": "architecture",
+      "on_focus": true,
+      "headline": "Differential attention in Backpack LMs lets context suppress word senses, cutting the perplexity gap to a Transformer by 31%",
+      "summary": "Backpack LMs represent each word as a non-negative weighted sum of learned sense vectors, which keeps the readout interpretable. The authors argue non-negativity is more restrictive than interpretability requires and replace the softmax sense weighting with differential attention (difference of two attention maps), giving signed weights so context can actively inhibit a sense.",
+      "result": "On WikiText-103, closes 31% of the perplexity gap to an equal-parameter Transformer versus the softmax Backpack; gains persist up to 350M parameters on OpenWebText; senses improve zero-shot sentence similarity by up to 33%. Example: a financial context pushes the river sense of 'bank' to -0.50.",
+      "critique": "Still behind a plain Transformer; the absolute perplexities are not given in the abstract. Scale stops at 350M, and there is no downstream evaluation beyond perplexity and sentence similarity. An interpretability-oriented architecture rather than an efficiency one. Details from the listing abstract.",
+      "authors": [
+        "Konstantinos Skianis",
+        "Giannis Nikolentzos",
+        "Polykarpos Meladianos",
+        "Michalis Vazirgiannis"
+      ],
+      "arxiv_id": "2611.15642"
+    },
+    {
+      "id": "comem-selective-context-compression",
+      "kind": "paper",
+      "title": "Beyond Compressing Everything: Contrastive Memory Learning for Selective Context Compression",
+      "url": "https://arxiv.org/abs/2611.16384",
+      "source": "arXiv",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "CoMem compresses long contexts into query-conditioned memory slots trained contrastively, reporting gains on QA and RULER-NIAH",
+      "summary": "Soft context compression usually encodes the whole document regardless of the question. CoMem conditions compression into memory slots on both the document and the query, trains with contrastive learning using same-document hard negatives so slots keep query-relevant content, and lets memory slots attend to each other bidirectionally.",
+      "result": "Reported gains over existing compression methods on question answering and RULER-NIAH across compression ratios; the listing abstract gives no specific numbers or named baselines.",
+      "critique": "No numbers, baselines, compression ratios or base model were visible, so the size of the gain cannot be judged. Query-conditioned compression must be recomputed per query, which undercuts the reuse that makes compressed contexts cheap; the cost of that was not discussed in the abstract.",
+      "authors": [
+        "Sikui Zhang",
+        "Haowei Liu",
+        "Ziyun Gan",
+        "Chunfeng Yuan",
+        "Guangze Gao",
+        "Nian Liu",
+        "Boyu Cai",
+        "Bo Li",
+        "Xiaolei Lv",
+        "Jun Gao",
+        "Bing Li",
+        "Weiming Hu"
+      ],
+      "arxiv_id": "2611.16384"
+    },
+    {
+      "id": "capability-drift-multilingual-grpo",
+      "kind": "paper",
+      "title": "Outside the Purview of the Reward: Capability Drift in Multilingual Post-Training",
+      "url": "https://arxiv.org/abs/2611.15717",
+      "source": "arXiv",
+      "category": "training",
+      "on_focus": false,
+      "headline": "GRPO on a multilingual MoE gains 36 points on MATH but loses 19 F1 on XQuAD-Indic; reward-free distillation recovers most of it",
+      "summary": "Compares two GRPO branches trained from a shared checkpoint of a multilingual mixture-of-experts model to measure what drifts outside the reward. One released branch optimises math; a sibling adds Indic instruction following. Tests reward-free distillation from an earlier checkpoint as a repair.",
+      "result": "Released branch: +36.07 on MATH, -19.32 F1 on XQuAD-Indic. The sibling branch recovers Indic scores and keeps MATH but not script compliance. Distillation from an earlier checkpoint restores most lost F1. Most of the MATH gain comes from emitting boxed answers more often, not higher accuracy among boxed answers.",
+      "critique": "One model family and two branches; the model name and size were not visible in the listing abstract. The finding that MATH gains are mostly answer-format compliance is the most useful part and suggests the 36-point headline overstates capability gains.",
+      "authors": [
+        "Sutanshu Saksena Raj",
+        "Purusharth Malik",
+        "Pasunuti Prasanjith",
+        "Daksh Maan",
+        "Parijat Chatterjee",
+        "Avinash Benki"
+      ],
+      "arxiv_id": "2611.15717"
+    },
+    {
+      "id": "divr-diffusion-lm-regeneration",
+      "kind": "paper",
+      "title": "Learning When Diffusion Language Models Should Regenerate",
+      "url": "https://arxiv.org/abs/2611.17320",
+      "source": "arXiv",
+      "category": "inference",
+      "on_focus": false,
+      "headline": "DiVR verifier decides when LLaDA-8B should regenerate a block, raising 5-benchmark accuracy from 35.3% to 43.4% at 1.9-3.5x greedy cost",
+      "summary": "Diffusion LMs decode blocks in parallel and can commit bad blocks. DiVR trains a verifier, built on the generator itself, that decides when a block should be regenerated, as a cheaper alternative to search-based test-time scaling. The generator is left unchanged.",
+      "result": "On LLaDA-8B-Base, average accuracy across five reasoning benchmarks rises from 35.3% to 43.4% at 1.9-3.5x the cost of greedy decoding, versus 3.8-7.4x for search baselines; also generalises to Dream.",
+      "critique": "Cost is relative to greedy decoding, not wall-clock; the search baselines were not named in the listing abstract. Absolute accuracy stays low, and comparison with an autoregressive model of similar size is not reported.",
+      "authors": [
+        "Minhae Oh",
+        "Jeonghye Kim"
+      ],
+      "arxiv_id": "2611.17320"
+    }
+  ]
+}
