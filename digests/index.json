@@ -1,7 +1,15 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-11-16T09:32:39+08:00",
+  "updated_at": "2026-11-17T09:35:41+08:00",
   "digests": [
+    {
+      "date": "2026-11-17",
+      "item_count": 12,
+      "on_focus_count": 10,
+      "top_headline": "Concertina folds groups of adjacent Qwen3-4B layers into one looped shared block; 2.27B student keeps ~84% of teacher avg",
+      "json": "digests/2026-11-17.json",
+      "md": "digests/2026-11-17.md"
+    },
     {
       "date": "2026-11-16",
       "item_count": 10,
