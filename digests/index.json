@@ -1,7 +1,15 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-11-17T09:35:41+08:00",
+  "updated_at": "2026-11-18T09:30:23+08:00",
   "digests": [
+    {
+      "date": "2026-11-18",
+      "item_count": 12,
+      "on_focus_count": 12,
+      "top_headline": "Olmo-core rebuilt for MoE: DDP + expert/pipeline parallelism, MXFP8; 858 TFLOP/s per B300 GPU at 1.2T params on up to 512 GPUs",
+      "json": "digests/2026-11-18.json",
+      "md": "digests/2026-11-18.md"
+    },
     {
       "date": "2026-11-17",
       "item_count": 12,
