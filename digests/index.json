@@ -1,7 +1,15 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-11-18T09:30:23+08:00",
+  "updated_at": "2026-11-19T09:50:00+08:00",
   "digests": [
+    {
+      "date": "2026-11-19",
+      "item_count": 12,
+      "on_focus_count": 11,
+      "top_headline": "Sparse attention's retrieval loss traced to a few 'blind' heads; fixing them lifts MiniCPM4.1-8B 64K multi-key retrieval 54.1% to 97.5%",
+      "json": "digests/2026-11-19.json",
+      "md": "digests/2026-11-19.md"
+    },
     {
       "date": "2026-11-18",
       "item_count": 12,

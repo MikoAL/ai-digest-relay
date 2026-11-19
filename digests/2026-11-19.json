@@ -1,0 +1,223 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-19",
+  "generated_at": "2026-11-19T09:50:00+08:00",
+  "notes": "Thursday in Taipei. Papers come from the arXiv cs.LG /new listing dated Wed 18 Nov (announced Tue 17 Nov 20:00 ET), which yesterday's run could not see; the Thu 19 Nov batch (announced about 20 minutes before this run) was not checked. About 400k of ~834k characters of that page were read, covering all 107 new submissions and cross-lists up to entry ~174; later cross-lists and replacements were not read. The arXiv cs.CL /new page still showed Tue 17 Nov (covered earlier), so cs.CL-only papers from 18 Nov may be missing. Paper details rest on the listing abstracts as summarized by the fetch tool; only the 2611.23035 and 2611.22019 abstract pages were read directly. Author lists other than sole-author papers are the first names shown in the listing summary and may be truncated. Skipped pages (permission request not answered): arXiv abstract pages for 2611.21917, 2611.22215, 2611.22947 and 2611.22280. The OpenAI GPT-6.2 launch post (openai.com) failed to load, so that item rests on secondary coverage. Hugging Face trending papers was read but surfaced no new on-focus items from the last day beyond ones covered. No new open-weight model releases dated 16-19 Nov were found on release trackers; latest vLLM release is still v0.33.0. Seen but not included: VisHead-Spec head-routed multimodal speculative decoding (+16.0% vs 9.5% for DSpark at batch 64 on Qwen3-VL-8B; arXiv ID not confirmed), TempQuant learned sampling temperature for 3-bit Qwen3-4B (MATH 34% to 51%), BQ-LoRA one-bit adapters, KVUse reusable-KV user memory, HADVQ E8-lattice VQ (no numbers), LoopPrune for looped DiTs, mixed-precision Qwen3-8B on B200 vs NVFP4 (2611.21974), MoE routing causal interventions (2611.22120), Limite 1B math model (2611.21646), Mamba perturbation bound (2611.21952).",
+  "items": [
+    {
+      "id": "lost-in-a-few-heads-sparse-attention",
+      "kind": "paper",
+      "title": "Lost in a Few Heads: Diagnosing and Repairing Block Selection in Sparse Attention",
+      "url": "https://www.arxiv.org/abs/2611.21917",
+      "source": "arXiv",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "Sparse attention's retrieval loss traced to a few 'blind' heads; fixing them lifts MiniCPM4.1-8B 64K multi-key retrieval 54.1% to 97.5%",
+      "summary": "Block-sparse attention selects a fixed budget of KV blocks per head. The paper diagnoses that most of the retrieval failure at a fixed budget comes from a small number of heads whose block selection misses the relevant blocks, and repairs only those heads (giving them correct/denser selection) while keeping the rest sparse.",
+      "result": "On MiniCPM4.1-8B at 64K context, multi-key retrieval rises from 54.1% to 97.5%, matching full attention. On Qwen3-8B with SeerAttention-R, repairing 18 of 288 KV heads raises accuracy from 29.8% to 97.7%.",
+      "critique": "Numbers come from the listing abstract; the abstract page could not be read. Results are on synthetic multi-key retrieval; effect on natural long-context tasks, the added compute/latency of the repaired heads, and whether the blind heads must be re-identified per model or per task are not stated in the summary.",
+      "authors": [
+        "Wenhe Zhang",
+        "Boxing Chen"
+      ],
+      "arxiv_id": "2611.21917"
+    },
+    {
+      "id": "echomoe-expert-parallel-activation-compression",
+      "kind": "paper",
+      "title": "Communicate the Change: Efficient Expert Parallelism via Activation Compression",
+      "url": "https://www.arxiv.org/abs/2611.22215",
+      "source": "arXiv",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "EchoMoE sends compressed deltas from an earlier-layer reference state in expert-parallel all-to-all, cutting inter-node traffic 58%",
+      "summary": "In expert parallelism the all-to-all dispatch of full hidden states dominates cost across nodes. EchoMoE retrofits pretrained MoE models so that each layer transmits a compressed difference relative to a reference hidden state from an earlier layer, which the receiving side already holds, rather than the full activation.",
+      "result": "Inter-node communication volume drops 58% and throughput rises 22.6%, with average accuracy within 3.8 points across 18 benchmarks; up to 2.38x inference speedup over bandwidth-limited Ethernet.",
+      "critique": "A 3.8-point average drop is not small for a lossless-sounding systems change, and per-benchmark losses may be larger. The headline speedup is on bandwidth-limited Ethernet, where gains are easiest; results on NVLink/InfiniBand clusters and against other activation-compression or low-precision all-to-all baselines are not given in the summary. Abstract page not read directly.",
+      "authors": [
+        "Fengyuan Liu",
+        "Jay Gala",
+        "Siva Reddy"
+      ],
+      "arxiv_id": "2611.22215"
+    },
+    {
+      "id": "gemma4-kv-cache-stored-once",
+      "kind": "paper",
+      "title": "Storing the Gemma 4 K=V Cache Once: Exact Global-KV Memory Savings in a Paged Serving Engine with Unchanged Attention Kernels",
+      "url": "https://www.arxiv.org/abs/2611.23035",
+      "source": "arXiv",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "Storing Gemma 4 31B's tied K=V global cache as one 640-value row in vLLM cuts per-request KV memory 1.34-1.40x at 32K-64K tokens",
+      "summary": "In Gemma 4 31B's global-attention layers the key is a scaled copy of the value (RoPE on a quarter of dimensions), but open serving engines still store full K and V (1,024 values per head per token). The author stores a single 640-value row and has an unchanged paged attention kernel read it through two overlapping strided views as both K and V cache; exact in real arithmetic.",
+      "result": "In a vLLM prototype (16-bit 31B), outputs are bit-identical to an emulation on the stock cache; 2 of 432 final answers differ from stock, within run-to-run noise. Decode KV memory per request falls 1.34-1.40x at 32K-64K; on a two-A100 prefill/decode setup, decode tokens per step are 1.38x (16K prompts) and 1.24x (8K prompts) versus stock.",
+      "critique": "Single-author prototype specific to one model family's tied-KV layers. The runtime makes an eager decode step 4-9% slower at equal batch size, and the method does not yet compose with an 8-bit KV cache at the default scale, which is how many deployments already save KV memory. Only two A100s tested.",
+      "authors": [
+        "Kushagra Bainsla"
+      ],
+      "arxiv_id": "2611.23035"
+    },
+    {
+      "id": "computed-permutation-trellis-coding",
+      "kind": "paper",
+      "title": "Computed Permutation Trellis Coding: Near-Optimal Quantization from Two Multiplications and a 64-Byte Table",
+      "url": "https://www.arxiv.org/abs/2611.22019",
+      "source": "arXiv",
+      "category": "efficiency",
+      "on_focus": true,
+      "headline": "Trellis-coded weight quantizer decodes with two multiplies and a 64-byte table; up to 27% lower KL than QTIP codebooks on Llama 3.1",
+      "summary": "Per-value formats like INT4/FP4 waste bits relative to the rate-distortion ideal; trellis codes (e.g. QTIP) recover this but need large lookup tables or restrictive hashes. CPTC's decoder multiplies its state by two coefficients and sums the top bits of the products to index a 64-byte table; because the sum is non-uniform, the rarely hit table ends can hold tail values. One decoder covers 1-6 bits and reproduces standard INT/FP formats exactly.",
+      "result": "Within 0.07 bits of the ideal at 4 bits, matching a random-permutation trellis code with a table thousands of times larger and beating every QTIP codebook. On Llama 3.1 8B and 70B Instruct without fine-tuning, lowest KL to the unquantized model at every tested bit width, up to 27% better than QTIP. Fused kernels quantize an 8B model's linear layers in under two minutes on one GPU.",
+      "critique": "Main LLM metric is KL divergence; downstream task accuracy and end-to-end GPU decode throughput versus QTIP/AQLM-style kernels are not in the abstract. The claim that the decoder is built into AWS Trainium 4 at native FP4/FP8 throughput rests on the author's statement and cycle-level simulation, not independent measurement. Single author.",
+      "authors": [
+        "Muhammed Fatih Balın"
+      ],
+      "arxiv_id": "2611.22019"
+    },
+    {
+      "id": "kernel-reality-check-linear-attention",
+      "kind": "paper",
+      "title": "The Kernel Reality Check: Benchmarking and Distilling Efficient Attention at Scale",
+      "url": "https://www.arxiv.org/abs/2611.22947",
+      "source": "arXiv",
+      "category": "architecture",
+      "on_focus": true,
+      "headline": "Benchmark finds FlashAttention generally faster and leaner than kernelized linear attention; distilled kernel methods trail softmax 2-10 pts",
+      "summary": "Benchmarks kernelized (feature-map) linear attention variants against softmax attention with FlashAttention for memory and speed in training and in vision transformers, then evaluates them under a unified protocol that distills a softmax model into each linear-attention variant.",
+      "result": "FlashAttention generally uses less memory and runs faster than the kernel methods in the tested settings. Under distillation, current kernel methods trail softmax by 2-10 points, while LARA++ recovers up to 99% of softmax accuracy but with substantial overhead.",
+      "critique": "Scope is kernelized feature-map attention; it is unclear from the summary whether modern gated linear/state-space models (Mamba, Gated DeltaNet) are included, which limits how far the negative conclusion generalizes. Sequence lengths where linear attention should win, and hardware used, are not stated in the summary. Abstract page not read directly.",
+      "authors": [
+        "Fırat Öncel",
+        "Cem Subakan",
+        "Mirco Ravanelli"
+      ],
+      "arxiv_id": "2611.22947"
+    },
+    {
+      "id": "xm-sparse-memory-pool-serving",
+      "kind": "paper",
+      "title": "XM-Sparse: High-Throughput Sparse-Attention LLM Serving over Scale-up Memory Pools",
+      "url": "https://www.arxiv.org/abs/2611.22280",
+      "source": "arXiv",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "XM-Sparse serves DeepSeek-V3.2 and GLM-5.3 sparse attention from a scale-up memory pool; up to 4.98x decode throughput over ECHO",
+      "summary": "Models with learned sparse attention (DeepSeek-V3.2-style) only touch a subset of KV per step, so the full KV can live in a large shared memory pool outside HBM. XM-Sparse is an SGLang-based serving system that offloads KV to a scale-up memory pool and fetches the selected entries for decode.",
+      "result": "On DeepSeek-V3.2 and GLM-5.3 with an emulated memory pool, up to 4.98x and 4.52x higher decode throughput than the PCIe-based ECHO and HiSparse systems, and up to 1.34x over a naive integration across 16K to 1M contexts.",
+      "critique": "The memory pool is emulated, so the gains depend on assumed pool bandwidth/latency rather than real hardware; the big multipliers are against PCIe-attached baselines that the pool is designed to beat. Abstract page not read directly.",
+      "authors": [
+        "Yijun Sun",
+        "Xudong Liao",
+        "Zhuobin Huang"
+      ],
+      "arxiv_id": "2611.22280"
+    },
+    {
+      "id": "moe-diffusion-decoding-sampler-cost",
+      "kind": "paper",
+      "title": "The Hidden Cost of MoE Diffusion Decoding: Profiling and Fixing the Sampler",
+      "url": "https://www.arxiv.org/abs/2611.21852",
+      "source": "arXiv",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "Profiling a 26B MoE diffusion LM on GB10 finds the logits sampler is the top decode cost after quantization; fix gives 2.4-2.7x",
+      "summary": "Profiles decoding of a 26B mixture-of-experts diffusion language model on an NVIDIA GB10 and finds that once weights are quantized, the logits sampling pipeline (not the experts) dominates decode time. The fix removes that sampler overhead and adds a W4A16 expert kernel.",
+      "result": "2.4-2.7x end-to-end speedup over bf16 with unchanged GSM8K, HumanEval and MATH accuracy.",
+      "critique": "Single model on a single desktop-class chip (GB10); the baseline is bf16, so the speedup mixes quantization gains with the sampler fix and the split between them is not given in the summary. Whether the sampler bottleneck appears on datacenter GPUs or other diffusion-LM samplers is unclear.",
+      "authors": [
+        "Harshit Samrat",
+        "Ramakrishna Paramahamsa Kompella"
+      ],
+      "arxiv_id": "2611.21852"
+    },
+    {
+      "id": "risa-recoverable-sparse-attention-block-diffusion",
+      "kind": "paper",
+      "title": "RISA: Recoverable Sparse Attention for Block-Diffusion Language Models",
+      "url": "https://www.arxiv.org/abs/2611.22191",
+      "source": "arXiv",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "RISA sparse attention for block-diffusion LMs: 2.67x attention speedup at 32K and 5.53x at 128K on DreamReasoner-8B vs dense",
+      "summary": "Block-diffusion language models re-attend to the full context at each denoising step. RISA applies sparse attention to these steps with a mechanism to recover from mis-selected blocks, trading a controlled KL deviation for attention speed.",
+      "result": "On DreamReasoner-8B at 32K context, the default setting speeds attention 2.67x and fixed-trajectory requests 1.36x over dense attention; attention speedup reaches 5.53x at 128K. At matched KL it decodes faster than MAGE, QUEST and LoSA budgets.",
+      "critique": "End-to-end request speedup (1.36x) is much smaller than the attention-only number. Quality is reported mainly as KL at matched budget; downstream task accuracy is not in the summary. One model. Abstract page not read directly.",
+      "authors": [
+        "Xinrui Zhong",
+        "Fanjiang Ye",
+        "Yuke Wang"
+      ],
+      "arxiv_id": "2611.22191"
+    },
+    {
+      "id": "infuseloop-parallel-looped-transformers",
+      "kind": "paper",
+      "title": "InfuseLoop: Cross-Trajectory Latent Injection for Scalable Parallel Looped Transformers",
+      "url": "https://www.arxiv.org/abs/2611.22426",
+      "source": "arXiv",
+      "category": "architecture",
+      "on_focus": true,
+      "headline": "InfuseLoop adds cross-trajectory attention residuals to parallel looped transformers, cutting perplexity 3.4-17.1% at 0.3% decode cost",
+      "summary": "Parallel looped transformers (PLTs) run several loop trajectories of shared weights in parallel. InfuseLoop adds lightweight attention residuals that inject hidden states from later trajectories into the current one, so information flows across trajectories instead of each loop being isolated.",
+      "result": "At eight loops, perplexity drops 3.4-17.1% versus vanilla PLTs and 10.5-37.3% versus a non-looped baseline, with 0.84 and 1.99 point downstream accuracy gains, at 0.3% extra decoding time over vanilla PLTs.",
+      "critique": "Model sizes and training token counts are not in the summary, so it is unclear whether gains hold at scale. The non-looped baseline comparison may not be compute-matched (eight loops cost more FLOPs). Downstream gains are under 2 points. Abstract page not read directly.",
+      "authors": [
+        "Zhaofeng Sun",
+        "Lanxiang Hu",
+        "Yu-Yang Qian"
+      ],
+      "arxiv_id": "2611.22426"
+    },
+    {
+      "id": "ambient-llms-temperature-matching-sft",
+      "kind": "paper",
+      "title": "Ambient LLMs: Data-Efficient Supervised Fine-tuning via Temperature Matching",
+      "url": "https://www.arxiv.org/abs/2611.23229",
+      "source": "arXiv",
+      "category": "training",
+      "on_focus": true,
+      "headline": "Temperature-matching SFT interpolates between standard SFT and distillation from a frozen base; up to 21% relative gain over SFT",
+      "summary": "Instead of training on hard targets alone, the method matches high-temperature conditional distributions to a frozen pretrained teacher, giving a family that recovers standard SFT as T goes to infinity and knowledge distillation at T=1. The aim is to fine-tune with less data while staying close to the pretrained model.",
+      "result": "Up to 21% average relative improvement over standard SFT across domain adaptation, instruction tuning and reasoning.",
+      "critique": "'Up to' a relative gain is the best case; absolute numbers, model sizes and comparisons against existing regularized SFT or KL-anchored methods are not in the summary. Extra cost of teacher forward passes is not stated. Abstract page not read directly.",
+      "authors": [
+        "Giannis Daras",
+        "Marios Papachristou",
+        "Adam Klivans"
+      ],
+      "arxiv_id": "2611.23229"
+    },
+    {
+      "id": "scaling-laws-vision-language-fusion",
+      "kind": "paper",
+      "title": "Scaling Laws for Vision-Language Fusion",
+      "url": "https://www.arxiv.org/abs/2611.22351",
+      "source": "arXiv",
+      "category": "scaling",
+      "on_focus": true,
+      "headline": "Scaling law for VLM pretraining over mixture ratio, steps and size finds early fusion increasingly favored as models grow",
+      "summary": "Models VLM pretraining loss dynamics as a function of image-text mixture ratio, training steps and model size, and uses the fitted law to compare early-fusion and late-fusion designs under a fixed data budget.",
+      "result": "Under a fixed data budget, early fusion preserves text performance while late fusion favors vision, and early fusion becomes increasingly favored as model size grows. The abstract gives no numeric fits or baselines.",
+      "critique": "No quantitative results are given in the summary: largest model size, fit quality and extrapolation tests are unknown. Conclusions about fusion choice may depend on the specific encoders and data mixes used. Abstract page not read directly.",
+      "authors": [
+        "Seng Pei Liew",
+        "Teppei Suzuki",
+        "Seiya Tokui"
+      ],
+      "arxiv_id": "2611.22351"
+    },
+    {
+      "id": "openai-gpt-6-2-astra-sol",
+      "kind": "news",
+      "title": "OpenAI releases GPT-6.2 Astra and GPT-6.2 Sol",
+      "url": "https://www.theneuron.ai/digest/everything-that-happened-in-ai-today-wednesday-november-18-2026/",
+      "source": "The Neuron",
+      "category": "other",
+      "on_focus": false,
+      "headline": "OpenAI's GPT-6.2 Astra scores 5.2 pts above its predecessor on Agents' Last Exam at under 1/3 the cost per task; $8/$40 per M tokens",
+      "summary": "OpenAI released GPT-6.2 Astra (for demanding work such as software development and research) and GPT-6.2 Sol (everyday work and multi-step agents), available via ChatGPT Work, Codex and the API. Astra is priced at $8 per million input and $40 per million output tokens. Both reached OpenAI's Critical cybersecurity threshold, and Astra reached the High threshold for AI self-improvement.",
+      "critique": "Rests on secondary coverage: OpenAI's launch post failed to load in this run. No architecture, parameter or efficiency details are disclosed, so the 'under one-third the cost per task' claim cannot be attributed to model or inference changes. Benchmark numbers are vendor-reported and not independently verified."
+    }
+  ]
+}
