@@ -1,0 +1,205 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-20",
+  "generated_at": "2026-11-20T09:28:25+08:00",
+  "notes": "Friday in Taipei. Papers come from the arXiv cs.LG /new listing dated Thu 19 Nov 2026 (announced Wed 18 Nov 20:00 ET), which yesterday's run could not see; the Fri 20 Nov batch (announced about 20 minutes before this run) was not checked. Entries 1-194 of that page (all 118 new submissions and cross-lists up to 194 of 218) were read verbatim; later cross-lists, replacements and the cs.CL listing were not read, so cs.CL-only papers may be missing. Paper details rest on the listing abstracts as read via the fetch tool; no abstract pages were read directly. Skipped: a first fetch request for the arXiv cs.LG listing was denied by the permission classifier (a reworded request succeeded). Hugging Face Daily Papers was not read (search returned no usable index page). No news or release items are included: trackers (llm-stats, ArtificialWatch) list Microsoft Aion 1.0 Instruct and Google Gemini 4 Neon on 18 Nov, but no primary source was found for either and no architecture details are given; latest vLLM release is still v0.33.0 (2 Nov). Seen but not included: Kernel Ridge Attention recurrent mixer (2611.23896, no numbers), adaptive latent-CoT horizon (2611.24001, +7.2 pts, -29.0% latent compute), on-policy distillation theory (2611.23397), MRPD off-policy expert consolidation (2611.24059), RSIBench-Infra agent infra-optimization benchmark (2611.24395), KV-message skipping between agents (2611.23570), tree-attention beam search up to 25x vs vLLM on Ascend (2611.23339), Simpler Tiny Recursive Models (2611.23677), sub-4-bit CNN collapse study (2611.23445).",
+  "items": [
+    {
+      "id": "toaster-nonlinear-memory-cascaded-linear",
+      "kind": "paper",
+      "title": "Toaster: Nonlinear Memory from Cascaded Linear Memories and Target Propagation",
+      "url": "https://www.arxiv.org/abs/2611.23648",
+      "source": "arXiv",
+      "category": "architecture",
+      "on_focus": true,
+      "headline": "Toaster stacks two DeltaNet-style linear memories with target propagation; beats KDA at all five sizes from 0.2B to 1.6B",
+      "summary": "Linear-attention/delta-rule models keep a single linear associative memory. Toaster builds a two-layer nonlinear memory out of two DeltaNet-style linear memories and trains it with target propagation, so each layer can still run an unmodified delta-rule kernel rather than needing a custom nonlinear-memory kernel.",
+      "result": "At matched budgets it has lower loss than KDA at all five sizes (0.2B-1.6B). At the largest size, average 3-shot accuracy over 13 tasks is 51.84% vs 50.52% for KDA and 50.04% for Titans. Loss stays below KDA's up to 20K tokens (5x the training length).",
+      "critique": "Numbers come from the listing abstract as read via the fetch tool; the abstract page and full paper were not read. Largest model is 1.6B, and the accuracy gap over KDA is about 1.3 points. Throughput/wall-clock cost of running two cascaded memories versus one is not given in the abstract, and no comparison with hybrid (attention + linear) models is mentioned.",
+      "authors": [
+        "Zeman Li",
+        "Ali Behrouz",
+        "Yuan Deng",
+        "Praneeth Kacham"
+      ],
+      "arxiv_id": "2611.23648"
+    },
+    {
+      "id": "qda-agentic-llm-quantization-design",
+      "kind": "paper",
+      "title": "QDA: Closed-Loop LLM Quantization Design with Agents",
+      "url": "https://www.arxiv.org/abs/2611.23388",
+      "source": "arXiv",
+      "category": "efficiency",
+      "on_focus": true,
+      "headline": "QDA uses an agent to design PTQ recipes scored by output KL; recovers 98.3% of FP8 accuracy on a 320B MoE at NVFP4 W4A4",
+      "summary": "Post-training quantization recipes (which layers, formats, rotation/clipping choices) are usually hand-tuned. QDA puts an LLM agent in a closed loop that proposes PTQ recipes and scores each by the KL divergence of the quantized model's outputs against the full-precision model, iterating toward better recipes.",
+      "result": "Beats the strongest public recipe by 0.9, 1.4 and 2.2 points on average at W4A16, W4A8 and W3A16. On the 320B MoE GLM-5.3-Flash at NVFP4 W4A4 it recovers 98.3% of FP8 accuracy vs 96.9% for the best vendor checkpoint.",
+      "critique": "Numbers come from the listing abstract as read via the fetch tool; the abstract page and full paper were not read. The search cost (agent calls, GPU-hours of calibration/evaluation per recipe) is not stated in the abstract, which matters for a 320B model. Risk of overfitting the recipe to the evaluation suite, and how transferable discovered recipes are across models, are not addressed in the abstract.",
+      "authors": [
+        "Xingyang Li",
+        "Tianlang Zhao",
+        "Song Han",
+        "Ligeng Zhu"
+      ],
+      "arxiv_id": "2611.23388"
+    },
+    {
+      "id": "kiwi-gpu-to-cpu-invocation-moe-ep",
+      "kind": "paper",
+      "title": "A Fast, Programmable GPU-to-CPU Invocation Layer for GPU-Initiated Communication",
+      "url": "https://www.arxiv.org/abs/2611.23848",
+      "source": "arXiv",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "KIWI gives sub-microsecond GPU-to-host calls; its MoE dispatch/combine kernels cut expert-parallel latency up to 2.3x on AMD GPUs",
+      "summary": "GPU-initiated communication for MoE expert parallelism is limited by what the GPU can do without the host. KIWI is a reverse-offload layer letting kernels invoke programmable CPU-side handlers with sub-microsecond one-way device-to-host latency; KIWI-EP redesigns MoE dispatch and combine kernels on top of it.",
+      "result": "KIWI-EP lowers expert-parallel latency by up to 2.3x vs the best existing backend on AMD GPUs and cuts vLLM time per output token by up to 29%.",
+      "critique": "Numbers come from the listing abstract as read via the fetch tool; the abstract page and full paper were not read. Results are 'up to' figures on AMD GPUs; median gains, NVIDIA results, and which models, batch sizes and EP degrees were used are not given in the abstract. The baseline backend is not named in the abstract text read.",
+      "authors": [
+        "Jiakun Yan",
+        "Shiksha Patel",
+        "David Sidler",
+        "Gengyu Rao"
+      ],
+      "arxiv_id": "2611.23848"
+    },
+    {
+      "id": "narrowspec-narrow-draft-speculative-decoding",
+      "kind": "paper",
+      "title": "NarrowSpec: Draft Hidden Width Need Not Match the Target in Speculative Decoding",
+      "url": "https://www.arxiv.org/abs/2611.23835",
+      "source": "arXiv",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "NarrowSpec halves or quarters draft-model hidden width with acceptance kept; 1.13-1.44x faster decode on GB10 at batch 1",
+      "summary": "Speculative-decoding drafters (DFlash, EAGLE-3) usually match the target's hidden width so they can consume its features. NarrowSpec shows the draft hidden width can be cut to 1/2 or 1/4 of the target's while keeping acceptance, reducing drafter cost. Tested with Qwen3-8B (NVFP4) and GPT-OSS-20B (MXFP4) in SGLang on B200 and GB10.",
+      "result": "At batch 1: 1.06-1.12x decode speedup on B200 and 1.13-1.44x on GB10 over full-width drafters. From batch 32 up to the largest batch each GPU fits, speedup reaches 1.21x.",
+      "critique": "Numbers come from the listing abstract as read via the fetch tool; the abstract page and full paper were not read. Gains on B200 at batch 1 are small (6-12%). Only two mid-size targets were tested; whether narrow drafters hold acceptance on larger or reasoning-heavy targets and longer outputs is not shown in the abstract.",
+      "authors": [
+        "Alagappan Valliappan",
+        "Ankit More",
+        "Dheevatsa Mudigere",
+        "Jatin Mitra"
+      ],
+      "arxiv_id": "2611.23835"
+    },
+    {
+      "id": "muon-update-curvature-analysis",
+      "kind": "paper",
+      "title": "Equal Steps, Unequal Curvature: Where Muon's Update Goes Wrong",
+      "url": "https://www.arxiv.org/abs/2611.24644",
+      "source": "arXiv",
+      "category": "training",
+      "on_focus": true,
+      "headline": "Curvature analysis of Muon: orthogonalizing Q, K, V separately cuts loss 0.0250 nats on a 124M model; spectral tilt adds more",
+      "summary": "Muon orthogonalizes each weight-matrix update, giving equal step sizes across singular directions even when curvature differs. The paper analyses where this mismatch hurts and proposes fixes: orthogonalizing Q, K and V separately instead of a fused QKV matrix, a spectral tilt (sigma^-1/4) during cooldown, and energy-matched Schatten-1 weight decay.",
+      "result": "On a 124M decoder trained on FineWeb-Edu: separate Q/K/V orthogonalization lowers loss by 0.0250 nats; spectral tilt in cooldown gives a further 0.0120 nats, and 0.0158 nats combined with NorMuon (three seeds); the tilt gives 0.0188 nats at 355M. Schatten-1 weight decay adds 0.0052 nats.",
+      "critique": "Numbers come from the listing abstract as read via the fetch tool; the abstract page and full paper were not read. Scale is 124M-355M, far below where optimizer choices for frontier pretraining are decided; gains are in nats of loss with no downstream evaluations mentioned. Only three seeds for the NorMuon combination; seed variance for other numbers is not stated.",
+      "authors": [
+        "Biswa Sengupta",
+        "Jinhua Wang",
+        "Léo Maxime Brunswic"
+      ],
+      "arxiv_id": "2611.24644"
+    },
+    {
+      "id": "fact-fixed-budget-speculative-decoding",
+      "kind": "paper",
+      "title": "FACT: Fixed-Budget Allocation and Cross-Step Training for Speculative Decoding",
+      "url": "https://www.arxiv.org/abs/2611.23463",
+      "source": "arXiv",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "FACT trains drafters through rollouts and allocates a fixed 256-node tree by confidence; speedup 1.46x to 2.02x on HumanEval",
+      "summary": "Two changes to tree speculative decoding: (1) cross-step training that backpropagates through the drafter's multi-step rollouts instead of detaching between steps, and (2) confidence-guided allocation of a fixed draft-tree budget (256 nodes). Target is a frozen Llama-3-8B-Instruct.",
+      "result": "Training through rollouts raises acceptance by 15-24% over detached training. With the fixed 256-node budget, confidence-guided allocation raises speedup over autoregressive decoding from 1.46x to 2.02x on HumanEval and from 1.31x to 1.75x on MT-Bench.",
+      "critique": "Numbers come from the listing abstract as read via the fetch tool; the abstract page and full paper were not read. Single, older target model (Llama-3-8B-Instruct). The comparison is against the authors' own detached/uniform variants; head-to-head numbers against EAGLE-3 or other current drafters are not in the abstract. Batch-1 setting presumed; behaviour at high batch is not stated.",
+      "authors": [
+        "Hadi Fares",
+        "Mayssa Hajj Hassan",
+        "Ali Salman",
+        "Ammar Mohanna"
+      ],
+      "arxiv_id": "2611.23463"
+    },
+    {
+      "id": "loopcache-looped-transformer-self-speculative",
+      "kind": "paper",
+      "title": "LoopCache: Accelerating Long-Context Self-Speculative Decoding for Looped Transformers",
+      "url": "https://www.arxiv.org/abs/2611.24301",
+      "source": "arXiv",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "LoopCache adds a cyclic loop-KV cache to self-speculative decoding in looped Transformers; 10.25x average speedup over WFD",
+      "summary": "Looped (depth-recurrent) Transformers reuse the same block several times, so self-speculative decoding at long context must read KV for every loop iteration. LoopCache keeps a cyclic loop-KV cache that limits per-step KV traffic to a single loop's worth.",
+      "result": "Average 10.25x and 14.56x speedup over WFD and LoopSpec, respectively.",
+      "critique": "Numbers come from the listing abstract as read via the fetch tool; the abstract page and full paper were not read. The abstract reports speedups only against looped-model decoding baselines (WFD, LoopSpec), not against a standard non-looped model of equal quality, and does not state output-quality or acceptance effects, model sizes or context lengths.",
+      "authors": [
+        "Zizhuo Fu",
+        "Haochen Huang",
+        "Shengxuan Qiu",
+        "Linye Wei"
+      ],
+      "arxiv_id": "2611.24301"
+    },
+    {
+      "id": "cap-and-track-llm-request-dispatch",
+      "kind": "paper",
+      "title": "Cap-and-Track: Optimizing LLM Inference Request Dispatch Across Shifting Capacity",
+      "url": "https://www.arxiv.org/abs/2611.24891",
+      "source": "arXiv",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "Meta's Cap-and-Track dispatches LLM inference using capacity refusals alone; served a classifier on 43% fewer H100s in production A/B",
+      "summary": "Inference fleets see capacity that shifts over time, and fixed-rate or queued dispatch either wastes GPUs or overloads them. Cap-and-Track is a traffic shaper (used at Meta for LLM and video inference) that adjusts dispatch using only capacity refusals as the signal, with no explicit capacity model.",
+      "result": "In a concurrent production A/B it served a classifier on 43% fewer H100s than its queued, fixed-rate predecessor. In real-engine replay, Track is within 1% of the goodput of a fixed rate tuned above capacity, with about a quarter of that rate's refusal share.",
+      "critique": "Numbers come from the listing abstract as read via the fetch tool; the abstract page and full paper were not read. The headline production saving is for a classifier workload, not generative decoding; savings for generation-heavy LLM traffic are not stated in the abstract. The baseline is Meta's own predecessor system, so the result is not independently reproducible.",
+      "authors": [
+        "Benjamin Novotny",
+        "Doug Szeto",
+        "Chang Wang",
+        "Shicheng Chen"
+      ],
+      "arxiv_id": "2611.24891"
+    },
+    {
+      "id": "momovl-modality-aware-moe-vlm-compression",
+      "kind": "paper",
+      "title": "MoMoVL: Modality-Aware Adaptive Compression for On-Device Sparsely-Activated Vision-Language Models",
+      "url": "https://www.arxiv.org/abs/2611.23695",
+      "source": "arXiv",
+      "category": "efficiency",
+      "on_focus": true,
+      "headline": "MoMoVL assigns per-expert, per-modality bit-widths to MoE vision-language models, cutting memory by up to 15.44%",
+      "summary": "MoE VLMs route vision and text tokens to experts unevenly, so uniform quantization wastes bits. MoMoVL assigns mixed precision per expert and per modality based on how each expert is used, targeting on-device deployment.",
+      "result": "Reduces memory footprint by up to 15.44% with a modest accuracy drop versus its uniform-precision baseline, and claims a better accuracy-compression trade-off than state-of-the-art mixed-precision baselines.",
+      "critique": "Numbers come from the listing abstract as read via the fetch tool; the abstract page and full paper were not read. A 15.44% memory reduction is modest, and the accuracy drop and named baselines are not quantified in the abstract. Latency and energy on actual devices are not mentioned.",
+      "authors": [
+        "Dongkeun Lee",
+        "Wonjun Lee"
+      ],
+      "arxiv_id": "2611.23695"
+    },
+    {
+      "id": "opengns-gradient-noise-scale-dataset",
+      "kind": "paper",
+      "title": "OpenGNS: An Open Dataset of the Gradient Noise Scale across Vision, Language, and Diffusion Models",
+      "url": "https://www.arxiv.org/abs/2611.24331",
+      "source": "arXiv",
+      "category": "scaling",
+      "on_focus": true,
+      "headline": "OpenGNS releases 400+ gradient-noise-scale trajectories for ResNets, GPTs and DiTs from 11M to 1B parameters under muP",
+      "summary": "The gradient noise scale (GNS) predicts the critical batch size, but measured trajectories are rarely published. OpenGNS releases over 400 GNS trajectories for ResNets, GPTs and DiTs from 11M to 1B parameters trained under muP.",
+      "result": "Dataset contribution with no accuracy baseline. The authors report that GNS behaves as a stable 'temperature of training' across model sizes.",
+      "critique": "Numbers come from the listing abstract as read via the fetch tool; the abstract page and full paper were not read. Largest model is 1B, so extrapolation of critical-batch-size behaviour to frontier scale is untested. The abstract does not quantify how well GNS predicts optimal batch size or compare against existing critical-batch-size scaling fits.",
+      "authors": [
+        "Marcel Aach",
+        "Jiangtao Wang",
+        "Stefan Kesselheim",
+        "Andreas Lintermann"
+      ],
+      "arxiv_id": "2611.24331"
+    }
+  ]
+}

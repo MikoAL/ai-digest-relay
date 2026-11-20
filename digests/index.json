@@ -1,7 +1,15 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-11-19T09:50:00+08:00",
+  "updated_at": "2026-11-20T09:28:25+08:00",
   "digests": [
+    {
+      "date": "2026-11-20",
+      "item_count": 10,
+      "on_focus_count": 10,
+      "top_headline": "Toaster stacks two DeltaNet-style linear memories with target propagation; beats KDA at all five sizes from 0.2B to 1.6B",
+      "json": "digests/2026-11-20.json",
+      "md": "digests/2026-11-20.md"
+    },
     {
       "date": "2026-11-19",
       "item_count": 12,
