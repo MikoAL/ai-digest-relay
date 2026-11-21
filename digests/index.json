@@ -1,7 +1,15 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-11-20T09:28:25+08:00",
+  "updated_at": "2026-11-21T09:40:00+08:00",
   "digests": [
+    {
+      "date": "2026-11-21",
+      "item_count": 11,
+      "on_focus_count": 9,
+      "top_headline": "Tencent posts Hy4 flash weights: 220B total (64B Engram n-gram tables), 12B active, 512-expert LatentMoE, 1M context, FP8 variant",
+      "json": "digests/2026-11-21.json",
+      "md": "digests/2026-11-21.md"
+    },
     {
       "date": "2026-11-20",
       "item_count": 10,
