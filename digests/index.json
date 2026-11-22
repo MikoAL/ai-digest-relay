@@ -1,7 +1,15 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-11-21T09:40:00+08:00",
+  "updated_at": "2026-11-22T09:35:03+08:00",
   "digests": [
+    {
+      "date": "2026-11-22",
+      "item_count": 11,
+      "on_focus_count": 11,
+      "top_headline": "Thinking Machines releases open-weight Inkling 2 Mini: looped MoE, 26.4B total / 3.4B active, middle two 6-layer blocks run 3x per token",
+      "json": "digests/2026-11-22.json",
+      "md": "digests/2026-11-22.md"
+    },
     {
       "date": "2026-11-21",
       "item_count": 11,
