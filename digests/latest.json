@@ -1,202 +1,164 @@
 {
   "schema_version": 1,
-  "date": "2026-11-22",
-  "generated_at": "2026-11-22T09:35:03+08:00",
-  "notes": "Sunday in Taipei; no new arXiv batch is announced on Saturday or Sunday. Papers come from the arXiv cs.LG /new listing dated Fri 20 Nov 2026 (119 new submissions); yesterday's run could not yet see this batch. New submissions [1]-[107] were read verbatim; [108]-[119] only as a model-extracted summary; cross-lists, replacements and the cs.CL listing were not read, so cs.CL-only papers may be missing. Paper details rest on the listing abstracts. Skipped (fetch permission not answered): arXiv abstract pages for 2611.26157, 2611.26363, 2611.26059 and 2611.26355. The Thinking Machines and AMD ROCm primary pages were first declined when requested as links from aiweekly.co, then read after they surfaced in a web search. creati.ai's 21 Nov news page returned a client error. Hugging Face Daily Papers was not read. vLLM: the GitHub releases page still shows v0.33.0 (2 Nov) as latest; v0.34.0 appears only on aggregators. Seen but not included: OpenAI 'Combatting adversarial distillation' and MedChemBench, GPT-6.2 Astra/Sol arriving in Codex CLI 0.171.0, Google Genie 4 in the Gemini API (all secondary coverage only, off focus); FAct learned Fourier activation (2611.26201, +1.46 pt over GELU on ViT); SKILL.PNG pixel-space skills (2611.26296); RouteVerify MoE routing probes (2611.25780); DualSAE (2611.25165); DS3M state-space models with Triton kernels (2611.25274, no numbers); compressed-momentum error-feedback bounds (2611.25463).",
+  "date": "2026-11-23",
+  "generated_at": "2026-11-23T09:40:00+08:00",
+  "notes": "Monday in Taipei. The Mon 23 Nov arXiv batch was not visible: arxiv.org/list/cs.LG/new and arxiv.org/list/cs.CL/new still showed Friday 20 Nov 2026 when checked twice during this run. Papers therefore come mainly from the Fri 20 Nov cs.CL listing (64 new, 32 cross), which earlier runs did not read; entries [1]-[18] and [61]-[77] were read verbatim, the rest only as a model-extracted summary. Abstract pages were read for 2611.24963, 2611.26275 and 2611.24969; other paper details rest on the listing abstracts. Skipped (fetch permission not answered): arXiv abstract pages for 2611.25717 (VR-SparseQuant, FP4 + 2:4 sparsity on Vera Rubin), 2611.25813, 2611.25433 (RoCoKV), 2611.25763, 2611.26358 (Reflection Beam technical report), 2611.25643 (TRAC) and 2611.26075, so those are not included; a fetch of pdf.arxiv.org/list/cs.CL/new was denied. Hugging Face Daily Papers was not covered (the only index page found rendered no paper list). No news or release items: trackers (aireleasetracker, BenchLM) show no releases dated 21-23 Nov; a DeepSeek release 'expected Mon 23 Nov' appears only as a forecast. vLLM: GitHub releases still show v0.33.0 (2 Nov) as latest. Seen but not included: Reflection Beam tech report (RL on 10.5K GB300 GPUs, 1.93B DFlash 2 drafter; abstract page not readable), MemFolder agent memory folding (2611.26427, 99.0% performance with 50% fewer records), Depth Pro 2 (2611.26603, secondary coverage only), InflEns (2611.25167) and FrontierReplay (2611.26020), both covered 22 Nov.",
   "items": [
     {
-      "id": "inkling-2-mini",
-      "kind": "release",
-      "title": "Thinking Machines Inkling 2 Mini (open weights, looped MoE transformer)",
-      "url": "https://thinkingmachines.ai/news/inkling-2-mini/",
-      "source": "Thinking Machines Lab blog",
+      "id": "canon-layers-at-scale",
+      "kind": "paper",
+      "title": "Physics of Language Models: Part 4.2, Canon Layers at Scale where Synthetic Pretraining Resonates in Reality",
+      "url": "https://arxiv.org/abs/2611.24963",
+      "source": "arXiv",
       "category": "architecture",
       "on_focus": true,
-      "headline": "Thinking Machines releases open-weight Inkling 2 Mini: looped MoE, 26.4B total / 3.4B active, middle two 6-layer blocks run 3x per token",
-      "summary": "24-layer multimodal decoder with sparse MoE FFNs (8 of 128 experts per layer) and hybrid attention (five sliding-window layers with up to 1,024-token windows plus one full-attention layer per six-layer block). The middle two six-layer blocks (layers 6-17) are weight-shared and run three times per token, so 24 stored layers give 48 layer applications; passes 2 and 3 read a gated 'message' from the previous pass. The model card puts this at ~5.4B effective active parameters per token, with up to 1M context and an Apache 2.0 license (both per the model card page, not the blog). Training: started with 384 experts per layer and pruned to the 128 most-used in midtraining, then 'healed' with 1T tokens distilled from a larger internal Inkling; SFT plus RL totalling 2.2T tokens over 2,000 steps; NVFP4 expert layers from pretraining through RL (last 4 layers MXFP8) and deployed at that precision. The checkpoint is ~20GB and targets one DGX Spark or Apple silicon machines with 32GB+. Weights at huggingface.co/thinkingmachines/Inkling-2-Mini; a DSpark drafter for speculative decoding is included.",
-      "result": "Vendor table against Qwen3.8-27B: DeepSWE v1.1 48.2% vs 42.2%, SWE-bench Pro v2 Hard 77.9% vs 73.8%, Terminal Bench v2.1 71.6% vs 73.0%, AA Index v5.0 20.1 vs 20.1, GPQA Diamond 86.6% vs 90.5%. The loop ablation says a non-looped model needed 7.5% less training compute but 140% more inference compute to match the looped loss. 'Intelligence per joule' on DGX Spark: 0.703 vs 0.430 for Qwen3.6-35B-A3B.",
-      "critique": "All numbers are self-reported, and agentic benchmarks depend on the harness (mini-swe-agent, pi v0.83.0). The headline comparison is against dense 27-31B models, while the closest MoE peers appear only in the energy test. The ablation is not cleanly isolated: the looped and non-looped models also differ in expert pruning and distillation, and pretraining token count and GPU-hours are not disclosed. Looping triples middle-layer FLOPs per token, so latency against a 3B-active non-looped MoE needs independent measurement. The model trails Qwen3.8-27B on knowledge-heavy tasks (AA-Omniscience -8.6 vs -6.4). Parts of the model card were read only as a summary."
+      "headline": "Canon layers at 8B/1T tokens save ~30% of pretraining tokens for equal MMLU; with Canon, gated linear attention matches Gated DeltaNet",
+      "summary": "Tests whether architecture findings from small synthetic 'playgrounds' (<100M params) hold at real scale. Runs 64 from-scratch pretraining runs of Transformers and three linear-model families at 1.3B-8B parameters on 1-2T Nemotron-CC tokens (about 100k USD per 8B run). Canon layers add cheap local token mixing between positions inside each block. The paper also introduces GLA5 and GDN2, which add low-rank output gates to gated linear attention and Gated DeltaNet.",
+      "result": "Canon layers save about 30% of pretraining tokens for the same MMLU accuracy at 8B. With Canon, gated linear attention matches Gated DeltaNet and beats Mamba2 at 8B/1T. At 1.3B/100B tokens, carefully tuned architectures differ very little. Even at 8B/1T, linear models that match Transformers on standard benchmarks cannot reliably retrieve from a 500-token context, and no model reliably beats chance on a simple two-hop question.",
+      "critique": "Single-author study whose cost and scale cannot easily be reproduced. The 30% figure is measured on one benchmark (MMLU) at one scale. Per the arXiv comments, results, recipes and code have been public since 9 Dec 2025 (github.com/facebookresearch/PhysicsLM4), so this is a write-up of earlier released work rather than wholly new results. Details here rest on the abstract. Hardware and the full linear-model baselines (e.g., hybrids) are not described there.",
+      "authors": [
+        "Zeyuan Allen-Zhu"
+      ],
+      "arxiv_id": "2611.24963"
     },
     {
-      "id": "frontierreplay-hybrid-prefix-caching",
+      "id": "g-mtp-drafting-gemma4",
       "kind": "paper",
-      "title": "FrontierReplay: Split-Free Exact Prefix Caching for Hybrid Language Models",
-      "url": "https://arxiv.org/abs/2611.26020",
+      "title": "Efficient and Robust Drafting with Multi-Token Prediction",
+      "url": "https://neurips.cc/virtual/2026/170022",
+      "source": "NeurIPS 2026 workshop (On-Device Intelligence)",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "G-MTP: multi-token-prediction drafter heads for Gemma 4 report up to 3.1x speculative-decoding speedup (2.3x on small on-device models)",
+      "summary": "Speculative decoding needs a drafter that is cheap but close to the target model. G-MTP extends an existing backbone LLM (tested on the Gemma 4 family) with Multi-Token Prediction drafting. It makes three changes: target activations are injected into the drafter, the drafter cross-attends to the target's KV cache without copying it, and a clustered vocabulary projection cuts output-layer cost. The paper also gives parameter-efficient fine-tuning recipes that keep the drafter aligned with the backbone when the backbone is post-trained for new domains.",
+      "result": "Up to 3.1x speedup for large server-side setups and up to 2.3x for smaller models aimed at memory-constrained devices. The fine-tuning recipe needs up to 1.83x fewer target forward passes than tuning only the backbone.",
+      "critique": "Workshop paper, summarized from the poster page; no arXiv version or code was found. The abstract names no baselines (EAGLE-style, Medusa, or independent draft models), and gives no acceptance rates, model sizes or hardware. 'Up to' figures hide the typical speedup. Gemma 4 only, so how well the method transfers to other model families is untested.",
+      "authors": [
+        "Filippo Galgani",
+        "Ziwei Ji",
+        "Omri Homburger",
+        "Ganesh Jawahar",
+        "Michelle Tadmor Ramanovich",
+        "Ivan Korotkov",
+        "Luciano Martins",
+        "Utku Evci",
+        "Edouard Yvinec",
+        "Tal Schuster"
+      ]
+    },
+    {
+      "id": "dloop-looped-diffusion-lm",
+      "kind": "paper",
+      "title": "dLoop: Looped Diffusion Language Models via Recurrent Latent Refinement",
+      "url": "https://arxiv.org/abs/2611.26275",
+      "source": "arXiv",
+      "category": "architecture",
+      "on_focus": true,
+      "headline": "dLoop converts a pretrained diffusion LM into a Prelude-Loop-Coda model that reruns a shared middle block on the masked state",
+      "summary": "Takes a pretrained diffusion language model and restructures it into Prelude, Loop and Coda stages. A parameter-shared intermediate block is applied repeatedly to the same partially masked state, so latent refinement happens inside one denoising step rather than only across steps. This trades more compute per forward pass for more tokens decoded per pass.",
+      "result": "Highest or tied-highest accuracy on GSM8K, MATH, MBPP and HumanEval among the methods compared. With tokens per forward pass (TPF) adjusted for loop compute, it beats Fast-dLLM on both accuracy and TPF on all four benchmarks and dParallel on three. It is more accurate than d3LLM on all four, but d3LLM has higher TPF.",
+      "critique": "The abstract gives no absolute numbers, base-model size, wall-clock latency or hardware, so how large the gains are is unknown. Only four math and code benchmarks. Loop-adjusted TPF is the authors' own metric, and real latency depends on kernels and batch size. No code link on the abstract page.",
+      "authors": [
+        "Handa Li",
+        "Pengxiang Li",
+        "Mingyu Cao",
+        "Xilu Wang",
+        "Li Shen",
+        "Da Li",
+        "Lu Yin"
+      ],
+      "arxiv_id": "2611.26275"
+    },
+    {
+      "id": "prkv-pagerank-kv-eviction",
+      "kind": "paper",
+      "title": "Global Importance Estimation for KV Cache Eviction",
+      "url": "https://arxiv.org/abs/2611.24969",
       "source": "arXiv",
       "category": "inference",
       "on_focus": true,
-      "arxiv_id": "2611.26020",
+      "headline": "PRKV ranks KV-cache tokens by Personalized PageRank over attention graphs for training-free eviction at up to 90% compression",
+      "summary": "Most KV-cache eviction methods score each token by the attention it receives directly. PRKV instead treats attention as a transition graph between tokens and runs Personalized PageRank on it. This estimates multi-hop, global importance, so tokens that matter only indirectly are kept. It is training-free and evicts the lowest-ranked entries.",
+      "result": "At moderate to aggressive compression ratios, up to 90%, PRKV is competitive with established eviction baselines on long-context understanding, sparse retrieval and chain-of-thought reasoning across several LLM families. It also reduces peak memory with low end-to-end overhead. The abstract gives no accuracy or latency numbers.",
+      "critique": "'Competitive with' rather than better, and the baselines and models are not named in the abstract. The cost of PageRank iterations per decode step is described only as 'low overhead', with no figures. Accepted at NeurIPS 2026 per the comments; no code link on the abstract page.",
       "authors": [
-        "Zekun Wang",
-        "Yizhuo Wang"
+        "Seojin Kim",
+        "Noseong Park"
       ],
-      "headline": "FrontierReplay: exact prefix caching for hybrid attention-recurrent LLMs via state-only replay, up to 4.26x goodput",
-      "summary": "In hybrid models, the recurrent layers' state at an arbitrary prefix boundary is not stored, so prefix caching needs either split prefill (slow) or approximate replay. FrontierReplay instead materializes exact checkpoints at structural boundaries without splitting prefill. It logs the recurrent layers' inputs and reconstructs states with a state-only replay kernel, and keeps the retained data in slots shared with the attention KV cache.",
-      "result": "Replay is '6-37x cheaper per token than full recomputation'. Against existing exact caches: median TTFT down 16-89% (up to 8.9x), 80%-SLO capacity up to 1.73x, goodput up to 4.26x (3.67x at larger scales). Against approximate replay: up to 1.54x higher goodput.",
-      "critique": "The abstract does not name the baseline systems or the hybrid models tested. Numbers rest on the listing abstract; the abstract page was not read. Gains depend on prefix-reuse rates in the workload. The memory cost of logging recurrent inputs, compared with storing states, is not quantified in the abstract."
+      "arxiv_id": "2611.24969"
     },
     {
-      "id": "dts-delta-tile-scoring-sparse-attention",
+      "id": "sparse-low-rank-biclique-decomposition",
       "kind": "paper",
-      "title": "DTS: Delta-Based Tile Scoring for Efficient Long-Context Sparse Attention",
-      "url": "https://arxiv.org/abs/2611.25938",
+      "title": "A Sparse Low-Rank Biclique Decomposition for Graphs",
+      "url": "https://arxiv.org/abs/2611.25826",
+      "source": "arXiv",
+      "category": "efficiency",
+      "on_focus": true,
+      "headline": "Signed biclique decomposition compresses graph matrices over 10x and speeds SpMM up to 6x vs cuSPARSE on suitable real graphs",
+      "summary": "Represents integer-weighted graph adjacency matrices as a sum of sparse, signed, binary rank-one factors (bicliques) plus a sparse residual. Shared-neighborhood structure is factored out once instead of being stored edge by edge. Sparse-dense matrix multiplication (SpMM), the core kernel of GNNs and graph analytics, then runs on the compact form.",
+      "result": "On real graphs with shared-neighborhood structure, compression factors above 10 and SpMM speedups of up to 6x over cuSPARSE.",
+      "critique": "Gains are stated only for graphs that have the right structure. Graphs without it, and the cost of computing the decomposition, are not quantified in the abstract. 'Up to 6x' gives no median. No end-to-end GNN training or inference timing. Graph kernels, not LLMs. Details rest on the arXiv listing abstract; author list is the first three names shown.",
+      "authors": [
+        "Antoine Vialle",
+        "Sergei Gerasimov",
+        "Aref Einizade"
+      ],
+      "arxiv_id": "2611.25826"
+    },
+    {
+      "id": "grepmem-index-free-agent-memory",
+      "kind": "paper",
+      "title": "Forget Freely, Grep Later: Lossless, Index-Free Memory for Long-Horizon LLM Agents",
+      "url": "https://arxiv.org/abs/2611.25123",
       "source": "arXiv",
       "category": "inference",
       "on_focus": true,
-      "arxiv_id": "2611.25938",
+      "headline": "GrepMem keeps a lossless plain-text log and lets an RL-trained Qwen3.5-9B regex-search it, reaching 95-97% on ContextBench",
+      "summary": "Long-horizon agents usually manage context by summarizing or embedding-indexing history, which loses information. GrepMem drops old context from the window but appends it to a plain-text log, and trains the model with RL (Qwen3.5-9B) to retrieve from that log with regex searches. It needs no vector index.",
+      "result": "95-97% accuracy on ContextBench versus at most 21% for lossy baselines. It beats SUPO's summarization approach by 8.8 percentage points on BCP-Multi.",
+      "critique": "The lossy baselines are weak by construction on a benchmark that tests exact recall, so the 95-97% vs 21% gap partly reflects the benchmark. One 9B model. The latency and token cost of the extra grep tool calls are not reported in the abstract. Details rest on the arXiv listing abstract; author list is the first three names shown.",
       "authors": [
-        "Emre Uğur",
-        "Jiawen Qi",
-        "Qinyu Chen"
+        "Ziyan Yang",
+        "Taiwei Shi",
+        "Jieyu Zhao"
       ],
-      "headline": "DTS: training-free block-sparse attention scoring; 3.3x prefill over FlashAttention-2 at 512K, within 0.1 pt of full attention",
-      "summary": "Block-sparse prefill needs a cheap way to score which key tiles matter; the scoring itself becomes a bottleneck at long context. DTS picks anchor tokens from local changes (deltas) between consecutive vectors and scores tiles against those anchors in a content-adaptive way, without training. Parallel delta packing speeds up anchor selection.",
-      "result": "On LLaMA-3.1-8B-Instruct, RULER (up to 128K) and LongBench accuracy is 'within 0.10 percentage points of full attention'. Scoring-pipeline latency is 38% lower than XAttention at 128K. Prefill is 3.3x faster than a PyTorch full-attention baseline using FlashAttention-2 at 512K tokens on four H100s.",
-      "critique": "Only one 8B model is evaluated. The end-to-end speedup is measured against a PyTorch full-attention baseline, not against other sparse methods (XAttention, MInference, FlexPrefill); the XAttention comparison covers scoring latency only. Decode is not addressed. Details rest on the listing abstract."
+      "arxiv_id": "2611.25123"
     },
     {
-      "id": "hisa-hidden-sparse-rope-attention",
+      "id": "llms-confidence-aware-zero-shot-classifiers",
       "kind": "paper",
-      "title": "HiSA: Sparsifying the Hidden Dimension of RoPE Attention in LLMs",
-      "url": "https://arxiv.org/abs/2611.26363",
+      "title": "LLMs Are Already Confidence-Aware Zero-Shot Classifiers",
+      "url": "https://arxiv.org/abs/2611.25289",
       "source": "arXiv",
-      "category": "architecture",
-      "on_focus": true,
-      "arxiv_id": "2611.26363",
+      "category": "inference",
+      "on_focus": false,
+      "headline": "Logit-based label scoring on 11 open LLMs beats black-box confidence (AUROC 0.74-0.77 vs 0.57-0.66) and cuts decode steps 88-96%",
+      "summary": "Compares ways to get calibrated confidence from LLMs used as zero-shot classifiers. Instead of generating a label and asking for confidence in text, it scores candidate labels directly from the model's logits. It studies 11 open-weight LLMs (1B-32B) on five classification datasets, and also examines the cost of single-token label IDs and decision-only scoring.",
+      "result": "Logit-based scoring reaches AUROC 0.74-0.77 versus 0.57-0.66 for black-box methods. Single-token label IDs cost 3-6 accuracy points on average. Decision-only scoring reduces decode steps by 88-96% on the three largest label sets.",
+      "critique": "Mostly a calibration study. The efficiency gain comes from skipping generation, which is expected. The method needs logit access, so closed API models are excluded. Five datasets only. Details rest on the arXiv listing abstract.",
       "authors": [
-        "Ambroise Borbely",
-        "Mathieu Salzmann",
-        "Olivier Verscheure"
+        "Owen Cook",
+        "Xingyi Song"
       ],
-      "headline": "HiSA computes only about a third of query-key products, using a static RoPE-derived sparsity pattern over the head dimension",
-      "summary": "Instead of sparsifying over tokens, Hidden Sparse Attention sparsifies the hidden (head) dimension of the query-key dot product. It uses a static, parameter-free pattern derived from RoPE's frequency structure, so each query-key pair uses only a subset of dimensions. Models are trained from scratch with this partial dot product, and FlashAttention-3 kernels are extended to support it.",
-      "result": "Computes 'only about a third of the query-key products' relative to the full dot product, and the authors report it 'improves decoding speed and shrinks memory footprint'. The abstract gives no absolute speed, memory or quality numbers.",
-      "critique": "Without numbers in the abstract, the quality cost against dense attention and the real kernel speedup cannot be judged from the listing. It requires training from scratch, so it cannot be retrofitted onto existing checkpoints. Model scale is not stated. The abstract page could not be read (fetch permission not answered)."
+      "arxiv_id": "2611.25289"
     },
     {
-      "id": "nariq-sub-3-bit-agentic-quantization",
+      "id": "frozen-lm-exact-state-tracking",
       "kind": "paper",
-      "title": "NariQ: Sub-3-Bit Quantization for Long-Horizon Agentic Tasks",
-      "url": "https://arxiv.org/abs/2611.26157",
+      "title": "Learning to Read Events for Exact State Tracking with Frozen Language Models",
+      "url": "https://arxiv.org/abs/2611.25211",
       "source": "arXiv",
-      "category": "efficiency",
-      "on_focus": true,
-      "arxiv_id": "2611.26157",
+      "category": "other",
+      "on_focus": false,
+      "headline": "A selector on a frozen LM extracts events into an external integer register; concurrent extraction cuts median wall-clock 136.1 s to 10.4 s",
+      "summary": "LLMs drift when they track state over very long event streams. This work trains a selector on top of a frozen language model to pull out individual event transitions, and delegates composition to an external integer register instead of the model's reasoning. Windows are extracted concurrently.",
+      "result": "Concurrent extraction cut median wall-clock time from 136.1 to 10.4 s with Sonnet 5.5 and from 313.5 to 28.0 s with GPT-6.1 Sol. Mean cost per document fell 55% and 44%. A frozen 0.8B model read all 299 windows of 43,687 events each. A 27B model answered 3 of 100 two-event windows correctly without visible reasoning and 96 of 100 with intermediate steps.",
+      "critique": "Single-author paper from a company (Attractor Dynamics Inc.). Speedups come mostly from parallelizing extraction rather than from a model change. The tasks are synthetic event logs. Cost figures assume fixed per-token prices. Details rest on the arXiv listing abstract.",
       "authors": [
-        "Doyeob Kim"
+        "Jeonghoon Lee"
       ],
-      "headline": "NariQ: trellis-coded PTQ calibrated on agent sessions matches BF16 on DeepSWE and Terminal Bench at 3.0 and 2.5 bits per weight",
-      "summary": "Low-bit quantization errors compound over long agentic trajectories. NariQ uses trellis-coded post-training quantization, calibrated on tokens produced by the BF16 model during real agent sessions instead of generic text.",
-      "result": "Prior quantizations at 3 bits or below 'solve at most 72% as many tasks as BF16 on DeepSWE'. NariQ at 3.0 and 2.5 bits per weight 'stays level with BF16' on DeepSWE and Terminal Bench. The 2.0-bit checkpoint trails.",
-      "critique": "Single author. The base model, task counts and variance across runs are not given in the abstract, and agentic pass rates are noisy. 'Prior quantizations' are not named. Gains may come mostly from in-domain calibration data rather than the trellis code; an ablation would separate the two. The abstract page could not be read."
-    },
-    {
-      "id": "complete-svd-functional-low-rank",
-      "kind": "paper",
-      "title": "Complete-SVD: A Functional Norm Approach to Low-Rank LLM Compression",
-      "url": "https://arxiv.org/abs/2611.26059",
-      "source": "arXiv",
-      "category": "efficiency",
-      "on_focus": true,
-      "arxiv_id": "2611.26059",
-      "authors": [
-        "Alper Kalle",
-        "Theo Rudkiewicz",
-        "Mohamed-Oumar Ouerfelli"
-      ],
-      "headline": "Complete-SVD: post-training low-rank LLM compression that minimizes output-logit distance via Kronecker-factored weighted SVD",
-      "summary": "SVD-based compression usually minimizes per-layer weight or activation error. Complete-SVD instead targets the L2 distance between the original and compressed model's logits, solved as a weighted SVD with a Kronecker-factored approximation of the weighting so it remains tractable.",
-      "result": "With WikiText-2 calibration it 'achieves the lowest C4 and PTB perplexity in every setting' and improves IFEval accuracy over 'the strongest prior output-aware methods'. The abstract gives no specific numbers.",
-      "critique": "No numbers, compression ratios or model names in the abstract. Perplexity-centric evaluation with one instruction-following benchmark. Low-rank compression usually lags quantization at equal memory, and that comparison is not mentioned. Details rest on the listing abstract."
-    },
-    {
-      "id": "amd-nitro-p-pixel-space-t2i",
-      "kind": "release",
-      "title": "AMD Nitro-P: VAE-free pixel-space text-to-image diffusion (679M)",
-      "url": "https://rocm.blogs.amd.com/artificial-intelligence/nitro-p/README.html",
-      "source": "AMD ROCm blog",
-      "category": "efficiency",
-      "on_focus": true,
-      "headline": "AMD releases Nitro-P, a 679M VAE-free pixel-space T2I model: GenEval 0.88 at 10.26 samples/s (512px) on one MI300X",
-      "summary": "Two-stage pixel-space diffusion without a VAE. An E-MMDiT on 16x16 RGB patches (Qwen3-1.7B text encoder) produces a 1/16-resolution semantic map, which modulates a lightweight U-Net pixel decoder through spatially varying scale and shift at the bottleneck. Training uses frequency-aware (DCT) flow matching, REPA alignment to DINOv2, and adversarial plus diffusion distillation for a one-step variant. Data: 25M public real and synthetic pairs, with a 256-to-1024px curriculum on MI300X. Weights at huggingface.co/amd/Nitro-P, code at github.com/AMD-AGI/Nitro-P.",
-      "result": "512px, single MI300X, batch 32: GenEval 0.88 at 10.26 samples/s, vs PixelDiT 0.78 at 5.54, DeCo 0.86 at 6.13, PixelGen 0.79 at 7.6, MiniT2I-L 0.88 at 2.4. The one-step variant gets 0.85 at 90.02 samples/s. 1024px: 0.87 vs PixelDiT 0.74, at 2.44 vs 2.05 samples/s.",
-      "critique": "All numbers are vendor-measured on AMD hardware only, with GenEval as the main quality metric (no FID or human preference). It ties MiniT2I-L on GenEval at 512px. At 20 steps it is slower than AMD's own Nitro-E (10.26 vs 18.83 samples/s). Total training compute and the license are not stated. FLUX-generated synthetic data (9.5M pairs) may favour GenEval-style prompts."
-    },
-    {
-      "id": "mambaflownp-linear-time-neural-process",
-      "kind": "paper",
-      "title": "Mamba Flow Matching Neural Processes: Linear-Time Inference for Irregularly Observed Spatial Fields",
-      "url": "https://arxiv.org/abs/2611.26355",
-      "source": "arXiv",
-      "category": "architecture",
-      "on_focus": true,
-      "arxiv_id": "2611.26355",
-      "authors": [
-        "Cosmo Santoni",
-        "Giovanni Charles",
-        "Timothy James Hitge"
-      ],
-      "headline": "MambaFlowNP replaces attention in joint neural processes with a multi-directional Mamba-2 scan: 114-784x faster, 10^6 points <1s",
-      "summary": "Joint-predictive neural processes over irregular spatial observations usually use attention, which costs quadratic compute in the number of points. MambaFlowNP serializes points and processes them with a multi-directional Mamba-2 scan (linear compute), trained with conditional flow matching for joint sampling.",
-      "result": "'114-784x faster than the strongest joint-predictive baseline'. Scales to 10^6 points on one NVIDIA L40S in under a second, with the lowest RMSE and CRPS on the NOAA tiers against attention-based joint baselines.",
-      "critique": "A domain application (spatial fields), not language modelling. The baselines are not named in the abstract, and how much of the speedup comes from asymptotic complexity rather than implementation is unclear. How the serialization order affects accuracy is not covered in the abstract. Details rest on the listing abstract; the abstract page could not be read."
-    },
-    {
-      "id": "approximate-adjoint-hybrid-models",
-      "kind": "paper",
-      "title": "Approximate Adjoint Models for Memory and Compute-Efficient Online Learning of Hybrid Models",
-      "url": "https://arxiv.org/abs/2611.26095",
-      "source": "arXiv",
-      "category": "training",
-      "on_focus": true,
-      "arxiv_id": "2611.26095",
-      "authors": [
-        "Emilio González-Zamora",
-        "Pierre Tandeo",
-        "Laurent Debreu"
-      ],
-      "headline": "Approximate adjoints cut peak memory up to 10x and runtime up to 4x for online training of hybrid physics-ML models",
-      "summary": "Training a neural component embedded in a long physical simulation needs backpropagation through many time steps, usually done with truncated BPTT. This method computes exact pullbacks only at sparse anchor states and propagates gradients between anchors with zero-order or pullback-reuse approximations.",
-      "result": "'Peak memory falls by up to an order of magnitude and runtime up to fourfold' relative to the standard approach (truncated BPTT), per the abstract.",
-      "critique": "Geared to physics/ML hybrid models, so transfer to LLM training (where activation checkpointing is the standard comparison) is unclear. The accuracy cost of the approximate gradient is not quantified in the listing abstract, and test systems and scale are not stated there."
-    },
-    {
-      "id": "fi-itep-embedding-pruning-recsys",
-      "kind": "paper",
-      "title": "Intelligent Embedding Pruning for Large-Scale Recommendation Models",
-      "url": "https://arxiv.org/abs/2611.25288",
-      "source": "arXiv",
-      "category": "efficiency",
-      "on_focus": true,
-      "arxiv_id": "2611.25288",
-      "authors": [
-        "Khazane",
-        "Saad-Falcon",
-        "Wu"
-      ],
-      "headline": "FI-ITEP: feature-importance-guided in-training embedding pruning cuts recommender memory 20-40%, trainer GPUs from 112 to 80",
-      "summary": "Embedding tables dominate memory in large recommendation models. FI-ITEP prunes embedding rows during training, setting a separate pruning ratio for each table from feature-importance scores, instead of the single percentile threshold used by ITEP.",
-      "result": "20-40% total memory reduction; GPU trainers per model reduced from 112 to 80, saving '1,000+ GPU-hours per model launch'. Reproduced on DLRM with Criteo 1TB.",
-      "critique": "Production results come from an internal setting that cannot be checked; only the Criteo reproduction is public. The baseline is limited to percentile ITEP; hashing, quantization and mixed-dimension embeddings are not compared in the abstract. Author list shows surnames only as given in the listing summary and may be truncated."
-    },
-    {
-      "id": "inflens-game-theoretic-lora-experts",
-      "kind": "paper",
-      "title": "Game-Theoretic Data Allocation for Expert Specialization and Routing",
-      "url": "https://arxiv.org/abs/2611.25167",
-      "source": "arXiv",
-      "category": "architecture",
-      "on_focus": true,
-      "arxiv_id": "2611.25167",
-      "authors": [
-        "Lovett",
-        "Lim",
-        "Vosoughi"
-      ],
-      "headline": "InflEns: mixture of LoRA experts where data allocation from a location game replaces a learned router",
-      "summary": "Rather than training a gating network, InflEns assigns training data to LoRA experts by solving a location game over data influence, so each expert specializes on a share of the data. At inference, routing follows that allocation, with no learned gate.",
-      "result": "The expert with the largest data share has the lowest NLL on about 90% of prompts, versus about 15% when allocations are permuted. Retraining a single expert lowers HarmBench attack success from 0.51 to 0.02.",
-      "critique": "No comparison with learned-router MoE or standard multi-LoRA routing on task quality or efficiency in the abstract. The specialization metric is internal (NLL share), and the HarmBench result shows modularity rather than efficiency. Scale and base model are not stated. Author list is surnames from the listing summary."
+      "arxiv_id": "2611.25211"
     }
   ]
 }

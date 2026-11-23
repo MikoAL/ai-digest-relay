@@ -1,7 +1,15 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-11-22T09:35:03+08:00",
+  "updated_at": "2026-11-23T09:40:00+08:00",
   "digests": [
+    {
+      "date": "2026-11-23",
+      "item_count": 8,
+      "on_focus_count": 6,
+      "top_headline": "Canon layers at 8B/1T tokens save ~30% of pretraining tokens for equal MMLU; with Canon, gated linear attention matches Gated DeltaNet",
+      "json": "digests/2026-11-23.json",
+      "md": "digests/2026-11-23.md"
+    },
     {
       "date": "2026-11-22",
       "item_count": 11,
