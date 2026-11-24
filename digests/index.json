@@ -1,7 +1,15 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-11-23T09:40:00+08:00",
+  "updated_at": "2026-11-24T09:45:00+08:00",
   "digests": [
+    {
+      "date": "2026-11-24",
+      "item_count": 12,
+      "on_focus_count": 11,
+      "top_headline": "Z.ai announces GLM-5.4, which it calls its first Loop Transformer, aimed at generalized coding",
+      "json": "digests/2026-11-24.json",
+      "md": "digests/2026-11-24.md"
+    },
     {
       "date": "2026-11-23",
       "item_count": 8,
