@@ -1,7 +1,15 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-11-24T09:45:00+08:00",
+  "updated_at": "2026-11-25T09:40:00+08:00",
   "digests": [
+    {
+      "date": "2026-11-25",
+      "item_count": 11,
+      "on_focus_count": 10,
+      "top_headline": "Temporal Residual adds a token-to-token second residual stream (2,752 params) to Qwen3.5-4B-Base; +7/+13/+5 pts on AIME24/AIME25/AMC23",
+      "json": "digests/2026-11-25.json",
+      "md": "digests/2026-11-25.md"
+    },
     {
       "date": "2026-11-24",
       "item_count": 12,

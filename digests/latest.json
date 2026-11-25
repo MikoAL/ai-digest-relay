@@ -1,209 +1,201 @@
 {
   "schema_version": 1,
-  "date": "2026-11-24",
-  "generated_at": "2026-11-24T09:45:00+08:00",
-  "notes": "Tuesday in Taipei. The Mon 23 Nov 2026 arXiv batch was visible: cs.LG/new (96 new, 75 cross-lists) and cs.CL/new (58 new, 33 cross-lists). cs.LG new submissions were read verbatim up to about entry [88] (2611.27889); the remainder, cross-lists and replacements were not read. cs.CL entries [1]-[35] and [63]-[79] were read verbatim, the rest only as a model-extracted summary. Paper details rest on the listing abstracts; author lists are the first three names shown and may be truncated. Skipped (fetch permission not answered): arXiv abstract pages for 2611.27233, 2611.27973, 2611.26637, 2611.27193, 2611.27500 and 2611.26835, and the Ling-3.2-air Hugging Face model card. Failed at the site: docs.z.ai GLM-5.4 page and huggingface.co/papers/2611.27973. The z.ai GLM-5.4 blog returned only its title metadata. Hugging Face Daily Papers was not covered (no usable index page found). Seen but not included: SDG chunk-boundary gating for linear attention (2611.26637) and Turnout RL-switched full/linear attention (2611.27500), both without numbers in the parts read; gated continued-fraction FFN layers (2611.26835); ToRA dual-row safety decoding (2611.26975, <4% per-token latency); quantization flipping 1.1-12.3% of reward-model decisions (2611.27155); search-native pretraining QueryLM (2611.26809); DepThink residual tokens vs looped LMs (2611.26752); LingSante-3.1-flash (560B/25B active) and MemT-1.0-Pro (secondary X posts only); OpenRouter dropping three inference providers over data-processing incidents.",
+  "date": "2026-11-25",
+  "generated_at": "2026-11-25T09:40:00+08:00",
+  "notes": "Wednesday in Taipei. Papers come from the arXiv cs.CL /new listing for Tuesday 24 Nov 2026 (131 new submissions); entries 1-81 (through 2611.29852) were read verbatim, entries 82-131 only as a model-extracted summary and are not used. Paper details rest on the listing abstracts; author lists are the first names shown and may be truncated. The arXiv cs.LG /new listing could not be read: the fetch of www.arxiv.org/list/cs.LG/new and of the web3.arxiv.org mirror were both declined, so cs.LG-only papers are missing today. Hugging Face Daily Papers was not covered (searches returned only third-party mirrors). Release trackers thursdai.news and llmgateway.io had no entries after 12 Nov and 9 Oct respectively. vLLM: GitHub releases still show v0.33.0 (2 Nov) as latest; v0.34.0 appears only on aggregators. Material update: NariQ (paper covered 22 Nov) now has a public Apache-2.0 GGUF model card with full benchmark tables. The Meta TLX blog post is dated 10 Nov but was not covered before and resurfaced in 23 Nov coverage. Seen but not included: Contrastive On-Policy Distillation (2611.28359), KMed-31B with multi-teacher on-policy delta distillation (2611.28719), EmoRouter modality cascading (2611.28960, 67.9-94.5% latency cut), HGDNA hybrid linear-attention genomic LM (2611.29400, no numbers), LM2 compiling a model into another's weights (2611.29577); unverified from summaries only: PCC layer pruning (2611.30183), quantizing diffusion LLMs under parallel decoding (2611.30587), Loop Residuals (2611.31094). News seen via secondary digests only: LingSante-3.1 (covered as seen 24 Nov), AWS Strands Decider v2, Architect Labs Frostbite AI-designed CPU, Amazon acquiring Decart optimization tech ($7.5B, TechCrunch), GPT-6.2 Sol rollout in ChatGPT, Anthropic Claude Ship.",
   "items": [
     {
-      "id": "glm-5-4-loop-transformer",
+      "id": "temporal-residual",
+      "kind": "paper",
+      "title": "The Temporal Residual: Fast and Effective Retrofitting of Latent Feedback into Pretrained Language Models",
+      "url": "https://arxiv.org/abs/2611.29843",
+      "source": "arXiv cs.CL",
+      "category": "architecture",
+      "on_focus": true,
+      "arxiv_id": "2611.29843",
+      "authors": [
+        "Ziyang Cai",
+        "Xingyu Zhu",
+        "Sanjeev Arora"
+      ],
+      "headline": "Temporal Residual adds a token-to-token second residual stream (2,752 params) to Qwen3.5-4B-Base; +7/+13/+5 pts on AIME24/AIME25/AMC23",
+      "summary": "Transformers cannot pass latent state forward across tokens except through the KV cache and emitted tokens. The paper adds a second residual stream that is carried from one token position to the next, giving latent feedback with only 2,752 extra parameters on a 4.2B model, and retrofits it into a pretrained model with 5B training tokens instead of training from scratch.",
+      "result": "Retrofitted on Qwen3.5-4B-Base with 5B tokens, it beats a standard model trained on the same data by 7, 13 and 5 points on AIME 2024, AIME 2025 and AMC 2023. Prior designs that feed state back into the existing residual stream recover at most 40% of the gain. GSM8K accuracy with no visible reasoning rises from 21% to 40%.",
+      "critique": "Single base model at 4B; no evidence at larger scale. AIME sets are tiny (30 problems each), so 5-13 point swings need seeds and confidence intervals, which the abstract does not give. A token-to-token recurrent stream breaks parallel training across positions unless handled carefully; training throughput and inference latency costs are not reported in the abstract. Results read from the listing abstract only."
+    },
+    {
+      "id": "position-skipped-indexer-distillation",
+      "kind": "paper",
+      "title": "Position-Skipped Distillation of Sparse-Attention Indexers: Train Short, Serve Long",
+      "url": "https://arxiv.org/abs/2611.29664",
+      "source": "arXiv cs.CL",
+      "category": "efficiency",
+      "on_focus": true,
+      "arxiv_id": "2611.29664",
+      "authors": [
+        "Fu Dai",
+        "Haodi Quan",
+        "Kamal Taha"
+      ],
+      "headline": "Distilling top-k sparse-attention indexers on 8K sequences with random position gaps matches 32K/64K-distilled indexers on perplexity",
+      "summary": "Learned top-k sparse-attention indexers (as in DeepSeek-style sparse attention) are normally distilled at the target context length, which is expensive. The method distills the indexer on short sequences but inserts randomly placed position gaps, so the indexer sees long-range position offsets without long sequences.",
+      "result": "On DeepSeek-V2-Lite and Qwen3-30B-A3B, an indexer distilled on 8K tokens is within about 0.5 perplexity of a 32K-distilled indexer up to 32K. On DeepSeek-V2-Lite it matches a 64K-distilled indexer at 64K with roughly 6x less training compute per token. On Llama-3.1-8B it trails the 32K run by 0.6 perplexity. With 4-bit key quantization, perplexity moves by at most 0.05 and the scan is 1.6-2.2x faster than half precision.",
+      "critique": "Evaluation is perplexity only in the abstract; no retrieval-heavy long-context tasks (needle, RULER, LongBench), where indexer misses matter most. A 0.5-0.6 perplexity gap is not negligible at long context. Contexts stop at 64K. The Llama-3.1-8B result shows the trick is weaker on a dense model."
+    },
+    {
+      "id": "grammar-as-a-draft",
+      "kind": "paper",
+      "title": "Grammar-as-a-Draft: More Tokens per Speculative Decoding Step on Grammar-Constrained Structured Outputs",
+      "url": "https://arxiv.org/abs/2611.28349",
+      "source": "arXiv cs.CL",
+      "category": "inference",
+      "on_focus": true,
+      "arxiv_id": "2611.28349",
+      "authors": [
+        "John Zhang",
+        "Silky Arora"
+      ],
+      "headline": "Grammar-as-a-Draft merges grammar-forced tokens into speculative drafts, raising MTP acceptance length from 2.06 to 5.43 on Qwen3.5-0.8B",
+      "summary": "In grammar-constrained decoding (JSON, schemas) many tokens are forced by the grammar, yet speculative drafters still spend proposals and verification on them. GaaD merges the drafter's proposal with grammar-forced tokens and skips logit computation for forced tokens during verification. It works with MTP, DFlash and n-gram drafters.",
+      "result": "Average acceptance length: 2.06 to 5.43 (MTP, Qwen3.5-0.8B), 1.99 to 5.31 (MTP, Qwen3.5-35B-A3B), 1.57 to 4.13 (DFlash, Qwen3-4B), 1.30 to 3.64 (n-gram, Qwen3-4B). Decoding is 2.66-2.81x faster at batch 1 and 1.14-1.70x at batch 64. A Rust implementation with MTP+GaaD is 2.23x faster on Qwen3.5-0.8B, 2.02x on Qwen3.5-397B-A17B-FP8 and 1.22x at 128 concurrent requests.",
+      "critique": "The abstract itself notes that committing forced tokens can change the output distribution relative to grammar-masked target decoding, so this is not lossless speculative decoding; the size of that shift is not quantified in the abstract. Gains shrink sharply under batching (1.22x at 128 concurrent). Speedups depend on how much of the output is grammar-forced, which varies by schema."
+    },
+    {
+      "id": "nohaircache-power-law-kv-eviction",
+      "kind": "paper",
+      "title": "NoHairCache: Calibrate-Once KV Cache Eviction with One Power-Law Exponent",
+      "url": "https://arxiv.org/abs/2611.29006",
+      "source": "arXiv cs.CL",
+      "category": "inference",
+      "on_focus": true,
+      "arxiv_id": "2611.29006",
+      "authors": [
+        "Shuyang Xiang"
+      ],
+      "headline": "NoHairCache treats H2O and StreamingLLM as endpoints of one power-law score; keeps 98.2% of full-cache NarrativeQA accuracy at 25% retention",
+      "summary": "KV eviction heuristics differ mainly in how they weight accumulated attention versus recency. The paper scores tokens with a single power-law family whose exponent alpha interpolates between H2O (attention-based) and StreamingLLM (recency-based), and calibrates alpha once on WikiText rather than per task.",
+      "result": "For Qwen2.5-1.5B-Instruct, calibrated alpha lies in [0.556, 0.822]. It gives the lowest perplexity on WikiText, PG19 and arXiv versus H2O and StreamingLLM, 0.06-0.10 PPL better than StreamingLLM at a 512-token budget. On NarrativeQA it keeps 98.2% of full-cache accuracy at 25% retention versus 91.1% for StreamingLLM.",
+      "critique": "Single author and a single 1.5B model in the abstract. Baselines are H2O and StreamingLLM only; newer eviction methods (SnapKV, PyramidKV, and the global-importance method covered 23 Nov) are not compared. Perplexity gains of 0.06-0.10 are small. No latency or kernel-compatibility numbers."
+    },
+    {
+      "id": "muted-distillation",
+      "kind": "paper",
+      "title": "Muted Distillation: Sealing Reasoning from Teacher Unlocks Token-Efficient Agents",
+      "url": "https://arxiv.org/abs/2611.28445",
+      "source": "arXiv cs.CL",
+      "category": "training",
+      "on_focus": true,
+      "arxiv_id": "2611.28445",
+      "authors": [
+        "Yuwei Zhang",
+        "Ian Miao",
+        "Wentao Zhang"
+      ],
+      "headline": "Muted Distillation hides student reasoning from the teacher in on-policy distillation, cutting agent output tokens 57% on OfficeQA Pro",
+      "summary": "In on-policy distillation (OPD) the teacher scores the student's full trajectory, including its reasoning, which rewards verbose reasoning. Muted Distillation seals the student's reasoning from the teacher, so supervision targets only the visible actions and answers, pushing the student toward shorter episodes.",
+      "result": "Versus standard OPD: output tokens per episode down 57% on OfficeQA Pro and 53% on SpreadsheetBench; accuracy matches OPD on OfficeQA Pro and pass@1 improves 4.8 points on SpreadsheetBench.",
+      "critique": "Only two agent benchmarks, both office/spreadsheet tasks. The only baseline in the abstract is standard OPD; length-penalized RL or simple length-controlled OPD would be the natural comparison. Model sizes and wall-clock savings are not given in the abstract."
+    },
+    {
+      "id": "rolling-entropy-sampling-dllm",
+      "kind": "paper",
+      "title": "RES: Accelerating Diffusion Language Models with Rolling Entropy Sampling",
+      "url": "https://arxiv.org/abs/2611.29066",
+      "source": "arXiv cs.CL",
+      "category": "inference",
+      "on_focus": true,
+      "arxiv_id": "2611.29066",
+      "authors": [
+        "Patrick Pynadath",
+        "Nicolas Perez-Nieves",
+        "Bobak Shahriari"
+      ],
+      "headline": "Training-free Rolling Entropy Sampling raises diffusion-LM tokens per forward pass from 19.3 to 25.5, with macro accuracy 80.7% to 78.8%",
+      "summary": "Diffusion LMs decode a window of masked tokens in parallel; samplers decide which positions to commit each step. RES commits a contiguous accepted prefix of the denoising window once it reaches a minimum length, while keeping positions further ahead revisable, so the window rolls forward. No training is needed.",
+      "result": "Across seven benchmarks, versus the entropy-bound sampler in DiffusionGemma: tokens per forward pass 19.3 to 25.5 (+32%), macro accuracy 80.7% to 78.8%.",
+      "critique": "It trades about 1.9 points of accuracy for speed, so it is a new point on the speed/quality curve, not a free win; a fair comparison would match accuracy and compare speed. Tokens per forward pass is not wall-clock throughput. Single baseline sampler and apparently a single model family."
+    },
+    {
+      "id": "nariq-qwen38-27b-gguf",
+      "kind": "release",
+      "title": "Nari Labs Qwen3.8-27B-NariQ-GGUF (2.0/2.5/3.0-bit trellis-coded weights)",
+      "url": "https://huggingface.co/nari-labs/Qwen3.8-27B-NariQ-GGUF",
+      "source": "Hugging Face model card",
+      "category": "efficiency",
+      "on_focus": true,
+      "arxiv_id": "2611.26157",
+      "headline": "Nari Labs releases Apache-2.0 NariQ GGUFs of Qwen3.8-27B at 3.0/2.5/2.0 bpw (10.1/8.4/6.8 GB); needs its llama.cpp fork",
+      "summary": "Update to the NariQ paper covered 22 Nov: the weights are now public with full tables. NariQ is trellis-coded post-training quantization (building on QTIP) calibrated on real coding-agent traces. The language model of Qwen3.8-27B is quantized; the vision tower, KV cache and activations stay BF16. Files: 3.0 bpw (10.12 GB, default), 2.5 bpw (8.44 GB), 2.0 bpw (6.75 GB) versus 53.8 GB BF16. Running them requires the nari-labs/nari-llama.cpp fork on NVIDIA Ampere or newer.",
+      "result": "Self-reported, versus BF16: DeepSWE v1.1 mean pass@1 39.8 (BF16) / 41.0 (3-bit) / 41.9 (2.5-bit) / 28.6 (2-bit); Terminal-Bench 2.1 62.6 / 63.8 / 60.2 / 52.4; AIME 25+26 97.7 / 98.3 / 96.5 / 86.0; MGSM 94.0 / 93.1 / 91.8 / 90.6. Decode on RTX PRO 6000 at 4K context: 88.9 tok/s (3.0 bpw) vs 94.7 for Unsloth UD-IQ3_XXS (10.9 GB).",
+      "critique": "All numbers are from the publisher. The card says 3-bit and 2.5-bit 'match BF16', but 2.5-bit is below BF16 on four of five benchmarks; DeepSWE gains are within the noise of 3 runs. Stock llama.cpp, Ollama and LM Studio cannot load the files, AMD/Intel are unsupported, and the fork is tuned for SM120; at 4K the 3.0 bpw file decodes slower than a comparable standard GGUF. The card gives no long-context accuracy data."
+    },
+    {
+      "id": "estimating-silenced-tokens-quantized",
+      "kind": "paper",
+      "title": "Estimating Silenced Tokens in Quantized LLMs",
+      "url": "https://arxiv.org/abs/2611.29536",
+      "source": "arXiv cs.CL",
+      "category": "efficiency",
+      "on_focus": true,
+      "arxiv_id": "2611.29536",
+      "authors": [
+        "Giuseppe Pappalardo"
+      ],
+      "headline": "Certified bounds show quantized LM heads can make hundreds of tokens unreachable as top-1, already at 8-bit on a 1B model",
+      "summary": "Quantizing the output head can make some vocabulary tokens impossible to emit as the argmax, whatever the input. The paper computes certified lower and upper bounds on the number of such 'silenced' tokens for a given quantized head.",
+      "result": "Silencing appears already at 8-bit on large-vocabulary models, up to a few hundred previously reachable tokens on a 1B-parameter model, and grows as precision drops. A small-vocabulary model resists until 3 bits. On a multilingual vocabulary, the silenced tokens are mostly non-Latin.",
+      "critique": "Single author; no named baselines and model names not given in the abstract. Top-1 unreachability matters for greedy decoding but less under sampling, and the abstract does not measure downstream impact. Practical deployments often keep the LM head at higher precision, which would sidestep the issue; worth checking whether the setups studied do so."
+    },
+    {
+      "id": "kernelshift-arm-kernel-benchmark",
+      "kind": "paper",
+      "title": "KernelShift: Benchmarking Kernel Optimization Across Evolving Hardware",
+      "url": "https://arxiv.org/abs/2611.29590",
+      "source": "arXiv cs.CL",
+      "category": "inference",
+      "on_focus": true,
+      "arxiv_id": "2611.29590",
+      "authors": [
+        "Shuaiwei Huang",
+        "Weihua Du",
+        "Allen Wu"
+      ],
+      "headline": "KernelShift: agent-written Arm CPU kernels beat auto-vectorization 2.4-19.8x but reach only 0.70x of hand-tuned KleidiAI",
+      "summary": "A benchmark of 99 CPU kernels drawn from ncnn, llama.cpp, Arm SIMD Loops and KleidiAI, spanning Arm Neon, SVE, SVE2 and SME2, to test whether LLM agents can write kernels for new instruction sets.",
+      "result": "Agents beat the auto-vectorizing compiler by 2.4-19.8x and reach up to 2.74x over ncnn's Neon kernels, but only 0.70x of Arm's hand-tuned KleidiAI kernels. In end-to-end inference of two LLMs, agent-written kernels give 1.3-1.6x prefill speedup over llama.cpp's fast path.",
+      "critique": "Which agents/models were evaluated and on what hardware is not in the abstract. Beating compiler auto-vectorization is a weak bar; the 0.70x versus KleidiAI is the more telling number. Prefill speedups over llama.cpp may reflect llama.cpp not using the newest instructions (e.g. SME2) rather than agent skill. Correctness checking across inputs is not described in the abstract."
+    },
+    {
+      "id": "meta-tlx-triton-extensions",
       "kind": "news",
-      "title": "GLM-5.4: Toward Generalized Coding with Our First Loop Transformer",
-      "url": "https://z.ai/blog/glm-5.4",
-      "source": "Z.ai blog",
-      "category": "architecture",
-      "on_focus": true,
-      "headline": "Z.ai announces GLM-5.4, which it calls its first Loop Transformer, aimed at generalized coding",
-      "summary": "Z.ai's blog post (dated 23 Nov by its image metadata) introduces GLM-5.4 as its first Loop Transformer. Only the title and metadata of the primary page were readable in this run. Per AI Weekly's write-up of the post: a 750B-parameter model that runs 28 of its 78 layers twice per forward pass, giving about 36% more effective depth with no added parameters; available first to GLM Coding Plan users, with API access after safety evaluation and open weights planned later. A Bluesky post quoted there says the looped middle layers were retrofitted with gates starting from the GLM-5 base checkpoint rather than pretrained from scratch.",
-      "critique": "Architecture details rest on secondary coverage (AI Weekly, quoting a Bluesky post), not on the primary page body, which could not be read. Z.ai's claim of intelligence comparable to 2T-3T-parameter models comes without published benchmarks in what was read (coverage notes the launch skipped benchmark tables). Looping doubles compute for 28 layers, so latency and cost per token rise; no throughput numbers seen. No weights, so independent verification is not yet possible."
-    },
-    {
-      "id": "ling-3-2-air",
-      "kind": "release",
-      "title": "inclusionAI Ling-3.2-air (open weights, 124B-total / 5.5B-active hybrid-attention MoE)",
-      "url": "https://aiweekly.co/alerts/inclusionai-drops-ling-32-air-124b-moe-at-55b-active",
-      "source": "AI Weekly",
-      "category": "architecture",
-      "on_focus": true,
-      "headline": "inclusionAI posts Ling-3.2-air: 124B MoE, 5.5B active, 35 Kimi Delta Attention + 7 gated MLA layers, 262K context, MIT",
-      "summary": "Open-weights MoE uploaded to Hugging Face on 23 Nov. Per AI Weekly's reading of the model card: 42-layer text backbone in a 5:1 hybrid pattern (35 Kimi Delta Attention linear-attention layers, 7 gated MLA layers), 512 routed experts plus 1 shared with 8 active per token, native 262,144-token context (1,048,576 via YaRN, not default), FP8 weights in about 129 GB, MIT license. Shares the native multimodal architecture of Ling-3.0-flash-VL.",
-      "result": "Vendor numbers as reported: Terminal-Bench 4.0 27%, AutomationBench-AA 61% (vs 15.7% for the baseline listed), Artificial Analysis Intelligence Index v5.0.1 score 23, Omniscience hallucination rate 49.3%.",
-      "critique": "Rests on secondary coverage: the primary Hugging Face model card could not be fetched in this run. Per OrcaRouter (via AI Weekly) there is no launch post, technical report or API, only the card, so training data, tokens and compute are unknown. The baseline in the AutomationBench comparison is not identified in the coverage. Deployment reportedly needs four 141 GB-class GPUs despite the small active count."
-    },
-    {
-      "id": "lrsa-longcat-recall-sparse-attention",
-      "kind": "paper",
-      "title": "LongCat Recall Sparse Attention: Co-Designing Key Organization and Retrieval for Long-Context Inference",
-      "url": "https://arxiv.org/abs/2611.27233",
-      "source": "arXiv cs.CL",
-      "category": "inference",
-      "on_focus": true,
-      "headline": "LRSA: retrieval-based sparse attention with a paged incremental key index; 4.70x faster key selection than DSA at 1M tokens",
-      "summary": "Long-context sparse attention normally pays a growing cost to score and select keys each step. LRSA co-designs how keys are organized and retrieved: it maintains an incrementally updated, paged index over keys so the selection step retrieves candidate blocks instead of scoring every key. It is integrated into SGLang.",
-      "result": "At a 1024K-token context: key selection 4.70x faster than DeepSeek Sparse Attention (DSA); selection plus attention combined 35.60x faster than full attention.",
-      "critique": "The listing abstract reports kernel/latency speedups only; accuracy versus DSA and full attention on long-context benchmarks was not visible in what was read. Speedups are at a single extreme length (1M); behavior at 32K-128K, where most serving happens, is not stated. Hardware and batch settings unknown; abstract page could not be read.",
-      "authors": [
-        "Hao Zhang",
-        "Bin Xiao",
-        "Kefeng Zhang"
-      ],
-      "arxiv_id": "2611.27233"
-    },
-    {
-      "id": "memonce",
-      "kind": "paper",
-      "title": "MemOnce: A Scalable Memory Architecture for Large Language Models",
-      "url": "https://arxiv.org/abs/2611.27973",
-      "source": "arXiv cs.CL",
-      "category": "inference",
-      "on_focus": true,
-      "headline": "MemOnce caches a subset of final-layer states and decodes them into KV caches on demand for long-context memory",
-      "summary": "Instead of storing per-layer KV caches for the full context, MemOnce caches only a small subset of final-layer hidden states and decodes them back into KV caches for the attention layers when needed, with sparse retrieval indices computed once and shared across layers. Details beyond the listing come from AI Weekly's summary of the paper.",
-      "result": "As reported by AI Weekly: on Qwen3.5-4B at 1M tokens, state cache 1313x smaller (about 25 MB vs over 32 GB for a vanilla Transformer), prefill 6.9x faster, throughput 3.5x higher; memory-benchmark average 60.07 vs 54.30 for full-context Qwen3.5-4B across MemBench, LoCoMo, LongMemEval and two PersonaMem splits; retrieval 64.2 ms, 12x faster than M+ and 17x faster than RAG.",
-      "critique": "Numbers come from secondary coverage; the arXiv abstract page and HF paper page could not be read. Evaluation is on conversational-memory benchmarks, not needle/retrieval-heavy long-context tasks where compressing to final-layer states could lose detail. Pretraining sweeps stop at 1.0B parameters on 8 H100s; single-team preprint with no independent reproduction."
-    },
-    {
-      "id": "ploq-prompt-low-rank-4bit",
-      "kind": "paper",
-      "title": "PLoQ: A Prompt-Specific Low-Rank Basis for 4-bit Quantization of LLM Activations",
-      "url": "https://arxiv.org/abs/2611.27092",
-      "source": "arXiv cs.LG",
+      "title": "TLX: A hardware-native GPU compiler for production ML (Meta Triton Low-Level Extensions)",
+      "url": "https://engineering.fb.com/2026/11/10/open-source/tlx-a-hardware-native-gpu-compiler-for-production-ml/",
+      "source": "Engineering at Meta blog",
       "category": "efficiency",
       "on_focus": true,
-      "headline": "PLoQ: per-prompt low-rank activation basis for W4A4KV4 quantization recovers up to 46% of lost perplexity, Llama/Qwen 1B-70B",
-      "summary": "Activation outliers make 4-bit activation and KV quantization lossy. PLoQ estimates a low-rank activation basis per prompt during prefill, quantizes that component separately and restores it inside the GEMM, without changing the weights. One-eighth of channels are kept at 8 bits, for about 4.2 bits per activation on average.",
-      "result": "Outperforms the state-of-the-art mixed-precision quantization on six Llama and Qwen models (1B-70B) at up to 8k tokens (16k on two models), recovering up to 46% of the perplexity that method loses. Overhead on Llama-3.1-8B at 8k tokens: +4% prefill, +8% decode.",
-      "critique": "The baseline is described only as 'state-of-the-art mixed-precision quantization' in the abstract; comparison against rotation methods (QuaRot/SpinQuant-style) not visible. Results are perplexity-centric; downstream task accuracy and long-generation quality unclear. Overhead is measured against what baseline kernel is unstated, and context tops out at 16k.",
-      "authors": [
-        "Faraz Tahmasebi",
-        "Michael Pellauer",
-        "Hyoukjun Kwon"
-      ],
-      "arxiv_id": "2611.27092"
+      "headline": "Meta details TLX, Triton extensions for warp-group orchestration, TMA/TMEM and clusters on Hopper, Blackwell, MI300 and MI350x",
+      "summary": "TLX (Triton Low-Level Extensions) keeps Triton's Python model for computation but exposes explicit orchestration: warp groups as first-class producer/consumer/epilogue roles, mbarrier-level synchronization, direct TMA, async tensor-core ops and Blackwell TMEM, and multi-CTA clusters with distributed shared memory. Meta says it powers production training, including the GEM model and a distributed grouped GEMM for MoE layers in its LLM pretraining stack. The post is dated 10 Nov (updated 19 Nov) and links the paper arXiv 2605.10905. RIO Rundown's 24 Nov summary of MarkTechPost coverage adds H100 matmul within -0.9% to +3.7% of cuBLAS and 11.8-15.2% over rocBLAS on MI350; those figures are not on Meta's post.",
+      "result": "Per Meta's post: 20-25% end-to-end MFU on thousands of GPUs for GEM training, up to 2x forward speedup for its GDPA attention kernel, 4x on H100 for the IKBO linear compression kernel, and up to two-thirds lower compute-intensive net latency for co-designed models.",
+      "critique": "The post gives no baselines for its speedups, so '2x' and '4x' cannot be judged; it says TLX is 'typically' on par with hand-tuned CUDA without numbers. No license or repository link is stated on the page despite the Open Source category. The post is two weeks old; the cuBLAS/rocBLAS comparisons rest on secondary coverage and are self-reported."
     },
     {
-      "id": "aimuon-spectral-residual",
+      "id": "harnesses-compositional-generalizers",
       "kind": "paper",
-      "title": "Accelerating Muon with Spectral Residual Correction",
-      "url": "https://arxiv.org/abs/2611.27077",
-      "source": "arXiv cs.LG",
-      "category": "training",
-      "on_focus": true,
-      "headline": "AIMuon adds a gradient-momentum residual to Muon's orthogonalized step; 6.5-10% fewer steps to Muon's loss on GPT-2/Qwen3-0.6B",
-      "summary": "Muon replaces the momentum update with its matrix sign (orthogonalization), discarding spectral magnitude information. AIMuon corrects the spectral step with a residual between gradient and momentum, approximating both matrix-sign transforms with Newton-Schulz iterations, and gives a stochastic stationarity bound.",
-      "result": "Reaches Muon's final validation loss with 8.98% (GPT-2-small), 10.05% (GPT-2-medium) and 6.49% (Qwen3-0.6B) fewer steps, and reaches a lower final loss than Muon, Muon-Nesterov and MONA.",
-      "critique": "Small scale (≤0.6B), so gains may not survive at frontier scale where Muon tuning differs. Step counts, not wall-clock: a second Newton-Schulz transform adds per-step cost that is not reported in the abstract. No AdamW comparison mentioned; seeds and hyperparameter sweeps unknown.",
-      "authors": [
-        "Zhixin Ren",
-        "Yao Lyu",
-        "Shengbo Eben Li"
-      ],
-      "arxiv_id": "2611.27077"
-    },
-    {
-      "id": "dwe-sparse-unbiased-kd",
-      "kind": "paper",
-      "title": "Distillation with Errors: Sparse Unbiased Backpropagation for Knowledge Distillation",
-      "url": "https://arxiv.org/abs/2611.27131",
-      "source": "arXiv cs.LG",
-      "category": "training",
-      "on_focus": true,
-      "headline": "DWE: sparse unbiased gradient estimates for full-vocabulary KD; up to 2.20x output-head speedup, 10-16% less training time",
-      "summary": "Full-vocabulary logit distillation makes the output head and its backward pass expensive. DWE builds sparse but unbiased paired gradient estimates for the KD loss, so only a subset of vocabulary entries is backpropagated while keeping the gradient unbiased.",
-      "result": "At equal budget, hidden-state and output-weight gradient MSE fall 63.5% and 57.9% versus importance sampling. Off-policy KD: up to 1.95x output-head speedup and 10.4-15.7% lower training time. On-policy KD: up to 2.20x output-head speedup.",
-      "critique": "Speedups are for the output head; end-to-end gains (10-16%) are modest and depend on vocabulary-to-model size ratio. The abstract reports gradient error and speed but no final student-quality numbers versus full KD or top-k truncated KD. Model sizes are not stated in the listing.",
-      "authors": [
-        "Yuyang Zhang",
-        "Yuxin Li"
-      ],
-      "arxiv_id": "2611.27131"
-    },
-    {
-      "id": "dpma-moe-compression",
-      "kind": "paper",
-      "title": "DPMA: Learning to Compress Mixture-of-Experts Models",
-      "url": "https://arxiv.org/abs/2611.27759",
-      "source": "arXiv cs.LG",
-      "category": "efficiency",
-      "on_focus": true,
-      "headline": "DPMA learns prune/merge/absorb coefficients and per-layer expert budgets; beats best baseline by up to 6.7 pts at 75% expert cut",
-      "summary": "MoE models are memory-heavy because all experts must be resident. DPMA is a retraining-free compressor with frozen weights that learns, per expert, coefficients for pruning, merging and absorbing into remaining experts, plus a layer-wise expert allocation under a global expert budget.",
-      "result": "Across four MoE models, eight multiple-choice benchmarks and five compression ratios; at 75% expert reduction it beats the strongest baseline on every model, by up to 6.7 percentage points.",
-      "critique": "Evaluation is multiple-choice only; generation, coding and long-context quality after compressing 75% of experts is untested in what was read. Which four MoE models and which baselines is not stated in the listing abstract. Memory savings and latency are not quantified.",
-      "authors": [
-        "Jon Irureta",
-        "Jon Imaz",
-        "Philipp Wiesner"
-      ],
-      "arxiv_id": "2611.27759"
-    },
-    {
-      "id": "copyro-copy-proposals-drafters",
-      "kind": "paper",
-      "title": "CoPyro: Feeding Copy Proposals to Parallel Drafters",
-      "url": "https://arxiv.org/abs/2611.27217",
+      "title": "Language Model Harnesses can be Compositional Generalizers",
+      "url": "https://arxiv.org/abs/2611.28298",
       "source": "arXiv cs.CL",
-      "category": "inference",
-      "on_focus": true,
-      "headline": "CoPyro feeds n-gram copied tokens to parallel speculative drafters instead of masks; +1-5% acceptance length on Qwen3",
-      "summary": "Parallel (multi-token) drafters predict several future tokens from mask placeholders. CoPyro replaces those masks with n-gram copy proposals taken from the context, giving the drafter concrete candidate tokens to refine.",
-      "result": "On Qwen3-4B across eight benchmarks, acceptance length rises for all four parallel drafters tested: +2.19-5.08% at 100K training samples, +1.08-2.00% with DFlash trained on 710K samples. Overhead on Qwen3-8B: 0.24 ms per decoding round in Transformers.",
-      "critique": "Gains are small and shrink as drafters are trained on more data, suggesting diminishing value for well-trained drafters. Reported in acceptance length, not end-to-end tokens/s. Overhead measured in HF Transformers, not an optimized serving engine. Only Qwen3 4B/8B.",
-      "authors": [
-        "Hong-Kai Zheng",
-        "Piji Li"
-      ],
-      "arxiv_id": "2611.27217"
-    },
-    {
-      "id": "cmhc-hyper-connections",
-      "kind": "paper",
-      "title": "cmHC: Balancing Stream Mixing in Hyper-Connections via Geometric Contraction",
-      "url": "https://arxiv.org/abs/2611.27193",
-      "source": "arXiv cs.LG",
-      "category": "architecture",
-      "on_focus": true,
-      "headline": "cmHC contracts mHC's Birkhoff-polytope mixing toward its interior to avoid under/over-mixing; up to 44.8% lower latency on Ascend",
-      "summary": "Manifold-constrained hyper-connections (mHC) replace the single residual stream with several streams mixed by doubly-stochastic matrices. The paper analyzes failure modes of under-mixing and over-mixing and constrains the mixing matrices to a contracted region of the Birkhoff polytope, away from its vertices. Fused operators are provided for Ascend NPUs.",
-      "result": "Fused operators reduce hyper-connection execution latency by up to 44.8% on Ascend NPUs; experiments on dense and MoE models at various scales.",
-      "critique": "The listing abstract gives no model-quality numbers versus mHC or standard residuals, and model scales are unspecified. The latency figure covers only the hyper-connection ops, not end-to-end training step time, and is Ascend-specific. Abstract page could not be read.",
-      "authors": [
-        "Haowei He",
-        "Ziwen Zhao",
-        "Chenshuo Pan"
-      ],
-      "arxiv_id": "2611.27193"
-    },
-    {
-      "id": "distp-local-update-hparam-transfer",
-      "kind": "paper",
-      "title": "DistP: Scaling Local-Update Training with Zero-Shot Hyperparameter Transfer",
-      "url": "https://arxiv.org/abs/2611.27808",
-      "source": "arXiv cs.LG",
-      "category": "scaling",
-      "on_focus": true,
-      "headline": "DistP extends zero-shot hyperparameter transfer to DiLoCo-style local-update training; -8.1% val loss at 823M params",
-      "summary": "muP-style hyperparameter transfer assumes standard data-parallel training. DistP extends zero-shot transfer to communication-efficient local-update training, covering changes in worker count, number of local steps and the outer optimizer, so hyperparameters tuned small can be reused at scale.",
-      "result": "In language modeling at 823M parameters, 8.1% lower validation loss and 10% higher mean downstream accuracy relative to baselines without retuning; fitted scaling laws suggest the gain grows with compute.",
-      "critique": "Largest run is 823M; the claim that gains grow with compute is an extrapolation from fitted scaling laws. 'Baselines without retuning' may be a weak comparison versus baselines tuned at the target scale. Specific outer optimizers and worker counts tested are not in the listing.",
-      "authors": [
-        "Andrej Jovanović",
-        "Alex Iacob",
-        "Philipp Wiesner"
-      ],
-      "arxiv_id": "2611.27808"
-    },
-    {
-      "id": "sarvam-105b-1711",
-      "kind": "release",
-      "title": "Introducing Sarvam-105B-1711",
-      "url": "https://www.sarvam.ai/blogs/sarvam-105b-1711",
-      "source": "Sarvam AI blog",
       "category": "other",
       "on_focus": false,
-      "headline": "Sarvam releases Sarvam-105B-1711 open-weight checkpoint: IFBench 32.5→82.5, Tau2 46.2→85.5, 65 GB NVFP4 build",
-      "summary": "New open-weight checkpoint (22 Nov) of Sarvam's 105B model, tuned for customer support, voice agents and tool calling, with long-context training extending context to 160K tokens (330B tokens on 512 GPUs). Efficiency-relevant details: 8-bit pretraining raised throughput from 5,500 to 10,900 tokens/s per GPU on B200s, and an NVFP4 build is 65 GB and runs on a single workstation GPU. Blended API price drops from $0.44 to $0.15 per million tokens.",
-      "result": "Versus the February release: conversational-agent average 42.6→73.9, IFBench 32.5→82.5, Tau2 46.2→85.5, Indic suite 30.1→79.1. Versus Qwen3.8 27B (xhigh): IFBench 82.5 vs 79.6, Tau2 85.5 vs 85.8, GPQA Diamond 80.4 vs 88.7, LiveCodeBench v6 75.3 vs 90.3.",
-      "critique": "All benchmarks are vendor-run, and the headline table reports the NVFP4 build. It trails the 27B Qwen baseline on GPQA, AIME and LiveCodeBench despite being ~4x larger. Total/active parameter counts and license were not found in the verbatim part of the post; MoE details rest on a model-extracted summary."
+      "arxiv_id": "2611.28298",
+      "authors": [
+        "Alex L. Zhang",
+        "Souradip Chakraborty",
+        "Omar Khattab"
+      ],
+      "headline": "RL-tuned recursive LM harness trained on short tasks generalizes to 2-64x longer ones; RLM-27B +26.9% over Qwen3.8-27B in same harness",
+      "summary": "Instead of extending context, a recursive language-model (RLM) harness decomposes long tasks into calls. The paper RL-trains the model inside the harness on short tasks, using surrogate harness training on synthetic data, and tests generalization to much longer tasks.",
+      "result": "Training on short tasks generalizes to tasks 2-64x longer. RLM-27B improves on Qwen3.8-27B in the same harness by 26.9% on average on CTC-Bench and ExpertLongBench while using about 2x fewer inference tokens.",
+      "critique": "Off focus but relevant to long-context alternatives. The baseline is the untrained model in the same harness, not a long-context model reading everything or other agentic scaffolds. Two benchmarks; '26.9%' is an average whose relative/absolute nature is unclear from the abstract."
     }
   ]
 }
