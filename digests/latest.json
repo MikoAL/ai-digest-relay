@@ -1,201 +1,214 @@
 {
   "schema_version": 1,
-  "date": "2026-11-25",
-  "generated_at": "2026-11-25T09:40:00+08:00",
-  "notes": "Wednesday in Taipei. Papers come from the arXiv cs.CL /new listing for Tuesday 24 Nov 2026 (131 new submissions); entries 1-81 (through 2611.29852) were read verbatim, entries 82-131 only as a model-extracted summary and are not used. Paper details rest on the listing abstracts; author lists are the first names shown and may be truncated. The arXiv cs.LG /new listing could not be read: the fetch of www.arxiv.org/list/cs.LG/new and of the web3.arxiv.org mirror were both declined, so cs.LG-only papers are missing today. Hugging Face Daily Papers was not covered (searches returned only third-party mirrors). Release trackers thursdai.news and llmgateway.io had no entries after 12 Nov and 9 Oct respectively. vLLM: GitHub releases still show v0.33.0 (2 Nov) as latest; v0.34.0 appears only on aggregators. Material update: NariQ (paper covered 22 Nov) now has a public Apache-2.0 GGUF model card with full benchmark tables. The Meta TLX blog post is dated 10 Nov but was not covered before and resurfaced in 23 Nov coverage. Seen but not included: Contrastive On-Policy Distillation (2611.28359), KMed-31B with multi-teacher on-policy delta distillation (2611.28719), EmoRouter modality cascading (2611.28960, 67.9-94.5% latency cut), HGDNA hybrid linear-attention genomic LM (2611.29400, no numbers), LM2 compiling a model into another's weights (2611.29577); unverified from summaries only: PCC layer pruning (2611.30183), quantizing diffusion LLMs under parallel decoding (2611.30587), Loop Residuals (2611.31094). News seen via secondary digests only: LingSante-3.1 (covered as seen 24 Nov), AWS Strands Decider v2, Architect Labs Frostbite AI-designed CPU, Amazon acquiring Decart optimization tech ($7.5B, TechCrunch), GPT-6.2 Sol rollout in ChatGPT, Anthropic Claude Ship.",
+  "date": "2026-11-26",
+  "generated_at": "2026-11-26T09:33:43+08:00",
+  "notes": "Thursday in Taipei. Papers come from the arXiv cs.CL /new listing for Wednesday 25 Nov 2026 (74 new, 52 cross-lists, 67 replacements); new submissions and cross-lists were read verbatim, replacements not read. Paper details rest on the listing abstracts; author lists are the first three names and may be truncated. Skipped (fetch declined): arxiv.org/list/cs.LG/new and arxiv.org/list/cs.LG/recent, so cs.LG-only papers are missing again today (cs.LG papers cross-listed to cs.CL are included). Hugging Face Daily Papers was not covered (searches returned only third-party mirrors). No release items: vLLM GitHub releases still show v0.33.0 (2 Nov) as latest; v0.34.0 appears only on aggregators. JetBrains Mellum2.1 Instruct (listed 25 Nov by nocode.mba) could not be verified: the JetBrains blog fetch failed at the site and the Hugging Face card found is the earlier Mellum2-12B-A2.5B-Instruct. Trackers list 22-25 Nov releases already covered or off focus (GLM-5.4, Sarvam-105B-1711, SenseNova U1.6, MAGI-2, Qwen-Audio-3.1-Live). Seen but not included: Verifiable On-Policy Distillation (2611.30325, no numbers), SD-Cache KV consolidation for RAG (2611.31265, no numbers), GramDelta incremental constrained decoding (2611.32807, 10.7-11.5x lower grammar-update latency), RECAP context compaction (2611.31258), HuluOPD (2611.32021), ARS-VLM zeroth-order post-training (2611.32147), sleep-based in-context adaptation (2611.32802), tool-free LLM repair of a 4-bit CNN (2611.33031).",
   "items": [
     {
-      "id": "temporal-residual",
+      "id": "ghc-grouped-hyper-connections",
       "kind": "paper",
-      "title": "The Temporal Residual: Fast and Effective Retrofitting of Latent Feedback into Pretrained Language Models",
-      "url": "https://arxiv.org/abs/2611.29843",
-      "source": "arXiv cs.CL",
+      "title": "GHC: Expanding Residual Interfaces in Hyper-Connections",
+      "url": "https://arxiv.org/abs/2611.31350",
+      "source": "arXiv",
       "category": "architecture",
       "on_focus": true,
-      "arxiv_id": "2611.29843",
+      "headline": "GHC splits hyper-connection branches into groups along heads/FFN channels; reports 35% training-efficiency gain over Pre-Norm",
+      "summary": "Hyper-connections widen the residual stream into several mixed streams, but each attention/FFN branch still reads and writes through a single interface. Grouped Hyper-Connections (GHC) split each branch into parallel groups along attention heads or FFN channels, so different groups get their own residual read/write interfaces, at negligible parameter and memory-access overhead. Tested on both dense and MoE models.",
+      "result": "Per the abstract, GHC beats Identity Hyper-Connections (IHC) and improves training efficiency by 35% over Pre-Norm and by 10% over IHC.",
+      "critique": "Details come from the arXiv listing abstract only (cs.LG cross-list in cs.CL). 'Training efficiency' is not defined in the abstract (tokens-to-target-loss vs. wall-clock), and model scales, token budgets and downstream evals are not stated. Wall-clock cost of the extra stream mixing is claimed negligible but not quantified. No comparison against mHC-style manifold-constrained variants is mentioned.",
       "authors": [
-        "Ziyang Cai",
-        "Xingyu Zhu",
-        "Sanjeev Arora"
+        "Tianyu Li",
+        "Hongtao Zhang",
+        "Dongchen Han"
       ],
-      "headline": "Temporal Residual adds a token-to-token second residual stream (2,752 params) to Qwen3.5-4B-Base; +7/+13/+5 pts on AIME24/AIME25/AMC23",
-      "summary": "Transformers cannot pass latent state forward across tokens except through the KV cache and emitted tokens. The paper adds a second residual stream that is carried from one token position to the next, giving latent feedback with only 2,752 extra parameters on a 4.2B model, and retrofits it into a pretrained model with 5B training tokens instead of training from scratch.",
-      "result": "Retrofitted on Qwen3.5-4B-Base with 5B tokens, it beats a standard model trained on the same data by 7, 13 and 5 points on AIME 2024, AIME 2025 and AMC 2023. Prior designs that feed state back into the existing residual stream recover at most 40% of the gain. GSM8K accuracy with no visible reasoning rises from 21% to 40%.",
-      "critique": "Single base model at 4B; no evidence at larger scale. AIME sets are tiny (30 problems each), so 5-13 point swings need seeds and confidence intervals, which the abstract does not give. A token-to-token recurrent stream breaks parallel training across positions unless handled carefully; training throughput and inference latency costs are not reported in the abstract. Results read from the listing abstract only."
+      "arxiv_id": "2611.31350"
     },
     {
-      "id": "position-skipped-indexer-distillation",
+      "id": "merge-aware-finetuning-fp8-nvfp4",
       "kind": "paper",
-      "title": "Position-Skipped Distillation of Sparse-Attention Indexers: Train Short, Serve Long",
-      "url": "https://arxiv.org/abs/2611.29664",
-      "source": "arXiv cs.CL",
-      "category": "efficiency",
-      "on_focus": true,
-      "arxiv_id": "2611.29664",
-      "authors": [
-        "Fu Dai",
-        "Haodi Quan",
-        "Kamal Taha"
-      ],
-      "headline": "Distilling top-k sparse-attention indexers on 8K sequences with random position gaps matches 32K/64K-distilled indexers on perplexity",
-      "summary": "Learned top-k sparse-attention indexers (as in DeepSeek-style sparse attention) are normally distilled at the target context length, which is expensive. The method distills the indexer on short sequences but inserts randomly placed position gaps, so the indexer sees long-range position offsets without long sequences.",
-      "result": "On DeepSeek-V2-Lite and Qwen3-30B-A3B, an indexer distilled on 8K tokens is within about 0.5 perplexity of a 32K-distilled indexer up to 32K. On DeepSeek-V2-Lite it matches a 64K-distilled indexer at 64K with roughly 6x less training compute per token. On Llama-3.1-8B it trails the 32K run by 0.6 perplexity. With 4-bit key quantization, perplexity moves by at most 0.05 and the scan is 1.6-2.2x faster than half precision.",
-      "critique": "Evaluation is perplexity only in the abstract; no retrieval-heavy long-context tasks (needle, RULER, LongBench), where indexer misses matter most. A 0.5-0.6 perplexity gap is not negligible at long context. Contexts stop at 64K. The Llama-3.1-8B result shows the trick is weaker on a dense model."
-    },
-    {
-      "id": "grammar-as-a-draft",
-      "kind": "paper",
-      "title": "Grammar-as-a-Draft: More Tokens per Speculative Decoding Step on Grammar-Constrained Structured Outputs",
-      "url": "https://arxiv.org/abs/2611.28349",
-      "source": "arXiv cs.CL",
-      "category": "inference",
-      "on_focus": true,
-      "arxiv_id": "2611.28349",
-      "authors": [
-        "John Zhang",
-        "Silky Arora"
-      ],
-      "headline": "Grammar-as-a-Draft merges grammar-forced tokens into speculative drafts, raising MTP acceptance length from 2.06 to 5.43 on Qwen3.5-0.8B",
-      "summary": "In grammar-constrained decoding (JSON, schemas) many tokens are forced by the grammar, yet speculative drafters still spend proposals and verification on them. GaaD merges the drafter's proposal with grammar-forced tokens and skips logit computation for forced tokens during verification. It works with MTP, DFlash and n-gram drafters.",
-      "result": "Average acceptance length: 2.06 to 5.43 (MTP, Qwen3.5-0.8B), 1.99 to 5.31 (MTP, Qwen3.5-35B-A3B), 1.57 to 4.13 (DFlash, Qwen3-4B), 1.30 to 3.64 (n-gram, Qwen3-4B). Decoding is 2.66-2.81x faster at batch 1 and 1.14-1.70x at batch 64. A Rust implementation with MTP+GaaD is 2.23x faster on Qwen3.5-0.8B, 2.02x on Qwen3.5-397B-A17B-FP8 and 1.22x at 128 concurrent requests.",
-      "critique": "The abstract itself notes that committing forced tokens can change the output distribution relative to grammar-masked target decoding, so this is not lossless speculative decoding; the size of that shift is not quantified in the abstract. Gains shrink sharply under batching (1.22x at 128 concurrent). Speedups depend on how much of the output is grammar-forced, which varies by schema."
-    },
-    {
-      "id": "nohaircache-power-law-kv-eviction",
-      "kind": "paper",
-      "title": "NoHairCache: Calibrate-Once KV Cache Eviction with One Power-Law Exponent",
-      "url": "https://arxiv.org/abs/2611.29006",
-      "source": "arXiv cs.CL",
-      "category": "inference",
-      "on_focus": true,
-      "arxiv_id": "2611.29006",
-      "authors": [
-        "Shuyang Xiang"
-      ],
-      "headline": "NoHairCache treats H2O and StreamingLLM as endpoints of one power-law score; keeps 98.2% of full-cache NarrativeQA accuracy at 25% retention",
-      "summary": "KV eviction heuristics differ mainly in how they weight accumulated attention versus recency. The paper scores tokens with a single power-law family whose exponent alpha interpolates between H2O (attention-based) and StreamingLLM (recency-based), and calibrates alpha once on WikiText rather than per task.",
-      "result": "For Qwen2.5-1.5B-Instruct, calibrated alpha lies in [0.556, 0.822]. It gives the lowest perplexity on WikiText, PG19 and arXiv versus H2O and StreamingLLM, 0.06-0.10 PPL better than StreamingLLM at a 512-token budget. On NarrativeQA it keeps 98.2% of full-cache accuracy at 25% retention versus 91.1% for StreamingLLM.",
-      "critique": "Single author and a single 1.5B model in the abstract. Baselines are H2O and StreamingLLM only; newer eviction methods (SnapKV, PyramidKV, and the global-importance method covered 23 Nov) are not compared. Perplexity gains of 0.06-0.10 are small. No latency or kernel-compatibility numbers."
-    },
-    {
-      "id": "muted-distillation",
-      "kind": "paper",
-      "title": "Muted Distillation: Sealing Reasoning from Teacher Unlocks Token-Efficient Agents",
-      "url": "https://arxiv.org/abs/2611.28445",
-      "source": "arXiv cs.CL",
+      "title": "Fix How It Acts, Not How It Thinks: Surgical Fine-Tuning of Frontier LLMs",
+      "url": "https://arxiv.org/abs/2611.32064",
+      "source": "arXiv",
       "category": "training",
       "on_focus": true,
-      "arxiv_id": "2611.28445",
+      "headline": "Merging a BF16 fine-tune into a mixed FP8/NVFP4 release erases 93% of the update; rounding each step fixes it (+8.4 pts Terminal-Bench 2.1)",
+      "summary": "Fine-tuning a frontier model in BF16 and then merging into its low-precision release format can silently discard the update: the median weight change is only 1.5% of one quantization rounding step, so rounding back to the mixed FP8/NVFP4 release format removes most of it. Merge-aware fine-tuning rounds weights to the release format at each training step so the learned change survives quantization.",
+      "result": "Merging into the mixed FP8/NVFP4 release erases 93% of the BF16 update. Merge-aware fine-tuning improves Nemotron-3.5 agentic coding by up to 8.4 points on Terminal-Bench 2.1.",
+      "critique": "From the listing abstract only. 'Up to 8.4 points' is a best case; the average gain, the baseline it is measured against (naive merge vs. BF16 model) and run-to-run variance are not given. Single model family (Nemotron-3.5) and single headline benchmark. Comparison with standard QAT/straight-through approaches is not mentioned in the abstract.",
       "authors": [
-        "Yuwei Zhang",
-        "Ian Miao",
-        "Wentao Zhang"
+        "Sandeep Singh Sandha",
+        "Prann Bansal",
+        "Arvind Sundararajan"
       ],
-      "headline": "Muted Distillation hides student reasoning from the teacher in on-policy distillation, cutting agent output tokens 57% on OfficeQA Pro",
-      "summary": "In on-policy distillation (OPD) the teacher scores the student's full trajectory, including its reasoning, which rewards verbose reasoning. Muted Distillation seals the student's reasoning from the teacher, so supervision targets only the visible actions and answers, pushing the student toward shorter episodes.",
-      "result": "Versus standard OPD: output tokens per episode down 57% on OfficeQA Pro and 53% on SpreadsheetBench; accuracy matches OPD on OfficeQA Pro and pass@1 improves 4.8 points on SpreadsheetBench.",
-      "critique": "Only two agent benchmarks, both office/spreadsheet tasks. The only baseline in the abstract is standard OPD; length-penalized RL or simple length-controlled OPD would be the natural comparison. Model sizes and wall-clock savings are not given in the abstract."
+      "arxiv_id": "2611.32064"
     },
     {
-      "id": "rolling-entropy-sampling-dllm",
+      "id": "modernelectra-flashdeberta",
       "kind": "paper",
-      "title": "RES: Accelerating Diffusion Language Models with Rolling Entropy Sampling",
-      "url": "https://arxiv.org/abs/2611.29066",
-      "source": "arXiv cs.CL",
+      "title": "ModernELECTRA: Replaced-Token Detection with Boundary-Window Reconstruction for Compact Encoders that Classify and Embed",
+      "url": "https://arxiv.org/abs/2611.31495",
+      "source": "arXiv",
+      "category": "efficiency",
+      "on_focus": true,
+      "headline": "ModernELECTRA trains 31M/61M encoders on ~1T tokens; its FlashDeBERTa kernel is 10x faster with 93% less memory at 4096 tokens",
+      "summary": "Adds a boundary-window reconstruction auxiliary task to ELECTRA-style replaced-token-detection pretraining and trains EdgeCoder-31M (8 layers, English) and EdgeCoder-Multilingual-61M (16 layers, 46 languages), each on about 1T tokens. Separately introduces FlashDeBERTa, a fused disentangled-attention kernel that never materializes the n x n score matrix and loads existing DeBERTa checkpoints unchanged.",
+      "result": "GLUE 86.0 (English) and 85.1 (multilingual). The English model beats Ettin-Enc-32m (83.5) and MiniLM-L12 (84.6) on GLUE and matches them on MTEB English v2 (51.1); the multilingual model beats the 2.3x larger mmBERT-small on GLUE. FlashDeBERTa at 4096 tokens: 10x faster and 93% less memory than the reference implementation.",
+      "critique": "From the listing abstract only. The kernel speedup is against the reference (unfused) DeBERTa implementation, not against other fused or FlashAttention-style variants; GPU type and batch size are not stated. No ablation of the boundary-window task's contribution is reported in the abstract. MTEB is only 'matched', not improved.",
+      "authors": [
+        "Mykhailo Shtopko",
+        "Ihor Stepanov",
+        "Dmytro Vodianytskyi"
+      ],
+      "arxiv_id": "2611.31495"
+    },
+    {
+      "id": "fredraft-accepted-length",
+      "kind": "paper",
+      "title": "Directly Maximizing On-policy Expected Accepted Length for Speculative Decoding",
+      "url": "https://arxiv.org/abs/2611.31256",
+      "source": "arXiv",
       "category": "inference",
       "on_focus": true,
-      "arxiv_id": "2611.29066",
+      "headline": "FreDraft trains speculative-decoding drafters on-policy to directly maximize expected accepted length rather than token-level alignment",
+      "summary": "Draft models for speculative decoding are usually trained to match the target's token distribution, a proxy for what matters (how many tokens get accepted). FreDraft trains on drafts sampled from the current draft model and directly maximizes their expected accepted length; it analytically marginalizes the token-level acceptance rate using the target's full vocabulary distribution to reduce gradient variance, and adds an explicit penalty on sampled tokens whose probability the draft overestimates.",
+      "result": "The abstract reports better accepted length and decoding speedup than strong baselines across multiple benchmarks and target models, plus faster on-policy training convergence, but gives no numbers.",
+      "critique": "No quantitative results, baseline names (e.g. EAGLE-family, DFlash) or target models are given in the abstract, so the size of the gain is unknown. Details from the listing abstract only.",
       "authors": [
-        "Patrick Pynadath",
-        "Nicolas Perez-Nieves",
-        "Bobak Shahriari"
+        "Ziying Zhang",
+        "Yaqing Wang",
+        "Yong Liu"
       ],
-      "headline": "Training-free Rolling Entropy Sampling raises diffusion-LM tokens per forward pass from 19.3 to 25.5, with macro accuracy 80.7% to 78.8%",
-      "summary": "Diffusion LMs decode a window of masked tokens in parallel; samplers decide which positions to commit each step. RES commits a contiguous accepted prefix of the denoising window once it reaches a minimum length, while keeping positions further ahead revisable, so the window rolls forward. No training is needed.",
-      "result": "Across seven benchmarks, versus the entropy-bound sampler in DiffusionGemma: tokens per forward pass 19.3 to 25.5 (+32%), macro accuracy 80.7% to 78.8%.",
-      "critique": "It trades about 1.9 points of accuracy for speed, so it is a new point on the speed/quality curve, not a free win; a fair comparison would match accuracy and compare speed. Tokens per forward pass is not wall-clock throughput. Single baseline sampler and apparently a single model family."
+      "arxiv_id": "2611.31256"
     },
     {
-      "id": "nariq-qwen38-27b-gguf",
-      "kind": "release",
-      "title": "Nari Labs Qwen3.8-27B-NariQ-GGUF (2.0/2.5/3.0-bit trellis-coded weights)",
-      "url": "https://huggingface.co/nari-labs/Qwen3.8-27B-NariQ-GGUF",
-      "source": "Hugging Face model card",
-      "category": "efficiency",
-      "on_focus": true,
-      "arxiv_id": "2611.26157",
-      "headline": "Nari Labs releases Apache-2.0 NariQ GGUFs of Qwen3.8-27B at 3.0/2.5/2.0 bpw (10.1/8.4/6.8 GB); needs its llama.cpp fork",
-      "summary": "Update to the NariQ paper covered 22 Nov: the weights are now public with full tables. NariQ is trellis-coded post-training quantization (building on QTIP) calibrated on real coding-agent traces. The language model of Qwen3.8-27B is quantized; the vision tower, KV cache and activations stay BF16. Files: 3.0 bpw (10.12 GB, default), 2.5 bpw (8.44 GB), 2.0 bpw (6.75 GB) versus 53.8 GB BF16. Running them requires the nari-labs/nari-llama.cpp fork on NVIDIA Ampere or newer.",
-      "result": "Self-reported, versus BF16: DeepSWE v1.1 mean pass@1 39.8 (BF16) / 41.0 (3-bit) / 41.9 (2.5-bit) / 28.6 (2-bit); Terminal-Bench 2.1 62.6 / 63.8 / 60.2 / 52.4; AIME 25+26 97.7 / 98.3 / 96.5 / 86.0; MGSM 94.0 / 93.1 / 91.8 / 90.6. Decode on RTX PRO 6000 at 4K context: 88.9 tok/s (3.0 bpw) vs 94.7 for Unsloth UD-IQ3_XXS (10.9 GB).",
-      "critique": "All numbers are from the publisher. The card says 3-bit and 2.5-bit 'match BF16', but 2.5-bit is below BF16 on four of five benchmarks; DeepSWE gains are within the noise of 3 runs. Stock llama.cpp, Ollama and LM Studio cannot load the files, AMD/Intel are unsupported, and the fork is tuned for SM120; at 4K the 3.0 bpw file decodes slower than a comparable standard GGUF. The card gives no long-context accuracy data."
-    },
-    {
-      "id": "estimating-silenced-tokens-quantized",
+      "id": "factorized-context-attention",
       "kind": "paper",
-      "title": "Estimating Silenced Tokens in Quantized LLMs",
-      "url": "https://arxiv.org/abs/2611.29536",
-      "source": "arXiv cs.CL",
-      "category": "efficiency",
-      "on_focus": true,
-      "arxiv_id": "2611.29536",
-      "authors": [
-        "Giuseppe Pappalardo"
-      ],
-      "headline": "Certified bounds show quantized LM heads can make hundreds of tokens unreachable as top-1, already at 8-bit on a 1B model",
-      "summary": "Quantizing the output head can make some vocabulary tokens impossible to emit as the argmax, whatever the input. The paper computes certified lower and upper bounds on the number of such 'silenced' tokens for a given quantized head.",
-      "result": "Silencing appears already at 8-bit on large-vocabulary models, up to a few hundred previously reachable tokens on a 1B-parameter model, and grows as precision drops. A small-vocabulary model resists until 3 bits. On a multilingual vocabulary, the silenced tokens are mostly non-Latin.",
-      "critique": "Single author; no named baselines and model names not given in the abstract. Top-1 unreachability matters for greedy decoding but less under sampling, and the abstract does not measure downstream impact. Practical deployments often keep the LM head at higher precision, which would sidestep the issue; worth checking whether the setups studied do so."
-    },
-    {
-      "id": "kernelshift-arm-kernel-benchmark",
-      "kind": "paper",
-      "title": "KernelShift: Benchmarking Kernel Optimization Across Evolving Hardware",
-      "url": "https://arxiv.org/abs/2611.29590",
-      "source": "arXiv cs.CL",
+      "title": "Factorized Context Attention: From Emulated to Native Grid Probing",
+      "url": "https://arxiv.org/abs/2611.32423",
+      "source": "arXiv",
       "category": "inference",
       "on_focus": true,
-      "arxiv_id": "2611.29590",
+      "headline": "Factorized Context Attention: training-free block-sparse attention reusing one KV cache; +9-14 pts on long novels over a single pass",
+      "summary": "Grid probing answers long-input questions by running the model over many spans separately, which re-encodes context repeatedly. Factorized Context Attention is a training-free block-sparse attention scheme that encodes the input once into a KV cache and then runs all spans as batched, masked sequences over that shared cache, making grid probing native rather than emulated.",
+      "result": "About +10 points over a single pass on long video and +9-14 points on long novels; finds needles in videos over a thousand frames and texts four times the context window; answers a later question in as little as one tenth of grid probing's time.",
+      "critique": "From the listing abstract only. Models, benchmarks and absolute accuracies are not named in the abstract; 'as little as a tenth' is a best case. Comparison is against single-pass and emulated grid probing, not against other long-context methods (RAG, sparse-attention retrofits, context extension).",
       "authors": [
-        "Shuaiwei Huang",
-        "Weihua Du",
-        "Allen Wu"
+        "Mohamed Eltahir",
+        "Manar Eyad",
+        "Yara Alzahrani"
       ],
-      "headline": "KernelShift: agent-written Arm CPU kernels beat auto-vectorization 2.4-19.8x but reach only 0.70x of hand-tuned KleidiAI",
-      "summary": "A benchmark of 99 CPU kernels drawn from ncnn, llama.cpp, Arm SIMD Loops and KleidiAI, spanning Arm Neon, SVE, SVE2 and SME2, to test whether LLM agents can write kernels for new instruction sets.",
-      "result": "Agents beat the auto-vectorizing compiler by 2.4-19.8x and reach up to 2.74x over ncnn's Neon kernels, but only 0.70x of Arm's hand-tuned KleidiAI kernels. In end-to-end inference of two LLMs, agent-written kernels give 1.3-1.6x prefill speedup over llama.cpp's fast path.",
-      "critique": "Which agents/models were evaluated and on what hardware is not in the abstract. Beating compiler auto-vectorization is a weak bar; the 0.70x versus KleidiAI is the more telling number. Prefill speedups over llama.cpp may reflect llama.cpp not using the newest instructions (e.g. SME2) rather than agent skill. Correctness checking across inputs is not described in the abstract."
+      "arxiv_id": "2611.32423"
     },
     {
-      "id": "meta-tlx-triton-extensions",
-      "kind": "news",
-      "title": "TLX: A hardware-native GPU compiler for production ML (Meta Triton Low-Level Extensions)",
-      "url": "https://engineering.fb.com/2026/11/10/open-source/tlx-a-hardware-native-gpu-compiler-for-production-ml/",
-      "source": "Engineering at Meta blog",
+      "id": "byte-patches-vs-bpe-350m",
+      "kind": "paper",
+      "title": "Byte Patches versus BPE at Matched Data: A Matched-Twin Comparison at 350M Parameters",
+      "url": "https://arxiv.org/abs/2611.31790",
+      "source": "arXiv",
+      "category": "architecture",
+      "on_focus": true,
+      "headline": "Matched 350M twins on 10B bytes: BPE-8k beats a MEGABYTE-style byte-patch model on bits/byte by 5.2%; bytes win on CharBench",
+      "summary": "Controlled comparison of tokenizer-free byte-patch modelling versus BPE: a MEGABYTE-style byte-patch Transformer (local64) and a BPE-8k Transformer, both at 350M parameters and trained on the same 10 billion bytes, evaluated on bits per byte by domain and on character-level and factual probes.",
+      "result": "BPE-8k has lower bits per byte: relative gaps -5.2% overall, -4.9% text, -9.3% code, -6.1% math. local64 wins CharBench 53.7% vs. 40.0%; BPE-8k wins fact200 16.5% vs. 7.0%.",
+      "critique": "Single small scale (350M, 10B bytes) and a single byte-patch design (MEGABYTE-style fixed patches); newer dynamic-patching architectures (e.g. entropy-based patching) are not tested, so the result may not generalize. Matching on bytes rather than FLOPs may favor one side. From the listing abstract only.",
+      "authors": [
+        "Asadullah Maliyawala",
+        "Andrej Lisal"
+      ],
+      "arxiv_id": "2611.31790"
+    },
+    {
+      "id": "ffn-intrinsic-dim-pca-pruning",
+      "kind": "paper",
+      "title": "Measuring Layer-wise Intrinsic Dimensionality of FFNs in LLMs via PCA",
+      "url": "https://arxiv.org/abs/2611.32782",
+      "source": "arXiv",
       "category": "efficiency",
       "on_focus": true,
-      "headline": "Meta details TLX, Triton extensions for warp-group orchestration, TMA/TMEM and clusters on Hopper, Blackwell, MI300 and MI350x",
-      "summary": "TLX (Triton Low-Level Extensions) keeps Triton's Python model for computation but exposes explicit orchestration: warp groups as first-class producer/consumer/epilogue roles, mbarrier-level synchronization, direct TMA, async tensor-core ops and Blackwell TMEM, and multi-CTA clusters with distributed shared memory. Meta says it powers production training, including the GEM model and a distributed grouped GEMM for MoE layers in its LLM pretraining stack. The post is dated 10 Nov (updated 19 Nov) and links the paper arXiv 2605.10905. RIO Rundown's 24 Nov summary of MarkTechPost coverage adds H100 matmul within -0.9% to +3.7% of cuBLAS and 11.8-15.2% over rocBLAS on MI350; those figures are not on Meta's post.",
-      "result": "Per Meta's post: 20-25% end-to-end MFU on thousands of GPUs for GEM training, up to 2x forward speedup for its GDPA attention kernel, 4x on H100 for the IKBO linear compression kernel, and up to two-thirds lower compute-intensive net latency for co-designed models.",
-      "critique": "The post gives no baselines for its speedups, so '2x' and '4x' cannot be judged; it says TLX is 'typically' on par with hand-tuned CUDA without numbers. No license or repository link is stated on the page despite the Open Source category. The post is two weeks old; the cuBLAS/rocBLAS comparisons rest on secondary coverage and are self-reported."
+      "headline": "PCA scan of FFN intrinsic dimension across 58 open LLMs; PCA-guided width pruning beats uniform width by up to +2.5 in distilled students",
+      "summary": "Measures the layer-wise intrinsic dimensionality of FFN activations with PCA across 58 open-weight LLMs from 14 families (70M to 72B), then uses the per-layer profile to allocate FFN width when pruning a knowledge-distilled student, instead of pruning every layer uniformly.",
+      "result": "PCA-guided width beats uniform width by +2.3 (Qwen3-8B teacher), +2.5 (Qwen2.5-3B), +0.9 (Gemma-3-4B) and +0.5 (LLaMA-3-8B); a budget-matched inverted allocation does worst on all four teachers.",
+      "critique": "Gains are modest (+0.5 to +2.5, metric not specified in the abstract) and variance is not reported. Baseline is uniform width only; no comparison with established structured-pruning methods (e.g. Minitron-style importance scores). Single-author paper; details from the listing abstract only.",
+      "authors": [
+        "Daehee Kim"
+      ],
+      "arxiv_id": "2611.32782"
     },
     {
-      "id": "harnesses-compositional-generalizers",
+      "id": "cot-proxy-action-distillation",
       "kind": "paper",
-      "title": "Language Model Harnesses can be Compositional Generalizers",
-      "url": "https://arxiv.org/abs/2611.28298",
-      "source": "arXiv cs.CL",
+      "title": "CoT-Proxy: Cross-Format Transfer for Distilling Long-Horizon Policies",
+      "url": "https://arxiv.org/abs/2611.33148",
+      "source": "arXiv",
+      "category": "training",
+      "on_focus": true,
+      "headline": "CoT-Proxy distills agent policies from teacher actions with an empty reasoning block; Qwen3-4B goes 7% to 48% on AppWorld",
+      "summary": "Distilling agents from teachers whose chain of thought is hidden or long is hard. The student is trained only on the teacher's actions with its own reasoning block left empty, plus a KL loss on its own generations; the behavior transfers to inference with thinking enabled ('cross-format transfer'). CoT-proxies extend this further.",
+      "result": "Distilling Qwen3.6-27B actions raises Qwen3-4B on AppWorld from 7% to 18% and Qwen3-32B from 12% to 25%; CoT-proxies raise Qwen3-4B to 35%. Distilling GPT-5.6 Luna from visible outputs and reasoning summaries raises Qwen3-4B from 7% to 48% on AppWorld and from 3% to 28% on SWE-bench Verified.",
+      "critique": "Comparisons are against the undistilled student, not against standard SFT on teacher traces or other distillation baselines (per the abstract). Distilling from a closed API model's outputs raises terms-of-service questions not addressed in the abstract. Training compute and number of trajectories not stated. From the listing abstract only.",
+      "authors": [
+        "Dawid J. Kopiczko",
+        "Tijmen Blankevoort",
+        "Yuki M. Asano"
+      ],
+      "arxiv_id": "2611.33148"
+    },
+    {
+      "id": "tablerouter-long-table-qa",
+      "kind": "paper",
+      "title": "TableRouter: Query-Aware Evidence Construction for Long-Table Question Answering",
+      "url": "https://arxiv.org/abs/2611.32006",
+      "source": "arXiv",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "Training-free TableRouter picks compute vs. coverage routes for long-table QA; beats 6 baselines in 9/9 settings with 77-95% fewer FLOPs",
+      "summary": "Long tables overflow or dilute LLM context. TableRouter is a training-free, query-aware router that chooses between a computation route (computing statistics over the table) and a coverage route (constructing a compact evidence subset), instead of feeding a truncated table to the model.",
+      "result": "Beats the strongest of six single-call baselines in all nine settings by 1.2-18.3 accuracy points while using 77-95% fewer estimated FLOPs than truncated-table prompting. With Qwen2.5-7B: 35.8% vs. 16.4% for the strongest external baseline. Explicit computed statistics add up to 40.0 points.",
+      "critique": "FLOPs are 'estimated', not measured latency. Baselines are single-call methods; multi-call agentic table methods are not mentioned in the abstract. Older backbone (Qwen2.5-7B). From the listing abstract only.",
+      "authors": [
+        "Anahita Bolourani",
+        "Xiaofeng Lin",
+        "Tung Sum Thomas Kwok"
+      ],
+      "arxiv_id": "2611.32006"
+    },
+    {
+      "id": "swiftloop-looped-transformer-inference",
+      "kind": "paper",
+      "title": "SwiftLoop: Selective Refinement for Adaptive Implicit Reasoning in Looped Transformers",
+      "url": "https://arxiv.org/abs/2611.31481",
+      "source": "arXiv",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "SwiftLoop freezes token positions during looped-transformer inference based on K/V reusability and output impact to cut loop compute",
+      "summary": "Looped transformers re-run the same layers several times on every position. SwiftLoop applies position-wise freezing during looped inference: positions whose keys/values are reusable and whose further refinement has little effect on the output stop being updated, so later loop iterations only refine a subset of positions.",
+      "result": "The abstract reports favorable accuracy-compute trade-offs versus fixed-loop inference and adaptive baselines, with measured inference acceleration, but gives no numbers.",
+      "critique": "No quantitative speedup, accuracy or model sizes in the abstract, and the adaptive baselines are not named. Relevant given recent loop-transformer production claims (e.g. GLM-5.4), but tested scale is unknown. From the listing abstract only.",
+      "authors": [
+        "Tianyi Zhao",
+        "Ke Wan",
+        "Chen Chen"
+      ],
+      "arxiv_id": "2611.31481"
+    },
+    {
+      "id": "aichipbench-accelerator-agents",
+      "kind": "paper",
+      "title": "AIChipBench: Benchmarking LLM Agents for Automated AI Accelerator Design",
+      "url": "https://arxiv.org/abs/2611.33093",
+      "source": "arXiv",
       "category": "other",
       "on_focus": false,
-      "arxiv_id": "2611.28298",
+      "headline": "AIChipBench: coding agents write RTL for quantized LLM decoders; 45 of 69 accepted designs fail on regrading at full test length",
+      "summary": "Benchmark in which LLM coding agents write synthesizable RTL accelerators for quantized Qwen3.5, Gemma 3, Gemma 4 and Llama 3.2 decoders, over 9,136 attempts by four coding agents, comparing feedback types (output-only vs. pointing to the first state mismatch).",
+      "result": "First-mismatch feedback raises acceptance over output-only feedback in all 12 cells by 25.0-46.9 points and halves agent-hours per accepted design. Of 69 accepted designs, 45 fail on regrading within the 32 steps their tests required. Sol 5.6 and Fable 5.1 rank above Astra 6 and Opus 5.5 in all 200 splits.",
+      "critique": "Off focus (hardware-design agents, not model efficiency itself). The regrading result suggests the benchmark's own acceptance tests are too short; whether accepted designs meet timing/area targets is not stated in the abstract. From the listing abstract only.",
       "authors": [
-        "Alex L. Zhang",
-        "Souradip Chakraborty",
-        "Omar Khattab"
+        "Guangyuan Wang",
+        "Chengran Li",
+        "Minchen Luo"
       ],
-      "headline": "RL-tuned recursive LM harness trained on short tasks generalizes to 2-64x longer ones; RLM-27B +26.9% over Qwen3.8-27B in same harness",
-      "summary": "Instead of extending context, a recursive language-model (RLM) harness decomposes long tasks into calls. The paper RL-trains the model inside the harness on short tasks, using surrogate harness training on synthetic data, and tests generalization to much longer tasks.",
-      "result": "Training on short tasks generalizes to tasks 2-64x longer. RLM-27B improves on Qwen3.8-27B in the same harness by 26.9% on average on CTC-Bench and ExpertLongBench while using about 2x fewer inference tokens.",
-      "critique": "Off focus but relevant to long-context alternatives. The baseline is the untrained model in the same harness, not a long-context model reading everything or other agentic scaffolds. Two benchmarks; '26.9%' is an average whose relative/absolute nature is unclear from the abstract."
+      "arxiv_id": "2611.33093"
     }
   ]
 }

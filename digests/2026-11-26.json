@@ -1,0 +1,214 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-26",
+  "generated_at": "2026-11-26T09:33:43+08:00",
+  "notes": "Thursday in Taipei. Papers come from the arXiv cs.CL /new listing for Wednesday 25 Nov 2026 (74 new, 52 cross-lists, 67 replacements); new submissions and cross-lists were read verbatim, replacements not read. Paper details rest on the listing abstracts; author lists are the first three names and may be truncated. Skipped (fetch declined): arxiv.org/list/cs.LG/new and arxiv.org/list/cs.LG/recent, so cs.LG-only papers are missing again today (cs.LG papers cross-listed to cs.CL are included). Hugging Face Daily Papers was not covered (searches returned only third-party mirrors). No release items: vLLM GitHub releases still show v0.33.0 (2 Nov) as latest; v0.34.0 appears only on aggregators. JetBrains Mellum2.1 Instruct (listed 25 Nov by nocode.mba) could not be verified: the JetBrains blog fetch failed at the site and the Hugging Face card found is the earlier Mellum2-12B-A2.5B-Instruct. Trackers list 22-25 Nov releases already covered or off focus (GLM-5.4, Sarvam-105B-1711, SenseNova U1.6, MAGI-2, Qwen-Audio-3.1-Live). Seen but not included: Verifiable On-Policy Distillation (2611.30325, no numbers), SD-Cache KV consolidation for RAG (2611.31265, no numbers), GramDelta incremental constrained decoding (2611.32807, 10.7-11.5x lower grammar-update latency), RECAP context compaction (2611.31258), HuluOPD (2611.32021), ARS-VLM zeroth-order post-training (2611.32147), sleep-based in-context adaptation (2611.32802), tool-free LLM repair of a 4-bit CNN (2611.33031).",
+  "items": [
+    {
+      "id": "ghc-grouped-hyper-connections",
+      "kind": "paper",
+      "title": "GHC: Expanding Residual Interfaces in Hyper-Connections",
+      "url": "https://arxiv.org/abs/2611.31350",
+      "source": "arXiv",
+      "category": "architecture",
+      "on_focus": true,
+      "headline": "GHC splits hyper-connection branches into groups along heads/FFN channels; reports 35% training-efficiency gain over Pre-Norm",
+      "summary": "Hyper-connections widen the residual stream into several mixed streams, but each attention/FFN branch still reads and writes through a single interface. Grouped Hyper-Connections (GHC) split each branch into parallel groups along attention heads or FFN channels, so different groups get their own residual read/write interfaces, at negligible parameter and memory-access overhead. Tested on both dense and MoE models.",
+      "result": "Per the abstract, GHC beats Identity Hyper-Connections (IHC) and improves training efficiency by 35% over Pre-Norm and by 10% over IHC.",
+      "critique": "Details come from the arXiv listing abstract only (cs.LG cross-list in cs.CL). 'Training efficiency' is not defined in the abstract (tokens-to-target-loss vs. wall-clock), and model scales, token budgets and downstream evals are not stated. Wall-clock cost of the extra stream mixing is claimed negligible but not quantified. No comparison against mHC-style manifold-constrained variants is mentioned.",
+      "authors": [
+        "Tianyu Li",
+        "Hongtao Zhang",
+        "Dongchen Han"
+      ],
+      "arxiv_id": "2611.31350"
+    },
+    {
+      "id": "merge-aware-finetuning-fp8-nvfp4",
+      "kind": "paper",
+      "title": "Fix How It Acts, Not How It Thinks: Surgical Fine-Tuning of Frontier LLMs",
+      "url": "https://arxiv.org/abs/2611.32064",
+      "source": "arXiv",
+      "category": "training",
+      "on_focus": true,
+      "headline": "Merging a BF16 fine-tune into a mixed FP8/NVFP4 release erases 93% of the update; rounding each step fixes it (+8.4 pts Terminal-Bench 2.1)",
+      "summary": "Fine-tuning a frontier model in BF16 and then merging into its low-precision release format can silently discard the update: the median weight change is only 1.5% of one quantization rounding step, so rounding back to the mixed FP8/NVFP4 release format removes most of it. Merge-aware fine-tuning rounds weights to the release format at each training step so the learned change survives quantization.",
+      "result": "Merging into the mixed FP8/NVFP4 release erases 93% of the BF16 update. Merge-aware fine-tuning improves Nemotron-3.5 agentic coding by up to 8.4 points on Terminal-Bench 2.1.",
+      "critique": "From the listing abstract only. 'Up to 8.4 points' is a best case; the average gain, the baseline it is measured against (naive merge vs. BF16 model) and run-to-run variance are not given. Single model family (Nemotron-3.5) and single headline benchmark. Comparison with standard QAT/straight-through approaches is not mentioned in the abstract.",
+      "authors": [
+        "Sandeep Singh Sandha",
+        "Prann Bansal",
+        "Arvind Sundararajan"
+      ],
+      "arxiv_id": "2611.32064"
+    },
+    {
+      "id": "modernelectra-flashdeberta",
+      "kind": "paper",
+      "title": "ModernELECTRA: Replaced-Token Detection with Boundary-Window Reconstruction for Compact Encoders that Classify and Embed",
+      "url": "https://arxiv.org/abs/2611.31495",
+      "source": "arXiv",
+      "category": "efficiency",
+      "on_focus": true,
+      "headline": "ModernELECTRA trains 31M/61M encoders on ~1T tokens; its FlashDeBERTa kernel is 10x faster with 93% less memory at 4096 tokens",
+      "summary": "Adds a boundary-window reconstruction auxiliary task to ELECTRA-style replaced-token-detection pretraining and trains EdgeCoder-31M (8 layers, English) and EdgeCoder-Multilingual-61M (16 layers, 46 languages), each on about 1T tokens. Separately introduces FlashDeBERTa, a fused disentangled-attention kernel that never materializes the n x n score matrix and loads existing DeBERTa checkpoints unchanged.",
+      "result": "GLUE 86.0 (English) and 85.1 (multilingual). The English model beats Ettin-Enc-32m (83.5) and MiniLM-L12 (84.6) on GLUE and matches them on MTEB English v2 (51.1); the multilingual model beats the 2.3x larger mmBERT-small on GLUE. FlashDeBERTa at 4096 tokens: 10x faster and 93% less memory than the reference implementation.",
+      "critique": "From the listing abstract only. The kernel speedup is against the reference (unfused) DeBERTa implementation, not against other fused or FlashAttention-style variants; GPU type and batch size are not stated. No ablation of the boundary-window task's contribution is reported in the abstract. MTEB is only 'matched', not improved.",
+      "authors": [
+        "Mykhailo Shtopko",
+        "Ihor Stepanov",
+        "Dmytro Vodianytskyi"
+      ],
+      "arxiv_id": "2611.31495"
+    },
+    {
+      "id": "fredraft-accepted-length",
+      "kind": "paper",
+      "title": "Directly Maximizing On-policy Expected Accepted Length for Speculative Decoding",
+      "url": "https://arxiv.org/abs/2611.31256",
+      "source": "arXiv",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "FreDraft trains speculative-decoding drafters on-policy to directly maximize expected accepted length rather than token-level alignment",
+      "summary": "Draft models for speculative decoding are usually trained to match the target's token distribution, a proxy for what matters (how many tokens get accepted). FreDraft trains on drafts sampled from the current draft model and directly maximizes their expected accepted length; it analytically marginalizes the token-level acceptance rate using the target's full vocabulary distribution to reduce gradient variance, and adds an explicit penalty on sampled tokens whose probability the draft overestimates.",
+      "result": "The abstract reports better accepted length and decoding speedup than strong baselines across multiple benchmarks and target models, plus faster on-policy training convergence, but gives no numbers.",
+      "critique": "No quantitative results, baseline names (e.g. EAGLE-family, DFlash) or target models are given in the abstract, so the size of the gain is unknown. Details from the listing abstract only.",
+      "authors": [
+        "Ziying Zhang",
+        "Yaqing Wang",
+        "Yong Liu"
+      ],
+      "arxiv_id": "2611.31256"
+    },
+    {
+      "id": "factorized-context-attention",
+      "kind": "paper",
+      "title": "Factorized Context Attention: From Emulated to Native Grid Probing",
+      "url": "https://arxiv.org/abs/2611.32423",
+      "source": "arXiv",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "Factorized Context Attention: training-free block-sparse attention reusing one KV cache; +9-14 pts on long novels over a single pass",
+      "summary": "Grid probing answers long-input questions by running the model over many spans separately, which re-encodes context repeatedly. Factorized Context Attention is a training-free block-sparse attention scheme that encodes the input once into a KV cache and then runs all spans as batched, masked sequences over that shared cache, making grid probing native rather than emulated.",
+      "result": "About +10 points over a single pass on long video and +9-14 points on long novels; finds needles in videos over a thousand frames and texts four times the context window; answers a later question in as little as one tenth of grid probing's time.",
+      "critique": "From the listing abstract only. Models, benchmarks and absolute accuracies are not named in the abstract; 'as little as a tenth' is a best case. Comparison is against single-pass and emulated grid probing, not against other long-context methods (RAG, sparse-attention retrofits, context extension).",
+      "authors": [
+        "Mohamed Eltahir",
+        "Manar Eyad",
+        "Yara Alzahrani"
+      ],
+      "arxiv_id": "2611.32423"
+    },
+    {
+      "id": "byte-patches-vs-bpe-350m",
+      "kind": "paper",
+      "title": "Byte Patches versus BPE at Matched Data: A Matched-Twin Comparison at 350M Parameters",
+      "url": "https://arxiv.org/abs/2611.31790",
+      "source": "arXiv",
+      "category": "architecture",
+      "on_focus": true,
+      "headline": "Matched 350M twins on 10B bytes: BPE-8k beats a MEGABYTE-style byte-patch model on bits/byte by 5.2%; bytes win on CharBench",
+      "summary": "Controlled comparison of tokenizer-free byte-patch modelling versus BPE: a MEGABYTE-style byte-patch Transformer (local64) and a BPE-8k Transformer, both at 350M parameters and trained on the same 10 billion bytes, evaluated on bits per byte by domain and on character-level and factual probes.",
+      "result": "BPE-8k has lower bits per byte: relative gaps -5.2% overall, -4.9% text, -9.3% code, -6.1% math. local64 wins CharBench 53.7% vs. 40.0%; BPE-8k wins fact200 16.5% vs. 7.0%.",
+      "critique": "Single small scale (350M, 10B bytes) and a single byte-patch design (MEGABYTE-style fixed patches); newer dynamic-patching architectures (e.g. entropy-based patching) are not tested, so the result may not generalize. Matching on bytes rather than FLOPs may favor one side. From the listing abstract only.",
+      "authors": [
+        "Asadullah Maliyawala",
+        "Andrej Lisal"
+      ],
+      "arxiv_id": "2611.31790"
+    },
+    {
+      "id": "ffn-intrinsic-dim-pca-pruning",
+      "kind": "paper",
+      "title": "Measuring Layer-wise Intrinsic Dimensionality of FFNs in LLMs via PCA",
+      "url": "https://arxiv.org/abs/2611.32782",
+      "source": "arXiv",
+      "category": "efficiency",
+      "on_focus": true,
+      "headline": "PCA scan of FFN intrinsic dimension across 58 open LLMs; PCA-guided width pruning beats uniform width by up to +2.5 in distilled students",
+      "summary": "Measures the layer-wise intrinsic dimensionality of FFN activations with PCA across 58 open-weight LLMs from 14 families (70M to 72B), then uses the per-layer profile to allocate FFN width when pruning a knowledge-distilled student, instead of pruning every layer uniformly.",
+      "result": "PCA-guided width beats uniform width by +2.3 (Qwen3-8B teacher), +2.5 (Qwen2.5-3B), +0.9 (Gemma-3-4B) and +0.5 (LLaMA-3-8B); a budget-matched inverted allocation does worst on all four teachers.",
+      "critique": "Gains are modest (+0.5 to +2.5, metric not specified in the abstract) and variance is not reported. Baseline is uniform width only; no comparison with established structured-pruning methods (e.g. Minitron-style importance scores). Single-author paper; details from the listing abstract only.",
+      "authors": [
+        "Daehee Kim"
+      ],
+      "arxiv_id": "2611.32782"
+    },
+    {
+      "id": "cot-proxy-action-distillation",
+      "kind": "paper",
+      "title": "CoT-Proxy: Cross-Format Transfer for Distilling Long-Horizon Policies",
+      "url": "https://arxiv.org/abs/2611.33148",
+      "source": "arXiv",
+      "category": "training",
+      "on_focus": true,
+      "headline": "CoT-Proxy distills agent policies from teacher actions with an empty reasoning block; Qwen3-4B goes 7% to 48% on AppWorld",
+      "summary": "Distilling agents from teachers whose chain of thought is hidden or long is hard. The student is trained only on the teacher's actions with its own reasoning block left empty, plus a KL loss on its own generations; the behavior transfers to inference with thinking enabled ('cross-format transfer'). CoT-proxies extend this further.",
+      "result": "Distilling Qwen3.6-27B actions raises Qwen3-4B on AppWorld from 7% to 18% and Qwen3-32B from 12% to 25%; CoT-proxies raise Qwen3-4B to 35%. Distilling GPT-5.6 Luna from visible outputs and reasoning summaries raises Qwen3-4B from 7% to 48% on AppWorld and from 3% to 28% on SWE-bench Verified.",
+      "critique": "Comparisons are against the undistilled student, not against standard SFT on teacher traces or other distillation baselines (per the abstract). Distilling from a closed API model's outputs raises terms-of-service questions not addressed in the abstract. Training compute and number of trajectories not stated. From the listing abstract only.",
+      "authors": [
+        "Dawid J. Kopiczko",
+        "Tijmen Blankevoort",
+        "Yuki M. Asano"
+      ],
+      "arxiv_id": "2611.33148"
+    },
+    {
+      "id": "tablerouter-long-table-qa",
+      "kind": "paper",
+      "title": "TableRouter: Query-Aware Evidence Construction for Long-Table Question Answering",
+      "url": "https://arxiv.org/abs/2611.32006",
+      "source": "arXiv",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "Training-free TableRouter picks compute vs. coverage routes for long-table QA; beats 6 baselines in 9/9 settings with 77-95% fewer FLOPs",
+      "summary": "Long tables overflow or dilute LLM context. TableRouter is a training-free, query-aware router that chooses between a computation route (computing statistics over the table) and a coverage route (constructing a compact evidence subset), instead of feeding a truncated table to the model.",
+      "result": "Beats the strongest of six single-call baselines in all nine settings by 1.2-18.3 accuracy points while using 77-95% fewer estimated FLOPs than truncated-table prompting. With Qwen2.5-7B: 35.8% vs. 16.4% for the strongest external baseline. Explicit computed statistics add up to 40.0 points.",
+      "critique": "FLOPs are 'estimated', not measured latency. Baselines are single-call methods; multi-call agentic table methods are not mentioned in the abstract. Older backbone (Qwen2.5-7B). From the listing abstract only.",
+      "authors": [
+        "Anahita Bolourani",
+        "Xiaofeng Lin",
+        "Tung Sum Thomas Kwok"
+      ],
+      "arxiv_id": "2611.32006"
+    },
+    {
+      "id": "swiftloop-looped-transformer-inference",
+      "kind": "paper",
+      "title": "SwiftLoop: Selective Refinement for Adaptive Implicit Reasoning in Looped Transformers",
+      "url": "https://arxiv.org/abs/2611.31481",
+      "source": "arXiv",
+      "category": "inference",
+      "on_focus": true,
+      "headline": "SwiftLoop freezes token positions during looped-transformer inference based on K/V reusability and output impact to cut loop compute",
+      "summary": "Looped transformers re-run the same layers several times on every position. SwiftLoop applies position-wise freezing during looped inference: positions whose keys/values are reusable and whose further refinement has little effect on the output stop being updated, so later loop iterations only refine a subset of positions.",
+      "result": "The abstract reports favorable accuracy-compute trade-offs versus fixed-loop inference and adaptive baselines, with measured inference acceleration, but gives no numbers.",
+      "critique": "No quantitative speedup, accuracy or model sizes in the abstract, and the adaptive baselines are not named. Relevant given recent loop-transformer production claims (e.g. GLM-5.4), but tested scale is unknown. From the listing abstract only.",
+      "authors": [
+        "Tianyi Zhao",
+        "Ke Wan",
+        "Chen Chen"
+      ],
+      "arxiv_id": "2611.31481"
+    },
+    {
+      "id": "aichipbench-accelerator-agents",
+      "kind": "paper",
+      "title": "AIChipBench: Benchmarking LLM Agents for Automated AI Accelerator Design",
+      "url": "https://arxiv.org/abs/2611.33093",
+      "source": "arXiv",
+      "category": "other",
+      "on_focus": false,
+      "headline": "AIChipBench: coding agents write RTL for quantized LLM decoders; 45 of 69 accepted designs fail on regrading at full test length",
+      "summary": "Benchmark in which LLM coding agents write synthesizable RTL accelerators for quantized Qwen3.5, Gemma 3, Gemma 4 and Llama 3.2 decoders, over 9,136 attempts by four coding agents, comparing feedback types (output-only vs. pointing to the first state mismatch).",
+      "result": "First-mismatch feedback raises acceptance over output-only feedback in all 12 cells by 25.0-46.9 points and halves agent-hours per accepted design. Of 69 accepted designs, 45 fail on regrading within the 32 steps their tests required. Sol 5.6 and Fable 5.1 rank above Astra 6 and Opus 5.5 in all 200 splits.",
+      "critique": "Off focus (hardware-design agents, not model efficiency itself). The regrading result suggests the benchmark's own acceptance tests are too short; whether accepted designs meet timing/area targets is not stated in the abstract. From the listing abstract only.",
+      "authors": [
+        "Guangyuan Wang",
+        "Chengran Li",
+        "Minchen Luo"
+      ],
+      "arxiv_id": "2611.33093"
+    }
+  ]
+}

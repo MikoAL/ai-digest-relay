@@ -1,7 +1,15 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-11-25T09:40:00+08:00",
+  "updated_at": "2026-11-26T09:33:43+08:00",
   "digests": [
+    {
+      "date": "2026-11-26",
+      "item_count": 11,
+      "on_focus_count": 10,
+      "top_headline": "GHC splits hyper-connection branches into groups along heads/FFN channels; reports 35% training-efficiency gain over Pre-Norm",
+      "json": "digests/2026-11-26.json",
+      "md": "digests/2026-11-26.md"
+    },
     {
       "date": "2026-11-25",
       "item_count": 11,
