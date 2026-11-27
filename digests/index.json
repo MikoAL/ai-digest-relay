@@ -1,7 +1,15 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-11-26T09:33:43+08:00",
+  "updated_at": "2026-11-27T09:24:54+08:00",
   "digests": [
+    {
+      "date": "2026-11-27",
+      "item_count": 11,
+      "on_focus_count": 9,
+      "top_headline": "AliceAI-Foundation-80B-A3B: MoE trained from scratch on 17.5T tokens, hybrid Kimi Delta Attention + full attention, Muon",
+      "json": "digests/2026-11-27.json",
+      "md": "digests/2026-11-27.md"
+    },
     {
       "date": "2026-11-26",
       "item_count": 11,
