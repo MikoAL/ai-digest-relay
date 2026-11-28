@@ -1,215 +1,157 @@
 {
   "schema_version": 1,
-  "date": "2026-11-27",
-  "generated_at": "2026-11-27T09:24:54+08:00",
-  "notes": "Friday in Taipei. Papers come from the arXiv cs.CL /new listing for Thursday 26 Nov 2026 (177 entries; 74 new submissions). New submissions [1]-[70] were read verbatim; [71]-[74] titles only; cross-lists and replacements were not read verbatim. Paper details rest on the listing abstracts; author lists are the first three names shown and may be truncated. Skipped (fetch declined): arxiv.org/list/cs.LG/new (cs.LG-only papers missing again), sakana.ai/namazu-small and huggingface.co/api/papers, so Hugging Face Daily Papers was not covered. Release trackers: thursdai.news has nothing after 12 Nov; aibriefing.io (updated 25 Nov) lists only Sakana Namazu Small (25 Nov, continued pretraining on Nemotron 3 Nano), which is not included because its primary page could not be read. Seen in cs.CL cross-lists as titles/summaries only, not verified and not included: Looped Models are Fast Multi-Token Predictors (2611.33896, summary claims up to 7.5x self-speculative speedup), State Space Attention (2611.33625), Any-Rate half-bit multi-precision quantization (2611.34402), tail-augmented speculative drafting (2611.34092), multi-teacher on-policy distillation from multimodal specialists (2611.34397). Seen but not included: PBRF-based trustworthiness repair of distilled LMs (2611.34831, up to 8% with <1% perplexity cost), CoT-vector projection to smaller students (2611.34183), Sports Agent on Qwen3.6-35B-A3B (2611.33700).",
+  "date": "2026-11-28",
+  "generated_at": "2026-11-28T09:45:00+08:00",
+  "notes": "Saturday in Taipei: no new arXiv batch. The newest listing on arxiv.org/list/cs.CL/new is still Thursday 26 Nov 2026 (no Friday-dated listing appeared, consistent with the US Thanksgiving holiday), so today leans on papers from that batch not yet covered and on this week's model releases. cs.LG coverage rests on arxiv.org/list/cs.LG/recent, which showed only the first 50 of 271 entries for Thu 26 Nov (titles only); the other 221 were not read. Skipped (fetch declined or not approved): arxiv.org/list/cs.LG/new, huggingface.co/papers/2611.34923, and the arxiv.org/abs pages for 2611.33896 (Looped Models are Fast Multi-Token Predictors), 2611.33625 (State Space Attention), 2611.34092, 2611.34397 and 2611.33823; a retry of 2611.33896 and 2611.33625 via other URLs was also declined. Those papers are not covered except 2611.33823, which rests on the cs.CL listing abstract. Hugging Face Daily Papers was covered only through the trending page. Release trackers checked (af.net November tracker, benchlm.ai, opper.ai, llm-stats.com) list nothing new dated 27-28 Nov. Not included: PrismML 'Ternary Bonsai 2.5 27B' (listed by af.net for 24 Nov, but the only primary pages found describe the July Ternary Bonsai 27B and September Bonsai 2 releases, so the 2.5 version could not be verified); JetBrains Mellum 2.1 (an October release despite a 26 Nov tracker entry); llama.cpp/ggml 1.0 (released 13 Nov per i-scoop.eu coverage).",
   "items": [
     {
-      "id": "aliceai-foundation-80b-a3b",
+      "id": "mixture-of-loops-transformer",
       "kind": "paper",
-      "title": "AliceAI-Foundation-80B-A3B-Base",
-      "url": "https://arxiv.org/abs/2611.34529",
+      "title": "Mixture-of-Loops Transformer",
+      "url": "https://github.com/hustvl/MoLT",
+      "source": "GitHub (hustvl) / arXiv cs.LG",
+      "category": "architecture",
+      "on_focus": true,
+      "headline": "MoLT: looped Transformer passes KV memory across loops; U-MoLT claims 1.7x token efficiency vs OLMo3 at 700M on 400B tokens",
+      "summary": "Looped Transformers reuse shared layers across loops but pay for it in efficiency; the paper asks what should be passed between loops. It introduces Mixture-of-Loops Attention (MoLA), which treats KV as memory across depths and loops. MoLT-R keeps the residual stream and reads local KV across loops; MoLT-KV restarts each loop from the embeddings and reads current-loop local KV plus preceding-loop memory KV at earlier positions. 'Loop forcing' allows parallel training and single-traversal Mixture-of-Loops decoding. U-MoLT splits memory construction (a downward encoder) from prediction readout (an upward cross-attention-only decoder) and can skip unused decoder traversals at inference without changing predictions.",
+      "result": "Per the README: with 400B-token pretraining against OLMo3 baselines, U-MoLT reaches 1.7x validation cross-entropy token efficiency at 700M; downstream average 62.6 vs 61.2 for OLMo3-1.5B, and 62.2 vs 60.1 for a 3B MoE (660M active), where 10-domain perplexity improves by 0.75 and 10-task accuracy by 2.1 points. Continued pretraining of Qwen3.5-0.8B-Base for 100B tokens gives 1.4x mean token efficiency. At ~113M parameters, U-MoLT with MoL-Hybrid-2 decoding runs at 996.6 ms vs 1,000.6 ms for non-looped OLMo3.",
+      "critique": "Details come from the GitHub README; the arXiv abstract page and the full paper were not read (the HF paper page fetch was declined). Training compute is not reported. The latency comparison is at ~113M parameters only and shows parity rather than a speedup. Only a minimal S-size U-MoLT implementation and a fused MoLA Triton kernel are released; MoLT-R, MoLT-KV, MoL-Hybrid decoding and the large-scale recipes are still TODO, and no checkpoints are listed, so the 700M-3B results cannot yet be reproduced.",
+      "authors": [
+        "Lianghui Zhu",
+        "Shijie Wang",
+        "Xinggang Wang",
+        "Jinze Bai",
+        "Bo Wang",
+        "Xiang Bai"
+      ],
+      "arxiv_id": "2611.34923"
+    },
+    {
+      "id": "looptitan-parameter-revisit-moe",
+      "kind": "paper",
+      "title": "LoopTitan: What Does Parameter Revisit Buy a Mixture-of-Experts?",
+      "url": "https://arxiv.org/html/2611.34821",
       "source": "arXiv",
       "category": "architecture",
       "on_focus": true,
-      "headline": "AliceAI-Foundation-80B-A3B: MoE trained from scratch on 17.5T tokens, hybrid Kimi Delta Attention + full attention, Muon",
-      "summary": "Technical report for an 80B-total / ~3B-active mixture-of-experts base model trained from scratch on 17.5T tokens. The architecture interleaves Kimi Delta Attention (a gated delta-rule linear attention) with full-attention layers, uses Attention Residuals, and trains with the Muon optimizer. The report also includes scaling-law experiments and an auxiliary loss on the MoE output.",
-      "result": "Per the abstract: 88.7% pass@8 on IMO-AnswerBench and 82.9% pass@8 on LiveCodeBench v5-v6. On WikiWebFacts / HardMultiQA it reports 86.5% / 67.9%, versus 83.2% / 65.4% for DeepSeek-V4-Flash-Base (284B total, 13B active) and 72.8% / 54.5% for Nemotron-3-Super-120B-A12B-Base.",
-      "critique": "Details come from the arXiv listing abstract only. The knowledge benchmarks named (WikiWebFacts, HardMultiQA) are not standard and may be in-house; the reasoning numbers are pass@8 with no pass@1 given and no baseline numbers for them in the abstract. Training compute, the share of the 17.5T tokens per language, and ablations isolating KDA, Attention Residuals and the auxiliary MoE loss are not stated in the abstract. Whether weights are released is not stated.",
+      "headline": "LoopTitan: in looped MoEs, parameter revisit adds ~nothing (+0.7 mBPB); gains come from shape, residual scaling and the optimizer",
+      "summary": "An ablation study of looped mixture-of-experts. Reported gains of looped MoEs over standard MoEs confound parameter revisit with network shape and residual scaling. The authors build non-revisit controls with the same shape, expert layout and residual scaling but independent parameters, plus a deeper control at equal parameters and compute (18 layers of width 1280, 42 experts per layer instead of 64). They show residual scaling is equivalent to an optimizer setting. They release the LoopTitan codebase, which unifies nine published looped recipes and checks parameter, compute and KV-cache budgets, and LoopTitan-Base, a standard MoE that matches the looped recipe under Muon without revisit.",
+      "result": "At 1.3B stored / 0.2B active parameters and 5B tokens (mBPB, negative is better): the looped MoE beats MoE-12 by -6.3 under AdamW, but the non-revisit control gets -7.0, so revisit alone contributes +0.7 (noise band ±2.1). Shape change accounts for -4.5 and expert layout plus residual scaling for -2.6. Switching MoE-12 to Muon alone gives -23.6, 3.7x the AdamW looped-recipe gain. Under Muon, adding one visit (+31% compute) gains 11.5 vs 10.4 for the deeper control, of which revisit explains 1.1. LoopTitan-Base is within 0.2 mBPB of the looped MoE.",
+      "critique": "Small scale: main runs are 1.3B/0.2B-active on 5B tokens, with larger checks at 3.0B/0.5B-active on 12-24B tokens and longer runs on a single seed; conclusions may not hold at frontier token counts. Only the first ~40K of ~885K characters were read verbatim, so the main results table was not checked. Results are loss (mBPB) only, with no downstream or inference-latency evaluation in the part read. GPU-hours are not stated, and no repository URL appeared in the read text.",
       "authors": [
-        "Nikolay Skachkov",
-        "Ekaterina Redina",
-        "Maksim Konoplev"
+        "Zichen Tian",
+        "Yudong Lu",
+        "Xuansheng Wu"
       ],
-      "arxiv_id": "2611.34529"
+      "arxiv_id": "2611.34821"
     },
     {
-      "id": "stable-gated-deltanet-2",
-      "kind": "paper",
-      "title": "Stable Gated DeltaNet-2: Understanding and Mitigating Recurrent State Instability",
-      "url": "https://arxiv.org/abs/2611.34051",
-      "source": "arXiv",
+      "id": "krafton-raon-1-mini",
+      "kind": "release",
+      "title": "KRAFTON Raon-1 mini (28.8B-A4.3B hybrid Raon Delta Attention + Gated MLA MoE)",
+      "url": "https://huggingface.co/KRAFTON/Raon-1-mini",
+      "source": "Hugging Face model card (KRAFTON)",
       "category": "architecture",
       "on_focus": true,
-      "headline": "Stable GDN-2 fixes exponential state growth in Gated DeltaNet-2; +6.80 RULER-128K average at ~1.6B scale",
-      "summary": "The authors trace long-context training failures of Gated DeltaNet-2 (GDN-2) to asymmetric erasure in the delta-rule update, which lets the recurrent state grow exponentially. They replace it with symmetric erasure plus decay-regulated residual writing, and prove an O(sqrt(T)) upper bound on state growth over sequence length T.",
-      "result": "On ~1.6B-parameter models versus GDN-2: +6.80 points on the 128K RULER average in the pure-recurrent setting, and +0.62 points on a nine-task average accuracy in the hybrid (linear + full attention) setting.",
-      "critique": "Details come from the arXiv listing abstract only. Single scale (~1.6B); token budget and training compute not stated. The hybrid-setting gain (0.62 points) is small and no variance across seeds is reported. Baselines are limited to GDN-2 in the abstract; no comparison with other stabilised linear-attention variants (e.g. Mamba-2, Kimi Delta Attention) is mentioned, and throughput impact of the modified update is not given.",
+      "headline": "KRAFTON Raon-1 mini: 28.8B-total / 4.3B-active MoE, 18 linear RDA + 7 Gated MLA layers, 262K context, Apache 2.0",
+      "summary": "Final release of the Raon-1 mini model, which the card says was trained from scratch; the af.net release tracker dates it 26 Nov. It has 25 layers in a 3:1 hybrid: 18 Raon Delta Attention (RDA) layers, a linear-attention variant that 'decouples the erase and write gates of Kimi Delta Attention' and keeps a fixed-size state, and 7 Gated MLA layers, the only ones with a KV cache (~8 KiB/token in BF16). It uses no positional encoding (NoPE), 128 routed experts with 6 routed + 1 shared active, a 4-stream 'Raon-mHC' residual, and a 259,840-token vocabulary. Native context is 262,144 tokens. It ships MXFP8, NVFP4, GGUF and MLX variants and a DFlash2 speculative-decoding draft.",
+      "result": "Card highlights: AIME 2026 96.7, HMMT Feb 2026 87.1, GPQA Diamond 86.0, MultiChallenge 64.9 and BrowseComp Plus 55.9. The card says the last two lead the compared MoE models (Qwen3.6 35B-A3B, Gemma 4 26B-A4B, Flint 40B-A2.5B, Inkling 2 Mini). A 256K-token request needs 2.0 GiB of KV cache and fits on one 24 GB GPU with NVFP4 weights. The earlier preview card reported up to a 2.18x DFlash2 speculative-decoding speedup on GSM8K on B300.",
+      "critique": "All numbers are self-reported. The full benchmark table on the final card is an image whose values could not be read, so only the highlights are given. Training tokens and compute are not stated, and there is no technical report, so RDA's decoupled gates and Raon-mHC have no published ablations. The card is inconsistent on memory: the highlights say 256K context runs in 20 GiB, the memory section says 24 GB. The final card gives no speculative-decoding speedup number.",
       "authors": [
-        "Xichong Zhang",
-        "Xixuan Hao",
-        "Zhichen Liu"
-      ],
-      "arxiv_id": "2611.34051"
+        "KRAFTON AI"
+      ]
     },
     {
-      "id": "dfly2-sparsity-sharing-spec-decoding",
+      "id": "aleph-alpha-kolibri-1-1",
+      "kind": "release",
+      "title": "Aleph Alpha Kolibri 1.1 (75B-A3.44B MoE with sparse attention)",
+      "url": "https://huggingface.co/Aleph-Alpha/Kolibri-1.1",
+      "source": "Hugging Face model card (Aleph Alpha)",
+      "category": "efficiency",
+      "on_focus": true,
+      "headline": "Aleph Alpha Kolibri 1.1: 75B/3.44B-active MoE switches to 4:1 sliding-window:sparse attention; overall 73.2 vs 66.6 for Kolibri 1",
+      "summary": "An update to the English/German Kolibri 1 MoE, released 23 Nov per the card. It continues from a Kolibri 1 checkpoint (20T pre-training + 3.42T mid-training tokens) and replaces the global GQA layers with sparse attention in a 4:1 sliding-window:sparse layout. The card intro says this is for cheaper long contexts; per the truncated part of the card, each query attends 2,048 selected keys with shared KV. It has 2 dense + 48 MoE layers (384 routed experts, 6 selected, 1 shared) and was trained with Muon. New stages were added: 805B mid-training tokens and 201B long-context tokens, then new SFT/RL with reasoning-effort levels. Native context is 262,144 tokens, extrapolatable to 1,048,576. Apache 2.0.",
+      "result": "Card post-training table, Kolibri 1.1 vs Kolibri 1.0: overall 73.2 vs 66.6, GPQA Diamond 87.1 vs 84.7, LiveCodeBench v6 93.0 vs 85.4, SWE-Bench Verified 70.4 vs 64.0, BrowseComp 34.8 vs 31.9, Tau3-Bench (Banking) 28.6 vs 38.7. The strongest compared model, Qwen3.8 Flash Next, scores 80.1 overall. Measured cost is 0.21 GPU-hours per 1,000 eval tasks vs 0.72 for Kolibri 1.0 (vLLM, one 8xB200 node, 8-bit weights). The Kolibri 1.1 phases used 5.52e22 FLOPs on top of the base checkpoint.",
+      "critique": "Self-reported. The cost-per-task figure mixes the attention change with different reasoning lengths after new post-training, so it does not isolate the sparse-attention gain, and no serving throughput or latency numbers are given. The card page was truncated, so the sparse-attention details and the long-context RULER figures rest on a model summary. Some scores regress (Tau3-Bench Banking, Tau2 Telecom), and it trails Qwen3.8 Flash Next and GLM-5.3 Flash on most rows. There is no dedicated Kolibri 1.1 technical report.",
+      "authors": [
+        "Aleph Alpha Research"
+      ]
+    },
+    {
+      "id": "any-rate-half-bit-quantization",
       "kind": "paper",
-      "title": "DFly2: Turbocharging Long-Context Speculative Decoding by Sharing the Target's Sparsity",
-      "url": "https://arxiv.org/abs/2611.34776",
+      "title": "Any-Rate: Half-Bit Multi-Precision LLM Quantization with Coded Bit-Planes",
+      "url": "https://arxiv.org/html/2611.34402v1",
+      "source": "arXiv",
+      "category": "efficiency",
+      "on_focus": true,
+      "headline": "Any-Rate: one PTQ checkpoint serves 2-8-bit LLM weights in half-bit steps over 2-4 bits via Hamming-coded bit-planes",
+      "summary": "Nested multi-precision quantization derives several precisions from one checkpoint by reading leading bit-planes, but existing methods offer only integer widths and degrade at 2 bits. Any-Rate is post-training quantization that constrains some bit-planes to extended Hamming [8,4,4] codewords over blocks of 8 weights, so each coded plane costs 0.5 bits/weight. A UHHHHHH layout (one unconstrained plane plus six coded planes) yields 2, 2.5, 3, 3.5 and 4-bit modes, and residual planes extend it to 5-8 bits. One lookup table per row is shared across modes, and all modes are encoded jointly with per-mode error feedback.",
+      "result": "Abstract: across four LLMs, state of the art among multi-precision methods at 2 and 3 bits. It keeps 69% of FP16 accuracy at 2 bits and is within one point of the best at 4 bits, against Any-Precision LLM, AnyBCQ and MatGPTQ. Decoding speed is about the same as existing kernels, and an LPDDR energy model estimates up to 27% less energy at equal accuracy. From the summarized body (not verbatim): Llama-3.1-8B-Instruct at 2 bits decodes at 142.4 tok/s vs 141.6 for Any-Precision LLM on an RTX 5070 Ti.",
+      "critique": "Models are small (Qwen2.5-3B, Gemma-3-4b-it, Llama-3.1-8B-Instruct, Phi-4 14B), so the method is untested on large MoEs. 69% of FP16 accuracy at 2 bits is still a large loss. The energy saving is an estimate from memory traffic, not a measurement. It trails MatGPTQ (3/4/8) slightly at 4 bits. Only ~40K of ~466K characters were read verbatim, so the main tables were not checked. Code: github.com/hoonki2002/Any-Rate.",
+      "authors": [
+        "Hoonki Lee",
+        "Haechan Shin",
+        "Hyuntaek Jung"
+      ],
+      "arxiv_id": "2611.34402"
+    },
+    {
+      "id": "llift-svd-compression-prep",
+      "kind": "paper",
+      "title": "Learning to Be Truncated: Preparing LLM Checkpoints for SVD Compression",
+      "url": "https://arxiv.org/abs/2611.34667",
+      "source": "arXiv",
+      "category": "efficiency",
+      "on_focus": true,
+      "headline": "LLift prepares one LLM checkpoint so a single SVD can be truncated to several compression ratios without per-ratio fine-tuning",
+      "summary": "SVD-based LLM compression usually needs fine-tuning or weight correction, repeated for every compression ratio. LLift fine-tunes a low-rank approximation at one ratio, using the original model as teacher. It then merges the learned updates back into the original weights while keeping the complementary components that were excluded from the training forward pass. SVD is applied once to the prepared model's target matrices, and the decompositions are reused at different truncation ranks.",
+      "result": "The abstract gives no numbers. It reports accuracy gains across three compression ratios on LLaMA-7B from a single prepared model, and says the gains extend across model families, sizes and SVD operators.",
+      "critique": "Only the abstract was read, and it states no figures, baselines or compute. The headline experiment uses LLaMA-7B, an old base model. The abstract does not say whether perplexity and accuracy hold up at aggressive ratios or how it compares with SVD-LLM-style methods. No code is linked.",
+      "authors": [
+        "Chenyue Fang",
+        "Danila Mishin",
+        "Babak Falsafi"
+      ],
+      "arxiv_id": "2611.34667"
+    },
+    {
+      "id": "pitfalls-dependency-ready-decoding-mdlm",
+      "kind": "paper",
+      "title": "Pitfalls of Dependency-Ready Decoding for Masked Diffusion Language Models",
+      "url": "https://arxiv.org/abs/2611.33823",
       "source": "arXiv",
       "category": "inference",
       "on_focus": true,
-      "headline": "DFly2 block-parallel drafter reuses the target's KV cache and sparse-indexer picks; 62-81% higher throughput on 64K sets",
-      "summary": "A block-parallel speculative drafter for sparse-attention target models that keeps no KV cache of its own: it reads the target's KV cache and reuses the target's sparse-attention indexer selections, so drafting cost stays flat as context grows. Evaluated on DS-V4.1-Flash, GLM-5.3-Flash and Hy4 flash targets.",
-      "result": "Accepts more tokens per step than DFlash and DSpark trained with the same recipe; the margin over the stronger baseline is 3.9-10.5% on general tasks and 10.0-31.5% on long-context and agentic tasks. At high concurrency on DS-V4.1-Flash, at matched per-user decode speed, throughput is 62% and 81% higher on two 64K-context sets.",
-      "critique": "Details come from the arXiv listing abstract only. Only applicable to targets with a learned sparse indexer (DeepSeek-style sparse attention). Throughput gains are reported for one target model and two 64K sets; hardware, batch sizes and the serving engine are not stated in the abstract. Baselines are trained by the authors on their own recipe, so comparisons with the original DFlash/DSpark releases are not shown.",
+      "headline": "Masked diffusion LMs: an attention-based dependency-ready decoding order collapses to left-to-right, per analysis paper",
+      "summary": "Examines decoding-order policies for masked diffusion language models, where the order in which tokens are unmasked governs how many tokens can be committed in parallel. Per the abstract, the authors find that an attention-based 'dependency-ready' decoder's order collapses to left-to-right, and they prove a margin-based result for Maximum-Margin decoding. The implication that this undercuts the parallelism diffusion LMs are meant to provide is this digest's reading, not a claim quoted from the abstract.",
+      "result": "The abstract reports no quantitative results; its findings are qualitative (order collapse) plus a theoretical margin-based guarantee for Maximum-Margin decoding.",
+      "critique": "Based on the cs.CL listing abstract only; the abstract page fetch was declined. No numbers, models or speed/quality trade-offs are given in the abstract, so the practical impact on decoding throughput is unknown. It is unclear which diffusion LMs and benchmarks were used.",
       "authors": [
-        "Hong Liu",
-        "Rui Cen",
-        "Junhan Shi"
+        "Lina Berrayana",
+        "Christopher Malon",
+        "Yoichi Ishibashi"
       ],
-      "arxiv_id": "2611.34776"
+      "arxiv_id": "2611.33823"
     },
     {
-      "id": "flyingstart-recurrent-depth-warm-starts",
+      "id": "cot-vector-projection-reasoning-transfer",
       "kind": "paper",
-      "title": "FlyingStart: Learned Cross-Token Warm Starts for Fixed-Point Decoding in Recurrent-Depth Language Models",
-      "url": "https://arxiv.org/abs/2611.34492",
-      "source": "arXiv",
-      "category": "inference",
-      "on_focus": true,
-      "headline": "FlyingStart warm-starts recurrent-depth decoding from the previous token's state; 14-19% fewer loops on Huginn-0125",
-      "summary": "Recurrent-depth (looped) LMs iterate a shared block to a fixed point for every token. FlyingStart initialises each token's iteration from the previous token's stopping state, passed through a closed-form linear map fitted on the frozen model. The map costs under 5% of one loop iteration and needs no retraining of the model.",
-      "result": "On Huginn-0125 it matches the accuracy of the strongest training-free baseline with 14-19% fewer decoding layers, raises batched throughput by 16-18% in two serving engines, and adds a further 10-14% when stacked on self-speculative decoding.",
-      "critique": "Details come from the arXiv listing abstract only. Evaluated on a single recurrent-depth model (Huginn-0125); generality to other looped architectures is not shown. The 'strongest training-free baseline' is not named in the abstract, and which serving engines and hardware were used is not stated.",
-      "authors": [
-        "Runguo Li",
-        "Dezhen Lu",
-        "Zixiang Ni"
-      ],
-      "arxiv_id": "2611.34492"
-    },
-    {
-      "id": "learning-from-recurrence-looped-lm",
-      "kind": "paper",
-      "title": "Learning from Recurrence: Internalizing Depth-Induced Preferences in Looped Language Models",
-      "url": "https://arxiv.org/abs/2611.33468",
-      "source": "arXiv",
-      "category": "architecture",
-      "on_focus": true,
-      "headline": "Retrofitted looped OLMo-2-1B trains its shared block on its own deeper-loop outputs; up to 46.2% mean relative math gain",
-      "summary": "The authors retrofit a pretrained OLMo-2-1B with a shared recurrent block, then train only that block on continuations the model itself generates at greater loop depth ('preference write-back'). No reference answers or correctness filtering are used, so the supervision signal comes purely from running more iterations.",
-      "result": "At target depths the updated models beat a non-recurrent control matched for mid-training data and token budget on all six mathematical reasoning benchmarks, with a mean relative accuracy gain of up to 46.2%.",
-      "critique": "Details come from the arXiv listing abstract only. Single 1B base model and math-only evaluation. The headline is a relative gain 'up to' 46.2%, which can be large on low absolute accuracy; absolute numbers and the benchmarks are not named in the abstract. Inference cost of running more loops versus the control is not reported.",
-      "authors": [
-        "Hui Chen",
-        "Joshua Elsdon",
-        "Can Goksen"
-      ],
-      "arxiv_id": "2611.33468"
-    },
-    {
-      "id": "dicalm-conv-attention-to-diffusion",
-      "kind": "paper",
-      "title": "DiCALM: Converting Autoregressive Convolution-Attention Language Models into Discrete Diffusion Language Models",
-      "url": "https://arxiv.org/abs/2611.33919",
-      "source": "arXiv",
-      "category": "architecture",
-      "on_focus": true,
-      "headline": "DiCALM converts LFM2/LFM2.5 conv-attention hybrids into masked diffusion LMs; up to 1.79x faster than matched AR models",
-      "summary": "Most AR-to-diffusion conversions start from pure Transformers. DiCALM adapts hybrid short-convolution + attention models (Liquid AI's LFM2 and LFM2.5) into masked discrete diffusion language models that can decode multiple tokens in parallel.",
-      "result": "In controlled experiments the converted models perform comparably to LFM2.5-based AR models fine-tuned on the same data, with speedups over them at 350M and 1.2B of over 1.4x on average and up to 1.79x.",
-      "critique": "Details come from the arXiv listing abstract only. Small scales (350M, 1.2B). 'Comparable' quality is not quantified in the abstract, and the speedup is measured against AR models of the same family rather than against speculative decoding or other diffusion LMs. How the convolutions' causality is handled bidirectionally is not described in the abstract.",
-      "authors": [
-        "Phong Le",
-        "Ngoc-Quan Pham",
-        "Dat Quoc Nguyen"
-      ],
-      "arxiv_id": "2611.33919"
-    },
-    {
-      "id": "care-opd-agent-distillation",
-      "kind": "paper",
-      "title": "Collect for Coverage, Replay with Evidence: Adaptive and Efficient On-Policy Distillation for Long-Horizon Agents",
-      "url": "https://arxiv.org/abs/2611.34756",
+      "title": "Lightweight Reasoning Transfer via Chain-of-Thought Vector Projection",
+      "url": "https://arxiv.org/abs/2611.34183",
       "source": "arXiv",
       "category": "training",
       "on_focus": true,
-      "headline": "CARE-OPD on-policy distillation for agents reaches 59.5% SWE-bench Verified with 45% less training time than async OPD",
-      "summary": "On-policy distillation (OPD) for long-horizon agents is expensive because every update needs fresh environment rollouts. CARE-OPD collects trajectories to expand coverage of interaction histories, gates updates whose teacher signal is unreliable, and allocates hindsight replay of past prefixes based on evidence of usefulness.",
-      "result": "Outperforms online OPD and prior prefix-replay baselines. On SWE-bench Verified it reaches 59.5% task success while cutting end-to-end training time by 45% and environment actions by 44% relative to asynchronous online OPD.",
-      "critique": "Details come from the arXiv listing abstract only. Student and teacher models, and the baseline's SWE-bench score, are not given in the abstract, so the size of the quality gain is unknown. Efficiency is measured against the authors' own asynchronous OPD implementation. Results on other agent benchmarks are not quantified in the abstract.",
+      "headline": "CoT-vector projection moves a teacher's reasoning steering vector into a smaller student's residual stream, no distillation run",
+      "summary": "A lightweight alternative to distilling reasoning into a smaller model: a teacher-side 'CoT Vector' (a steering direction associated with chain-of-thought behaviour) is projected into the residual-stream space of a smaller student. The listing abstract describes transfer through the student's activations rather than a full distillation run; how and where the projected vector is applied is not detailed in the abstract as read.",
+      "result": "Per the abstract: +10.37 to +21.98 accuracy points on GSM8K and MATH across teacher-student settings. On four code benchmarks, +3.23 to +4.67 pass@1 for a Qwen2.5-7B-Instruct student and up to +9.65 for base Qwen2.5-7B.",
+      "critique": "From the listing abstract only. Gains are relative to the unsteered student, not to standard logit or on-policy distillation or to simply prompting for CoT, so whether this beats cheap baselines is unclear. Students are ~7B Qwen2.5 models, and the abstract does not say how the projection is learned or how much data it needs. It is borderline on focus: it is reasoning transfer via activation steering, not compression.",
       "authors": [
-        "Haowen Hou",
-        "Gen Li",
-        "Ruilin Li"
+        "Yulin Qi",
+        "Shuo Xu",
+        "Shuxia Lin"
       ],
-      "arxiv_id": "2611.34756"
-    },
-    {
-      "id": "kd-for-diffusion-lms",
-      "kind": "paper",
-      "title": "Rethinking Knowledge Distillation for Diffusion Language Models",
-      "url": "https://arxiv.org/abs/2611.33670",
-      "source": "arXiv",
-      "category": "training",
-      "on_focus": true,
-      "headline": "Forward-KL distillation fails for diffusion LMs; data-free off-then-on-policy KD gets a 93M student from Dream-7B",
-      "summary": "The authors argue that the standard forward-KL token-level distillation used for AR models fails for masked diffusion LMs, and propose a data-free framework that first distills off-policy and then switches to on-policy distillation on the student's own denoising trajectories.",
-      "result": "On MDLM the student reaches GPT-2-judged perplexity 24.75, below the teacher's 27.04. Distilling Dream-7B into a 93M student lowers Qwen-2.5-judged perplexity from 25.23 (forward-KL baseline) to 19.83, with zero-shot benchmark performance preserved.",
-      "critique": "Details come from the arXiv listing abstract only. Generative perplexity under an external judge model rewards low-entropy text and is a weak quality metric; no diversity/entropy numbers are given in the abstract. A student beating its teacher on this metric is a warning sign rather than proof of quality. Zero-shot results are described only as 'preserved', without numbers.",
-      "authors": [
-        "Yuxuan Sun",
-        "Yuanjian Xu",
-        "Jianing Hao"
-      ],
-      "arxiv_id": "2611.33670"
-    },
-    {
-      "id": "chorus-ngram-module-scaling",
-      "kind": "paper",
-      "title": "Bigger Model or Bigger Table? How Much Backbone a Chorus N-gram Module Replaces",
-      "url": "https://arxiv.org/abs/2611.34725",
-      "source": "arXiv",
-      "category": "scaling",
-      "on_focus": true,
-      "headline": "Chorus n-gram table study: each added table parameter replaces at most 0.31 backbone parameters at 16M-349M scale",
-      "summary": "A scaling-style study of the Chorus n-gram lookup module (an n-gram lookup table added alongside a Transformer backbone). The author trains 16M-349M backbones on 1.34B tokens of pre-1918 Polish and measures how large a plain model each table-augmented model matches, i.e. the exchange rate between table and backbone parameters.",
-      "result": "With tables about the backbone's size, Chorus matches a plain model 1.34x its size at 16M and 1.16-1.20x its size from 107M to 349M; each added table parameter replaces at most 0.31 backbone parameters. A separate learning-rate search cuts Chorus's gain at 47M by about a third. Chorus trains slower than a plain model of its own size but faster than a plain model of the same loss.",
-      "critique": "Details come from the arXiv listing abstract only. Single author, small scale (≤349M) and a narrow, low-resource corpus of 1.34B tokens, so transfer to modern pretraining regimes is uncertain. The finding that LR tuning removes a third of the gain suggests other reported gains may also partly reflect baseline under-tuning. A useful negative-leaning calibration point rather than a strong positive result.",
-      "authors": [
-        "Szymon Kocur"
-      ],
-      "arxiv_id": "2611.34725"
-    },
-    {
-      "id": "logtopersona-log-filtering",
-      "kind": "paper",
-      "title": "LogToPersona: New Benchmark and Efficient Persona Prediction through Semantic Log Filtering",
-      "url": "https://arxiv.org/abs/2611.33510",
-      "source": "arXiv",
-      "category": "inference",
-      "on_focus": false,
-      "headline": "LogToPersona filters on-device mobile logs before prompting; up to 39% less memory, 2.5GB saved for Qwen3-4B",
-      "summary": "A day of mobile usage logs is about 30K tokens, whose KV cache alone exceeds the INT4 weights of a 4B model. The paper introduces a persona-prediction benchmark and a semantic filter that keeps only behaviourally distinct log entries before they reach the on-device LM, reducing context length rather than changing the model.",
-      "result": "Across nine models from four families the filter cuts memory footprint by up to 39% and more than halves prefill time; for Qwen3-4B it removes 2.5GB, while maintaining or improving prediction quality.",
-      "critique": "Details come from the arXiv listing abstract only. This is input pruning for one application, not a general KV-cache method, hence marked off focus. The benchmark is introduced by the same authors; no comparison with generic KV-cache compression or eviction methods is mentioned in the abstract.",
-      "authors": [
-        "Ahmed Alajrami",
-        "Ondrej Bohdal",
-        "Seokwoo Song"
-      ],
-      "arxiv_id": "2611.33510"
-    },
-    {
-      "id": "rerankers-together-cache-scorers",
-      "kind": "paper",
-      "title": "When Rerankers Work Together: Better and Faster Reranking without Joint Training",
-      "url": "https://arxiv.org/abs/2611.33844",
-      "source": "arXiv",
-      "category": "other",
-      "on_focus": false,
-      "headline": "Cache-based coarse scorers before CrossEncoder/Provence add 4.02-9.43 points on NoLiMa 32K and speed pruning 1.57-1.88x",
-      "summary": "Proposes Cache-Pointwise and Cache-Shapley, coarse relevance scorers that reuse the reader model's cached computation, placed in front of existing rerankers or context pruners (CrossEncoder, Provence) in RAG pipelines, without training the components jointly.",
-      "result": "With Gemma on NoLiMa at 32K, answer accuracy improves by 4.02-9.43 percentage points while online pruning is 1.57-1.88x faster. Cache-Pointwise fused with ColBERTv2 via reciprocal rank fusion gains 4.60 points at 1.36x speedup over ColBERTv2.",
-      "critique": "Details come from the arXiv listing abstract only. Retrieval-pipeline work, off the architecture/efficiency focus. Results centre on one long-context benchmark (NoLiMa 32K) and one reader family (Gemma); how 'Cache' scorers obtain their cache and its memory cost are not described in the abstract.",
-      "authors": [
-        "Yanqiao Chen",
-        "Dongsheng Hou",
-        "Yuhan Rui"
-      ],
-      "arxiv_id": "2611.33844"
+      "arxiv_id": "2611.34183"
     }
   ]
 }

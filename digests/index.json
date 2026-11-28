@@ -1,7 +1,15 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-11-27T09:24:54+08:00",
+  "updated_at": "2026-11-28T09:45:00+08:00",
   "digests": [
+    {
+      "date": "2026-11-28",
+      "item_count": 8,
+      "on_focus_count": 8,
+      "top_headline": "MoLT: looped Transformer passes KV memory across loops; U-MoLT claims 1.7x token efficiency vs OLMo3 at 700M on 400B tokens",
+      "json": "digests/2026-11-28.json",
+      "md": "digests/2026-11-28.md"
+    },
     {
       "date": "2026-11-27",
       "item_count": 11,
